@@ -1,0 +1,136 @@
+generated: '2026-09-14'
+method: derived
+source: openapi/aiera-rest-api-openapi.json, well-known/aiera-mcp-pub-oauth-authorization-server.json, well-known/aiera-mcp-pub-oauth-protected-resource.json, https://aiera.com/security/, https://rest.aiera.com/docs/authentication
+description: >-
+  Standards conformance asserted from what Aiera's own contracts and discovery documents declare, not
+  from marketing claims. The strongest signals are on the MCP surface (a fully specified OAuth 2.1
+  discovery stack) and in the REST data model, which speaks the capital-markets instrument-identifier
+  vocabulary natively rather than through a bespoke scheme.
+conformance:
+- id: oauth2
+  conforms: true
+  evidence: https://mcp-pub.aiera.com/.well-known/oauth-authorization-server
+  detail: >-
+    Authorization code grant with refresh tokens; token_endpoint_auth_methods_supported
+    [none, client_secret_post, client_secret_basic].
+- id: rfc8414
+  name: OAuth 2.0 Authorization Server Metadata
+  conforms: true
+  evidence: https://mcp-pub.aiera.com/.well-known/oauth-authorization-server
+  detail: Served as a 200 application/json document carrying issuer, authorization_endpoint, token_endpoint and jwks_uri.
+- id: rfc9728
+  name: OAuth 2.0 Protected Resource Metadata
+  conforms: true
+  evidence: https://mcp-pub.aiera.com/.well-known/oauth-protected-resource
+  detail: 'resource https://mcp-pub.aiera.com; authorization_servers []; scopes_supported [openid, profile, email]; bearer_methods_supported [header].'
+- id: rfc7636
+  name: PKCE
+  conforms: true
+  evidence: 'code_challenge_methods_supported: [S256] in the authorization-server metadata'
+- id: rfc7591
+  name: OAuth 2.0 Dynamic Client Registration
+  conforms: true
+  evidence: 'registration_endpoint: https://mcp-pub.aiera.com/oauth/register'
+  detail: client_id_metadata_document_supported is also true, which is what lets the Claude and ChatGPT connector directories register without a pre-issued client.
+- id: oidc
+  name: OpenID Connect
+  conforms: partial
+  evidence: 'scopes_supported: [openid, profile, email]; issuer is an Amazon Cognito user pool'
+  detail: >-
+    The three OIDC scopes are offered and the issuer is an OIDC provider, but Aiera serves no
+    /.well-known/openid-configuration on any of its own hosts — discovery for the identity layer is only
+    reachable through the Cognito issuer.
+- id: mcp
+  name: Model Context Protocol
+  conforms: true
+  evidence: 'POST https://mcp-pub.aiera.com/ {"jsonrpc":"2.0","method":"tools/list"} -> HTTP 401 with an MCP OAuth challenge'
+  detail: >-
+    The server answers JSON-RPC at the documented endpoint and implements the MCP authorization spec's
+    discovery pointer (oauth_discovery_url in the challenge body). Tool schemas could not be read
+    anonymously.
+- id: openapi
+  name: OpenAPI Specification
+  conforms: true
+  evidence: openapi/aiera-rest-api-openapi.json (3.0.3), openapi/aiera-unified-openapi.yaml (3.1.0)
+  detail: Two first-party spec families, served live and published in Aiera's own GitHub repository.
+- id: pagination
+  conforms: true
+  evidence: 'page / page_size query parameters on 15 operations; Pagination and CalendarPagination response schemas'
+  detail: Page-number pagination on REST; an opaque search_after cursor on the MCP semantic-search tools.
+- id: idempotency
+  conforms: false
+  evidence: openapi/aiera-rest-api-openapi.json - zero occurrences of any idempotency key header
+  detail: See conventions/aiera-conventions.yml (coverage - none).
+- id: rfc9457
+  name: Problem Details for HTTP APIs
+  conforms: false
+  evidence: No application/problem+json media type and no error body schema in either published spec.
+- id: rfc8594
+  name: Sunset HTTP Header
+  conforms: false
+  evidence: No Sunset or Deprecation header documented; no operation marked deprecated.
+- id: rfc5545
+  name: iCalendar
+  conforms: true
+  evidence: '/calendars/ical/user (get_calendar_ical_user) and /calendars/ical/high_priority (get_get_high_priority_calendar)'
+  detail: >-
+    Aiera publishes the corporate-event calendar as subscribable iCalendar feeds, so any standard
+    calendar client consumes it with no bespoke connector.
+domain_standards:
+- id: iso6166
+  name: ISIN (International Securities Identification Number)
+  conforms: true
+  evidence: 'openapi/aiera-rest-api-openapi.json - components.schemas.Equity.properties.isin; isin query parameter on 13 operations'
+  detail: ISIN is a first-class lookup key, not a passthrough string.
+- id: iso10383
+  name: MIC (Market Identifier Code)
+  conforms: true
+  evidence: 'openapi/aiera-rest-api-openapi.json - components.schemas.Equity.properties.mic ("Market identifier code"); exchange_mic in response payloads'
+- id: cusip
+  name: CUSIP
+  conforms: true
+  evidence: 'components.schemas.Equity.properties.cusip; cusip query parameter on 6 operations'
+- id: gics
+  name: GICS (Global Industry Classification Standard)
+  conforms: true
+  evidence: 'components.schemas.Equity.properties.sector_id ("GICS sector ID"), gics_sector, subsector_id ("GICS sub-sector ID"), gics_sub_sector; the /equities-v2/sectors operation'
+  detail: Aiera's sector taxonomy is GICS rather than a proprietary classification, so sector filters map directly onto a buyer's existing models.
+- id: permid
+  name: Refinitiv PermID
+  conforms: true
+  evidence: 'components.schemas.Equity.properties.permid; permid query parameter on 13 operations'
+- id: ric
+  name: Refinitiv Instrument Code (RIC)
+  conforms: true
+  evidence: 'components.schemas.Equity.properties.ric ("Reuters/Refinitiv RIC"); ric query parameter on 13 operations'
+- id: sec-edgar-forms
+  name: SEC EDGAR form types
+  conforms: true
+  evidence: 'find_filings form_number parameter documented with 10-K, 10-Q, 8-K; the filings-v1 surface'
+  detail: Filings are addressed by SEC form number rather than an Aiera-internal document class.
+- id: fix
+  name: FIX Protocol
+  conforms: false
+  evidence: No FIX message type, tag or session concept appears in any Aiera contract.
+  note: Expected absence - Aiera is a research-content provider, not an order-routing venue.
+- id: fdx
+  name: Financial Data Exchange
+  conforms: false
+  evidence: No FDX resource shapes; Aiera serves research content, not consumer banking data.
+  note: Expected absence, recorded so the gap is not read as an unchecked box.
+compliance:
+  certifications_published: []
+  detail: >-
+    Aiera publishes a security page at https://aiera.com/security/ describing AES-256 encryption at rest
+    and in transit, HTTPS-only user communication, AWS infrastructure, MFA-protected server access, IAM
+    access control, a daily backup policy and staff security training, and states that its "procedures
+    and protocols comply with global security standards". It names no certification or audit report —
+    no SOC 2, ISO 27001, PCI DSS, HIPAA or FedRAMP claim appears anywhere on the public site, and no
+    trust center exists at trust.aiera.com. Because no certification is named, no Compliance pointer is
+    emitted for this record.
+  security_page: https://aiera.com/security/
+  trust_center: null
+summary:
+  conforms_count: 13
+  domain_standards_count: 9
+  certifications_count: 0

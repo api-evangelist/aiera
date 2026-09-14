@@ -1,0 +1,33 @@
+generated: '2026-09-14'
+method: searched
+source: https://aiera.com/pricing, https://aiera.com/integrations/enterprise-level-apis/, https://aiera.com/demo/, https://rest.aiera.com/
+plan_count: 0
+pricing_published: false
+model: enterprise_contact_sales
+note: >-
+  Aiera publishes no plans, tiers, list prices, quotas or overage rates. https://aiera.com/pricing
+  returns HTTP 200 but serves the site homepage rather than a pricing page — a soft 404, not a pricing
+  surface. The site's only commercial call to action is "Request a Demo"
+  (https://aiera.com/demo/), and the Enterprise-Level APIs page describes the API as being for "firms
+  with dedicated development resources" with no figure attached. The REST documentation states only
+  that "you will be provided with a unique API key when you first sign up for the service", with no
+  self-serve signup for API access; dashboard.aiera.com/auth is a sign-in for existing accounts. Aiera
+  sells to buy-side and sell-side institutions under negotiated contracts, and entitlements — not plan
+  tiers — are what gate content access.
+plans: []
+evidence:
+- url: https://aiera.com/pricing
+  status: 200
+  finding: soft-404, returns the homepage body
+- url: https://aiera.com/integrations/enterprise-level-apis/
+  status: 200
+  finding: enterprise API positioning, no prices, CTA is "Request a Demo"
+- url: https://rest.aiera.com/docs/authentication
+  status: 200
+  finding: API key issued on signup; no plan or quota language
+entitlements:
+  model: >-
+    Aiera describes "centralized entitlement and access controls" governing which content a caller may
+    read. The API exposes this at /users-v1/entitlements (get_get_entitlements), so a customer can read
+    their own entitlement set programmatically even though the commercial terms are not public.
+  operation: get_get_entitlements

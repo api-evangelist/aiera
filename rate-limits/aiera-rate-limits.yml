@@ -1,0 +1,38 @@
+generated: '2026-09-14'
+method: searched
+source: https://rest.aiera.com/ (all 86 documentation pages), openapi/aiera-rest-api-openapi.json, openapi/aiera-unified-openapi.yaml
+limit_count: 0
+documented: false
+note: >-
+  Aiera documents no rate limits. A search of the served OpenAPI found zero occurrences of 429,
+  "rate limit", "ratelimit", "throttle" or "Retry-After", and no operation declares a 429 response. The
+  same search across Aiera's REST documentation pages found no limits page and no limit statements. The
+  only quantitative ceiling Aiera publishes anywhere is a pagination bound, which is not a rate limit —
+  and the two surfaces state it differently.
+limits: []
+response_headers:
+  documented: []
+  observed: []
+  note: >-
+    No X-RateLimit-*, RateLimit-* or Retry-After header is documented. None could be observed on a live
+    response either: every unauthenticated request to premium.aiera.com is answered by the API Gateway
+    with HTTP 403 before reaching the application, so no successful response was available to inspect
+    anonymously.
+exhaustion_status: null
+pagination_bounds:
+  sources:
+  - surface: MCP tool reference
+    source: https://rest.aiera.com/docs/mcp-tools
+    page_size_default: 25
+    page_size_max: 25
+  - surface: aiera-mcp Python package
+    source: https://github.com/aiera-inc/aiera-mcp (DEFAULT_PAGE_SIZE / DEFAULT_MAX_PAGE_SIZE)
+    page_size_default: 50
+    page_size_max: 100
+  note: >-
+    These two first-party sources disagree about the same ceiling, which is worth flagging on its own:
+    an agent written against the documented max of 25 will under-fetch against a server that accepts 100.
+impact: >-
+  For an agent, an undocumented limit is indistinguishable from no limit until it trips. With no 429
+  declared, no Retry-After and no published ceiling, a client has no basis for a backoff strategy other
+  than treating every non-2xx as fatal.

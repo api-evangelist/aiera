@@ -1,0 +1,35 @@
+generated: '2026-09-14'
+method: probed
+source: https://mcp-pub.aiera.com/.well-known/oauth-protected-resource, https://mcp-pub.aiera.com/.well-known/oauth-authorization-server
+note: >-
+  The only OAuth surface Aiera publishes is the hosted MCP server at mcp-pub.aiera.com, and the only
+  scopes it advertises are the three OIDC identity scopes. There is no resource-level or
+  permission-level scope vocabulary: authorization to Aiera data is carried by the account's
+  entitlements, not by OAuth scope. The REST API at premium.aiera.com is API-key authenticated and has
+  no scope surface at all.
+applies_to:
+  api: Aiera MCP Server
+  resource: https://mcp-pub.aiera.com
+  authorization_server: https://mcp-pub.aiera.com
+  issuer: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_vFMHse86f
+flows:
+  authorization_code: true
+  refresh_token: true
+  pkce: S256
+  dynamic_client_registration: https://mcp-pub.aiera.com/oauth/register
+  client_id_metadata_document_supported: true
+  token_endpoint_auth_methods: [none, client_secret_post, client_secret_basic]
+scopes:
+- name: openid
+  description: OpenID Connect - request an ID token identifying the authenticated Aiera user.
+  standard: true
+- name: profile
+  description: Standard OIDC profile claims for the authenticated Aiera user.
+  standard: true
+- name: email
+  description: Standard OIDC email claim for the authenticated Aiera user.
+  standard: true
+scope_count: 3
+authorization_model: >-
+  Entitlement-based. Aiera's marketing and API documentation both describe centralized entitlement and
+  access controls determining which content a caller may read; OAuth scope conveys identity only.

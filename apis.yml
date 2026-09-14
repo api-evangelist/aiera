@@ -1,23 +1,193 @@
 aid: aiera
 name: Aiera
-description: 'Aiera is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  Aiera is a New York-based financial research technology company that provides real-time and historical
+  intelligence on public-company events. Its platform covers earnings calls, investor days, conferences and
+  shareholder meetings with live AI transcription plus human-edited transcripts, and layers on AI-generated
+  summaries, topic and tonal-sentiment analysis, SEC filings, company-published documents, broker research,
+  expert-insight content (including Third Bridge) and financial news. Aiera exposes that corpus to buy-side and
+  sell-side institutions through an entitlement-aware REST API, a hosted remote MCP server for LLM and agentic
+  workflows, embeddable web components (AieraChat, Aieracast, EventList), and an open-source Python MCP package.
+image: https://aiera.com/wp-content/uploads/2025/09/aiera-default-feature.jpg
 url: https://raw.githubusercontent.com/api-evangelist/aiera/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-09-14'
 modified: '2026-09-14'
 tags:
-- Company
-apis: []
+- Financial Research
+- Earnings Calls
+- Transcripts
+- SEC Filings
+- Market Data
+- Financial Data
+- Broker Research
+- Expert Networks
+- Speech To Text
+- Financial Services
+- MCP
+- agent-native
+tags_raw:
+- financial-research
+- earnings-calls
+- transcripts
+- sec-filings
+- market-data
+- financial-data
+- broker-research
+- expert-networks
+- speech-to-text
+- financial-services
+- mcp
+- agent-native
+apis:
+- name: Aiera REST API
+  description: >-
+    Entitlement-aware REST API over Aiera's financial research corpus — corporate events and transcripts,
+    calendars and estimated events, equities and sectors, companies and people, SEC filings, company-published
+    documents, broker research, Third Bridge expert-access content, Transcrippets and chat sessions. Authenticated
+    with an issued API key passed in the X-API-Key header (an api_key query parameter is also accepted).
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  image: https://aiera.com/wp-content/uploads/2025/09/aiera-default-feature.jpg
+  position: Producing
+  tags:
+  - Financial Research
+  - Earnings Calls
+  - Transcripts
+  - SEC Filings
+  - Market Data
+  - Financial Data
+  properties:
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: OpenAPI
+    url: openapi/aiera-rest-api-openapi.json
+  - type: OpenAPI
+    url: openapi/aiera-unified-openapi.yaml
+  - type: OpenAPI
+    url: openapi/aiera-equity-openapi.yaml
+  - type: OpenAPI
+    url: openapi/aiera-tonal-sentiments-openapi.yaml
+  - type: OpenAPI
+    url: openapi/aiera-transcrippets-openapi.yaml
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: Overlay
+    url: overlays/aiera-rest-api-overlay.yaml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- name: Aiera MCP Server
+  description: >-
+    Aiera's hosted remote Model Context Protocol server, exposing the financial research corpus to LLMs and
+    agentic workflows as roughly three dozen specialized tools across equities and financials, indexes and
+    watchlists, events and transcripts, SEC filings, company documents, Third Bridge expert insights, broker
+    research and trusted web search. Reachable over HTTP at https://mcp-pub.aiera.com/ with an API key, or via
+    OAuth 2.1 (Amazon Cognito issuer, PKCE, dynamic client registration) as used by the Claude and ChatGPT
+    connector directories. An open-source Python package runs the same tool surface over stdio.
+  humanURL: https://rest.aiera.com/docs/mcp
+  baseURL: https://mcp-pub.aiera.com
+  image: https://aiera.com/wp-content/uploads/2025/09/aiera-default-feature.jpg
+  position: Producing
+  tags:
+  - MCP
+  - agent-native
+  - Financial Research
+  - Financial Data
+  properties:
+  - type: MCPServer
+    url: mcp/aiera-mcp.yml
+  - type: MCPServer
+    url: https://mcp-pub.aiera.com/
+  - type: ToolCrosswalk
+    url: mcp/aiera-tool-crosswalk.yml
+  - type: Documentation
+    url: https://rest.aiera.com/docs/mcp
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: OAuthScopes
+    url: scopes/aiera-scopes.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-mcp
+common:
+- type: Website
+  url: https://aiera.com/
+- type: DeveloperPortal
+  url: https://rest.aiera.com/
+- type: Documentation
+  url: https://rest.aiera.com/
+- type: APIReference
+  url: https://rest.aiera.com/docs/authentication
+- type: GettingStarted
+  url: https://rest.aiera.com/#quick-start
+- type: Support
+  url: https://support.aiera.com/hc/en-us
+- type: Blog
+  url: https://aiera.com/newsroom/
+- type: GitHubOrganization
+  url: https://github.com/aiera-inc
+- type: SignUp
+  url: https://dashboard.aiera.com/auth
+- type: Login
+  url: https://dashboard.aiera.com/auth
+- type: TermsOfService
+  url: https://aiera.com/terms-of-service/
+- type: PrivacyPolicy
+  url: https://aiera.com/privacy-policy/
+- type: StatusPage
+  url: https://status.aiera.com/
+- type: MCPServer
+  url: mcp/aiera-mcp.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: LLMsTxt
+  url: llms/aiera-llms.txt
+- type: WellKnown
+  url: well-known/aiera-well-known.yml
+- type: Authentication
+  url: authentication/aiera-authentication.yml
+- type: OAuthScopes
+  url: scopes/aiera-scopes.yml
+- type: Conventions
+  url: conventions/aiera-conventions.yml
+- type: Lifecycle
+  url: lifecycle/aiera-lifecycle.yml
+- type: Conformance
+  url: conformance/aiera-conformance.yml
+- type: DomainSecurity
+  url: security/aiera-domain-security.yml
+- type: Packages
+  url: packages/aiera-packages.yml
+- type: SDKs
+  url: packages/aiera-packages.yml
+- type: Components
+  url: components/aiera-components.yml
+- type: RateLimits
+  url: rate-limits/aiera-rate-limits.yml
+- type: Plans
+  url: plans/aiera-plans-pricing.yml
+- type: ErrorCatalog
+  url: errors/aiera-problem-types.yml
+- type: DataModel
+  url: data-model/aiera-data-model.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
-common:
-- type: Website
-  url: https://www.nasdaqprivatemarket.com/
+x-enrichment:
+  date: '2026-09-14'
+  status: enriched
+  artifacts_added: 29
+  pass: local-v3

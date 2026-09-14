@@ -1,0 +1,119 @@
+generated: '2026-09-14'
+method: searched
+source: https://rest.aiera.com/docs/authentication, https://rest.aiera.com/docs/component-aieracast, https://mcp-pub.aiera.com/.well-known/oauth-authorization-server, https://mcp-pub.aiera.com/.well-known/oauth-protected-resource, openapi/aiera-rest-api-openapi.json, openapi/aiera-unified-openapi.yaml
+docs: https://rest.aiera.com/docs/authentication
+description: >-
+  Aiera runs three distinct authentication models across three surfaces: a server-side API key on the
+  REST API, OAuth 2.1 (or a query-parameter key) on the hosted MCP server, and a separate public,
+  domain-restricted key for the browser-embedded components. Authorization to content is not carried by
+  any of them — it is carried by the account's entitlements.
+summary:
+  types: [apiKey, oauth2]
+  api_key_in: [header, query]
+  oauth_surfaces: 1
+surfaces:
+- surface: Aiera REST API
+  base_url: https://premium.aiera.com/api
+  spec_servers: https://rest-api.aiera.com/api
+  method: api_key
+  primary:
+    scheme: apiKeyHeader
+    in: header
+    parameter: X-API-Key
+  alternate:
+    scheme: apiKeyQuery
+    in: query
+    parameter: api_key
+    caution: A key in a query string is logged by proxies and gateways; prefer the header.
+  applied: 'globally - security: [{apiKeyHeader: []}] at the document root'
+  issuance: >-
+    "You will be provided with a unique API key when you first sign up for the service." There is no
+    self-serve API key issuance flow; API access is arranged with Aiera.
+  verification_endpoint: https://premium.aiera.com/api/status
+  verification_example: "curl --request GET --url 'https://premium.aiera.com/api/status' --header 'X-API-Key: REDACTED_EXAMPLE_KEY'"
+  rotation_documented: false
+  expiry_documented: false
+- surface: Aiera MCP Server
+  endpoint: https://mcp-pub.aiera.com/
+  method: oauth2
+  primary:
+    flow: authorization_code
+    pkce: S256
+    issuer: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_vFMHse86f
+    authorization_endpoint: https://mcp-pub.aiera.com/authorize
+    token_endpoint: https://mcp-pub.aiera.com/token
+    jwks_uri: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_vFMHse86f/.well-known/jwks.json
+    registration_endpoint: https://mcp-pub.aiera.com/oauth/register
+    grant_types: [authorization_code, refresh_token]
+    scopes: [openid, profile, email]
+    bearer_methods: [header]
+    token_endpoint_auth_methods: [none, client_secret_post, client_secret_basic]
+  alternate:
+    method: api_key
+    in: query
+    parameter: api_key
+    evidence: >-
+      Aiera's own OpenAI and Anthropic SDK examples pass
+      https://mcp-pub.aiera.com/?api_key=<API_KEY> as the server URL.
+  user_experience: >-
+    In the Claude and ChatGPT connector directories the user signs in with their existing Aiera
+    dashboard credentials; the connector completes the OAuth flow and dynamic client registration.
+  challenge: >-
+    An unauthenticated JSON-RPC call returns HTTP 401 with
+    {"error":"authentication_required", "oauth_discovery_url":"https://mcp-pub.aiera.com/.well-known/oauth-protected-resource"}.
+  metadata_files:
+  - well-known/aiera-mcp-pub-oauth-authorization-server.json
+  - well-known/aiera-mcp-pub-oauth-protected-resource.json
+- surface: Embedded components
+  method: public_api_key
+  parameter: authenticateApiKey(<publicApiKeyHash>)
+  constraint: >-
+    Aiera's component documentation states the public key may only be used on white-listed domains, and
+    that a deeper user-level (SSO) integration is available on request.
+  note: >-
+    This is a browser-exposed key by design and is a different credential from the server-side REST key.
+    Aiera also flags that the hideSettings option should almost always be true because settings are
+    bound to the key and therefore shared across all users of that key.
+  docs: https://rest.aiera.com/docs/component-aieracast
+- surface: aiera-mcp local package
+  method: api_key
+  env: AIERA_API_KEY
+  base_url_env: AIERA_BASE_URL
+  base_url_default: https://graphql.aiera.com/api
+  docs: https://github.com/aiera-inc/aiera-mcp
+schemes:
+- name: apiKeyHeader
+  type: apiKey
+  in: header
+  parameter: X-API-Key
+  description: Issued API key
+  sources: [openapi/aiera-rest-api-openapi.json]
+- name: apiKeyQuery
+  type: apiKey
+  in: query
+  parameter: api_key
+  description: Issued API key
+  sources: [openapi/aiera-rest-api-openapi.json]
+- name: ApiKeyAuth
+  type: apiKey
+  in: header
+  parameter: X-API-KEY
+  sources: [openapi/aiera-equity-openapi.yaml, openapi/aiera-transcrippets-openapi.yaml, openapi/aiera-unified-openapi.yaml]
+  note: Same mechanism as apiKeyHeader under a different scheme name and header casing in the GitHub-published spec family.
+- name: mcpOAuth
+  type: oauth2
+  flow: authorizationCode
+  scopes: [openid, profile, email]
+  sources: [well-known/aiera-mcp-pub-oauth-authorization-server.json]
+authorization:
+  model: entitlements
+  detail: >-
+    Aiera describes centralized entitlement and access controls governing which content a caller may
+    read. Neither the API key nor the OAuth scope set expresses content permissions — OAuth scope here
+    is identity only. A customer can read its own entitlement set via /users-v1/entitlements
+    (get_get_entitlements).
+  scopes_artifact: scopes/aiera-scopes.yml
+gaps:
+- No 401 response is declared on any REST operation despite authentication being globally required.
+- No key rotation, expiry or revocation procedure is documented.
+- No /.well-known/openid-configuration is served on any Aiera host; identity discovery resolves only through the Cognito issuer.

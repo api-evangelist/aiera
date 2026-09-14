@@ -1,0 +1,102 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the Aiera REST API
+  version: 1.0.0
+extends: ../openapi/aiera-rest-api-openapi.json
+x-generated: '2026-09-14'
+x-method: derived
+x-source: >-
+  Derived from openapi/aiera-rest-api-openapi.json (served verbatim at
+  https://premium.aiera.com/api/swagger.json) plus Aiera's own documentation at https://rest.aiera.com/.
+  This overlay records API Evangelist's enhancements only; the original specification is never mutated.
+actions:
+- target: $.info
+  description: Attach contact, documentation and licensing context that the served spec omits.
+  update:
+    contact:
+      name: Aiera Support
+      url: https://support.aiera.com/hc/en-us
+    x-provider: Aiera
+    x-docs: https://rest.aiera.com/
+    x-docs-status: >-
+      Aiera's REST documentation carries a banner stating it is being deprecated in favour of the Aiera
+      Platform at https://platform.aiera.com; no migration date is published.
+    x-source-repository: https://github.com/aiera-inc/aiera-rest-openapi
+    x-alternate-base-url: https://premium.aiera.com/api
+    x-base-url-note: >-
+      servers[] names https://rest-api.aiera.com/api while Aiera's authentication documentation
+      instructs callers to use https://premium.aiera.com/api. Both are Aiera hosts; the documented one
+      is what apis.yml records as baseURL.
+- target: $.externalDocs
+  description: Add a link to the human documentation.
+  update:
+    description: Aiera API Documentation
+    url: https://rest.aiera.com/
+- target: $.components.securitySchemes.apiKeyQuery
+  description: Flag the query-parameter key variant as the weaker of the two accepted mechanisms.
+  update:
+    x-security-note: >-
+      An API key in a query parameter is logged by proxies, gateways and browser history. Prefer the
+      X-API-Key header (apiKeyHeader). Recorded as an observation about the published contract, not a
+      finding against Aiera's implementation.
+- target: $.paths
+  description: Record cross-cutting runtime semantics that the specification does not declare.
+  update:
+    x-conventions:
+      idempotency:
+        coverage: none
+        note: No idempotency key header exists on any of the four mutating operations.
+      rate_limits:
+        documented: false
+        note: No 429 response and no rate-limit headers are declared or documented.
+      errors:
+        rfc9457: false
+        note: 400/403/404 are declared with a description only - no schema, content type or example.
+      pagination:
+        style: page_number
+        params: [page, page_size]
+        page_size_max: 25
+      symbology:
+        note: >-
+          Company selection accepts bloomberg_ticker, isin, ric, permid, cusip or ticker
+          interchangeably on most collection operations - the most consistent convention in the API.
+- target: $.paths['/transcrippets-v1/create'].post
+  description: Record the reversal path for the only creating operation in the contract.
+  update:
+    x-reversibility:
+      reversal_operation: post_delete_transcrippet
+      reversal_path: /transcrippets-v1/{transcrippet_id}/delete
+      window: null
+      grade: documented
+      note: A reversal exists; Aiera publishes no window, retention period or statement of whether deletion is soft or hard.
+- target: $.paths['/chat-v1/sessions'].post
+  description: Record the reversal path for chat session creation.
+  update:
+    x-reversibility:
+      reversal_operation: delete_chat_session_detail
+      reversal_path: /chat-v1/sessions/{session_id}
+      partial_reversal: post_chat_session_clear_sources
+      window: null
+      grade: documented
+- target: $.paths['/events-v2/request-event'].post
+  description: Flag an irreversible write surface.
+  update:
+    x-reversibility:
+      reversal_operation: null
+      grade: none
+      note: >-
+        Requesting a new event, reporting an event issue and adding connection details all reach
+        Aiera's operations team and have no documented cancel or withdraw operation.
+- target: $.tags
+  description: Record the divergence between this contract and Aiera's other published surfaces.
+  update:
+    x-surface-divergence:
+      mcp_only_capabilities: [financials, ratios, kpis_and_segments, indexes, watchlists, conferences, semantic_search, broker_research, trusted_web_search]
+      note: >-
+        Roughly two dozen capabilities Aiera exposes as MCP tools have no operation in this contract, and
+        broker research is documented on the REST docs site while being absent from both published
+        specs. See mcp/aiera-tool-crosswalk.yml.
+      second_spec_family: openapi/aiera-unified-openapi.yaml
+      second_spec_note: >-
+        Aiera's GitHub-published specs cover topics, AI summaries, corporate activity, news and monitor
+        stream matches, and share exactly one path with this contract.

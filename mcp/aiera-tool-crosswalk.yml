@@ -1,0 +1,191 @@
+generated: '2026-09-14'
+method: derived
+source: mcp/aiera-mcp.yml (tool inventory from https://rest.aiera.com/docs/mcp-tools) bound against openapi/aiera-rest-api-openapi.json and openapi/aiera-unified-openapi.yaml
+note: >-
+  Live MCP tools/list is OAuth-gated (HTTP 401 anonymously), so bindings are made by name and documented
+  semantics rather than by comparing live inputSchema to OpenAPI parameters. Confidence is set accordingly.
+  A striking finding: Aiera's MCP surface and its published OpenAPI surface are only partly overlapping
+  projections of the same corpus. Financials, ratios, KPIs and segments, indexes, watchlists, conferences
+  and all four embedding-based semantic search tools have NO operation in either published spec, while
+  chat sessions, Transcrippets, people, user admin and entitlements have no MCP tool.
+surfaces:
+  openapi:
+  - file: openapi/aiera-rest-api-openapi.json
+    served_at: https://premium.aiera.com/api/swagger.json
+    servers: https://rest-api.aiera.com/api
+    operations: 53
+    gated: false
+  - file: openapi/aiera-unified-openapi.yaml
+    served_at: https://github.com/aiera-inc/aiera-rest-openapi/blob/main/specs/unified.yaml
+    servers: https://premium.aiera.com/api
+    operations: 26
+    gated: false
+  mcp:
+    url: https://mcp-pub.aiera.com/
+    tool_count: 39
+    gated: true
+    gate: OAuth 2.1 (Cognito) or api_key query parameter
+  graphql:
+    endpoint: https://graphql.aiera.com/api
+    gated: true
+    note: >-
+      Named as the default AIERA_BASE_URL in the aiera-mcp package README. POST introspection returns
+      HTTP 405 Method Not Allowed, and Aiera publishes no GraphQL schema or GraphQL documentation; the
+      host appears to front the REST surface. Recorded as unverified, not as a GraphQL contract.
+crosswalk:
+- tool: find_equities
+  category: Equities & Market Data
+  rest: [get_get_equities, getEquities]
+  binding: direct
+  confidence: high
+- tool: get_equity_summaries
+  category: Equities & Market Data
+  rest: [get_get_equity_summaries, get_get_equity_summary]
+  binding: direct
+  confidence: high
+- tool: get_sectors_and_subsectors
+  category: Equities & Market Data
+  rest: [get_get_sectors]
+  binding: direct
+  confidence: high
+- tool: find_events
+  category: Events
+  rest: [get_get_events, getEvents]
+  binding: direct
+  confidence: high
+- tool: get_event
+  category: Events
+  rest: [get_get_event, get_get_event_transcripts, getEvent]
+  binding: composite
+  confidence: high
+  note: The tool returns event metadata plus transcript content, which REST splits across two operations.
+- tool: get_upcoming_events
+  category: Events
+  rest: [get_get_calendar, get_get_event_estimates, getCalendar]
+  binding: composite
+  confidence: medium
+  note: Confirmed plus estimated upcoming events; REST serves these from the calendar and calendar/estimated operations.
+- tool: find_filings
+  category: Filings
+  rest: [get_get_filings, getFilings]
+  binding: direct
+  confidence: high
+- tool: get_filing
+  category: Filings
+  rest: [get_get_filing, get_get_filing_json, get_get_filing_text]
+  binding: composite
+  confidence: high
+- tool: find_company_docs
+  category: Company Documents
+  rest: [get_get_docs]
+  binding: direct
+  confidence: high
+- tool: get_company_doc
+  category: Company Documents
+  rest: [get_get_doc, get_get_doc_text]
+  binding: composite
+  confidence: high
+  note: The tool is documented as returning raw text, which maps to the /text variant.
+- tool: get_company_doc_categories
+  category: Company Documents
+  rest: [get_doc_categories]
+  binding: direct
+  confidence: high
+- tool: get_company_doc_keywords
+  category: Company Documents
+  rest: [get_doc_keywords]
+  binding: direct
+  confidence: high
+- tool: find_third_bridge_events
+  category: Expert Access
+  rest: [get_get_provider_events]
+  binding: direct
+  confidence: medium
+  note: REST parameterizes the provider in the path (/expert-access-v1/{provider}/); the tool pins it to Third Bridge.
+- tool: get_third_bridge_event
+  category: Expert Access
+  rest: [get_get_provider_event]
+  binding: direct
+  confidence: medium
+mcp_only:
+- tool: get_financials
+  reason: No income-statement / balance-sheet / cash-flow operation exists in either published OpenAPI.
+- tool: get_ratios
+  reason: No ratio-metrics operation exists in either published OpenAPI.
+- tool: get_kpis_and_segments
+  reason: No KPI or segment-metrics operation exists in either published OpenAPI.
+- tool: get_available_indexes
+  reason: No index operation exists in either published OpenAPI.
+- tool: get_index_constituents
+  reason: No index-constituents operation exists in either published OpenAPI.
+- tool: get_available_watchlists
+  reason: No watchlist operation exists in either published OpenAPI (watchlist_id appears only as a filter parameter).
+- tool: get_watchlist_constituents
+  reason: No watchlist-constituents operation exists in either published OpenAPI.
+- tool: find_conferences
+  reason: No conference operation exists in either published OpenAPI (conference_id appears only as a filter parameter).
+- tool: search_transcripts
+  reason: Embedding-based semantic search over transcripts has no REST counterpart in any published spec.
+- tool: search_filings
+  reason: Embedding-based semantic search over filings has no REST counterpart in any published spec.
+- tool: search_company_docs
+  reason: Embedding-based semantic search over company documents has no REST counterpart in any published spec.
+- tool: search_thirdbridge
+  reason: Embedding-based semantic search over Third Bridge transcripts has no REST counterpart in any published spec.
+- tool: find_research
+  reason: Broker research is documented at https://rest.aiera.com/docs/find-research but is absent from both published OpenAPI specs.
+- tool: get_research
+  reason: Documented REST operation (docs/get-research) absent from both published OpenAPI specs.
+- tool: search_research
+  reason: Documented REST operation (docs/search-research) absent from both published OpenAPI specs.
+- tool: get_research_providers
+  reason: Documented REST operation (docs/get-research-providers) absent from both published OpenAPI specs.
+- tool: get_research_authors
+  reason: Documented REST operation (docs/get-research-authors) absent from both published OpenAPI specs.
+- tool: get_research_asset_classes
+  reason: Documented REST operation (docs/get-research-asset-classes) absent from both published OpenAPI specs.
+- tool: get_research_asset_types
+  reason: Documented REST operation (docs/get-research-asset-types) absent from both published OpenAPI specs.
+- tool: get_research_subjects
+  reason: Documented REST operation (docs/get-research-subjects) absent from both published OpenAPI specs.
+- tool: get_research_product_focuses
+  reason: Documented REST operation (docs/get-research-product-focus) absent from both published OpenAPI specs.
+- tool: get_research_discipline_types
+  reason: Documented REST operation (docs/get-research-discipline-types) absent from both published OpenAPI specs.
+- tool: get_research_region_types
+  reason: Documented REST operation (docs/get-research-region-types) absent from both published OpenAPI specs.
+- tool: get_research_country_codes
+  reason: Documented REST operation (docs/get-research-country-codes) absent from both published OpenAPI specs.
+- tool: trusted_web_search
+  reason: Domain-restricted web search is an MCP-native capability with no Aiera REST operation.
+rest_only:
+- operations: [get_chat_sessions, post_chat_sessions, get_chat_session_detail, patch_chat_session_detail, delete_chat_session_detail, post_chat_session_prompt, post_chat_session_clear_sources]
+  reason: The Chat v1 session surface has no MCP tool; an MCP client is expected to be the LLM, not to drive Aiera's own chat.
+- operations: [get_get_transcrippets, post_create_transcrippet, post_delete_transcrippet]
+  reason: Transcrippet creation and deletion (the only write surface in the spec) is not exposed as an MCP tool.
+- operations: [get_get_people, get_get_person, getPerson]
+  reason: People lookup has REST operations and a docs page but no MCP tool.
+- operations: [get_list_users, get_get_entitlements]
+  reason: Account administration and entitlement introspection are not exposed to agents.
+- operations: [get_get_companies, get_get_company]
+  reason: Company lookup is REST-only; the MCP surface is equity-centric (bloomberg_ticker keyed).
+- operations: [get_get_calendar_entry, get_equities_covered, get_get_high_priority_calendar, get_calendar_ical_user]
+  reason: Calendar entry detail, coverage counts and the two iCal feeds have no MCP tool.
+- operations: [get_get_event_transcript, get_get_event_transcripts_html, get_get_event_transcripts_pdf, get_get_event_transcripts_text]
+  reason: Transcript item detail and the HTML/PDF/text download renditions have no MCP tool.
+- operations: [post_add_connection_details, post_report_event_issue, post_request_new_event]
+  reason: Event operations write-back (connection details, issue reports, event requests) is not agent-exposed.
+- operations: [get_get_doc_coverage, get_get_doc_pdf, get_get_filing_pdf, get_get_filing_datafile, get_get_status]
+  reason: Binary renditions, coverage endpoints and the expert-access status check have no MCP tool.
+- operations: [getTopics, getTopicsAndEquitiesCount, getTopicsAndEventCount, getEventSummaries, getEventSummary, getEventSummaryByType, getCorporateActivity, getCorporateActivityCoverage, getCorporateActivityById, getCorporateActivityAuditDetails, getNews, getMatch, getEventTranscripts, getCalendarCoverage, getCalendarById]
+  reason: >-
+    The unified.yaml surface (topics, AI summaries, corporate activity, news, monitor/dashboard stream
+    matches, CSV transcript export) is entirely absent from the MCP tool set.
+coverage:
+  mcp_tools: 39
+  mcp_tools_bound: 14
+  mcp_only: 25
+  openapi_operations: 79
+  openapi_operations_bound: 26
+  rest_only: 53
+  overlap_ratio: 0.36

@@ -1,0 +1,1 @@
+{"resource":"https://mcp-pub.aiera.com","authorization_servers":["https://mcp-pub.aiera.com"],"scopes_supported":["openid","profile","email"],"bearer_methods_supported":["header"]}

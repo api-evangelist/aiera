@@ -1,0 +1,209 @@
+generated: '2026-09-14'
+method: probed
+source: anonymous HTTPS probes of the named /.well-known/ path list on every host in this record
+note: >-
+  Only mcp-pub.aiera.com serves real /.well-known/ documents — the OAuth 2.0 authorization-server and
+  protected-resource metadata backing the hosted MCP server's OAuth flow. docs.aiera.com is a Next.js
+  single-page app whose catch-all answers HTTP 200 with the same 30,400-byte HTML shell for every
+  /.well-known/ path probed; those are recorded as 200-html, not as served documents. No security.txt,
+  api-catalog, ai-plugin.json or agent card was found on any Aiera host.
+hosts:
+- host: aiera.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: www.aiera.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: rest.aiera.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: premium.aiera.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 403
+  - path: /.well-known/openid-configuration
+    status: 403
+  - path: /.well-known/oauth-authorization-server
+    status: 403
+  - path: /.well-known/oauth-protected-resource
+    status: 403
+  - path: /.well-known/api-catalog
+    status: 403
+  - path: /.well-known/ai-plugin.json
+    status: 403
+  - path: /.well-known/agent-card.json
+    status: 403
+  - path: /.well-known/agent.json
+    status: 403
+- host: rest-api.aiera.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 403
+  - path: /.well-known/oauth-authorization-server
+    status: 403
+  - path: /.well-known/oauth-protected-resource
+    status: 403
+  - path: /.well-known/api-catalog
+    status: 403
+  - path: /.well-known/agent-card.json
+    status: 403
+  - path: /.well-known/agent.json
+    status: 403
+- host: api.aiera.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: mcp-pub.aiera.com
+  documents:
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    file: aiera-mcp-pub-oauth-authorization-server.json
+    content_type: application/json
+    note: >-
+      RFC 8414 authorization-server metadata. issuer is an Amazon Cognito user pool
+      (us-east-1_vFMHse86f); authorize/token/register endpoints are proxied on mcp-pub.aiera.com.
+      Advertises PKCE S256 and RFC 7591 dynamic client registration.
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    file: aiera-mcp-pub-oauth-protected-resource.json
+    content_type: application/json
+    note: >-
+      RFC 9728 protected-resource metadata. resource https://mcp-pub.aiera.com,
+      scopes_supported [openid, profile, email], bearer_methods_supported [header].
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: graphql.aiera.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: docs.aiera.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    note: 200-html - SPA catch-all shell, not a document. Treated as a miss.
+  - path: /.well-known/openid-configuration
+    status: 200
+    note: 200-html - SPA catch-all shell, not a document. Treated as a miss.
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    note: 200-html - SPA catch-all shell, not a document. Treated as a miss.
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    note: 200-html - SPA catch-all shell, not a document. Treated as a miss.
+  - path: /.well-known/api-catalog
+    status: 200
+    note: 200-html - SPA catch-all shell, not a document. Treated as a miss.
+  - path: /.well-known/ai-plugin.json
+    status: 200
+    note: 200-html - SPA catch-all shell, not a document. Treated as a miss.
+  - path: /.well-known/agent-card.json
+    status: 200
+    note: 200-html - SPA catch-all shell, not a document. Treated as a miss.
+  - path: /.well-known/agent.json
+    status: 200
+    note: 200-html - SPA catch-all shell, not a document. Treated as a miss.
+- host: platform.aiera.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: public.aiera.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 403
+  - path: /.well-known/api-catalog
+    status: 403
+  - path: /.well-known/agent-card.json
+    status: 403
+  - path: /.well-known/agent.json
+    status: 403
+summary:
+  hosts_probed: 11
+  documents_served: 2
+  security_txt: false
+  api_catalog: false
+  agent_card: false

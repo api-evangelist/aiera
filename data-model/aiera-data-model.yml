@@ -1,0 +1,215 @@
+generated: '2026-09-14'
+method: derived
+source: openapi/aiera-rest-api-openapi.json ($ref graph and *_id reference fields across 104 component schemas), openapi/aiera-unified-openapi.yaml, https://rest.aiera.com/docs/dictionary-event
+description: >-
+  Aiera's object graph has two roots that meet at the Event. One is the securities master — Company,
+  Equity, Sector/Subsector — keyed on industry-standard symbology (ISIN, CUSIP, RIC, PermID, Bloomberg
+  ticker, MIC) and classified with GICS. The other is content — Event, Transcript, Filing,
+  CompanyDocument, Research — each of which hangs off a company or equity. The AI-derived layer
+  (Summary, Topic, Sentiment, Linguistics) attaches to the Event rather than existing independently.
+identifier_style:
+  primary_keys: integer surrogate ids (event_id, equity_id, company_id, person_id, filing_id, topic_id, transcript_item_id, speaker_id)
+  prefixed_ids: false
+  note: >-
+    Aiera uses bare integers, not prefixed opaque ids, so an id carries no type information. An agent
+    holding the number 12345 cannot tell whether it is an event, an equity or a filing without
+    remembering where it came from. The external symbology fields (isin, cusip, ric, permid,
+    bloomberg_ticker) are the type-safe keys, and they are the ones the API is designed around.
+entities:
+- name: Company
+  key: company_id
+  description: An issuer. Carries name, urls (CompanyURL) and descriptive metadata.
+  operations: [get_get_companies, get_get_company]
+- name: Equity
+  key: equity_id
+  description: A listed security for a company, keyed additionally by ticker, local_ticker, mic, bloomberg_ticker, isin, permid, ric and cusip, and classified by GICS sector/subsector.
+  operations: [get_get_equities, get_get_equity, get_get_equity_summaries, get_get_equity_summary, getEquities]
+- name: Sector
+  key: sector_id
+  description: GICS sector, with Subsector as its child classification.
+  operations: [get_get_sectors]
+- name: Event
+  key: event_id
+  description: >-
+    The central object — an earnings call, presentation, investor meeting, shareholder meeting or
+    conference appearance. Composite by design, embedding transcripts, tags, connection detail,
+    hierarchy, grouping, linguistics, price data and company metadata.
+  operations: [get_get_events, get_get_event, getEvents, getEvent]
+- name: Transcript
+  key: transcript_item_id
+  description: One utterance within an event transcript, with speaker_id, timing and optional word offsets.
+  operations: [get_get_event_transcripts, get_get_event_transcript]
+- name: TranscriptSpeaker
+  key: speaker_id
+  description: The speaker on a transcript item, resolved to a Person and to a Firm where known.
+- name: Person
+  key: person_id
+  description: An executive or analyst, with representations (speaker identities) and the events they spoke at.
+  operations: [get_get_people, get_get_person, getPerson]
+- name: Firm
+  description: The employer attributed to a transcript speaker - the mechanism by which sell-side analyst questions are attributed to a bank.
+- name: CalendarEvent
+  key: event_id
+  description: A scheduled or estimated future event; EstimateItem carries the predicted date and EstimateActual the settled one.
+  operations: [get_get_calendar, get_get_calendar_entry, get_get_event_estimates]
+- name: Filing
+  key: filing_id
+  description: An SEC filing addressed by EDGAR form number, with FilingEquity and FilingDatafile children and PDF/text/JSON renditions.
+  operations: [get_get_filings, get_get_filing, get_get_filing_json, get_get_filing_pdf, get_get_filing_text, get_get_filing_datafile]
+- name: CompanyDocument
+  key: doc_id
+  description: A company-published document (press release, annual report, earnings release, slide presentation), categorised and keyword-tagged.
+  operations: [get_get_docs, get_get_doc, get_get_doc_text, get_get_doc_pdf, get_doc_categories, get_doc_keywords, get_doc_coverage]
+- name: Summary
+  description: AI-generated summary of an event, retrievable by event and by summary type.
+  operations: [getEventSummaries, getEventSummary, getEventSummaryByType]
+- name: Topic
+  key: topic_id
+  description: A topic extracted across the corpus, joinable to both equities and events.
+  operations: [getTopics, getTopicsAndEquitiesCount, getTopicsAndEventCount]
+- name: Sentiment
+  description: Tonal sentiment for an event, with SentimentBreakout detail and a CSV export path.
+- name: Linguistics
+  description: Linguistic measures attached to an event transcript.
+- name: PriceData
+  description: Price movement around an event, with SegmentPrice detail per transcript segment.
+- name: Transcrippet
+  key: transcrippet_id
+  description: A shareable clip of a transcript. The only user-created object in the API.
+  operations: [get_get_transcrippets, post_create_transcrippet, post_delete_transcrippet]
+- name: ChatSession
+  key: session_id
+  description: A conversation over the corpus, accumulating sources that can be cleared.
+  operations: [get_chat_sessions, post_chat_sessions, get_chat_session_detail, patch_chat_session_detail, delete_chat_session_detail, post_chat_session_prompt, post_chat_session_clear_sources]
+- name: CorporateActivity
+  key: corporate_activity_id
+  description: Corporate actions and activity, with coverage and audit-trail sub-resources (unified.yaml surface only).
+  operations: [getCorporateActivity, getCorporateActivityById, getCorporateActivityCoverage, getCorporateActivityAuditDetails]
+relationships:
+- from: Equity
+  to: Company
+  type: belongs_to
+  via: company_id
+  evidence: components.schemas.Equity.properties.company_id and company_metadata ($ref Company)
+- from: Equity
+  to: Sector
+  type: belongs_to
+  via: sector_id
+  evidence: components.schemas.Equity.properties.sector_id (GICS sector ID)
+- from: Subsector
+  to: Sector
+  type: belongs_to
+  via: sector_id
+- from: Event
+  to: Company
+  type: belongs_to
+  via: company_id
+- from: Event
+  to: Equity
+  type: belongs_to
+  via: equity_id
+- from: Event
+  to: Transcript
+  type: has_many
+  via: transcripts ($ref Transcript)
+- from: Event
+  to: EventTag
+  type: has_many
+  via: event_tags
+- from: Event
+  to: Linguistics
+  type: has_one
+  via: linguistics
+- from: Event
+  to: PriceData
+  type: has_one
+  via: price_data
+- from: Event
+  to: ConnectionDetail
+  type: has_one
+  via: connection_detail
+- from: Event
+  to: Hierarchy
+  type: has_one
+  via: hierarchy
+- from: Event
+  to: Grouping
+  type: has_one
+  via: grouping
+- from: Event
+  to: CalendarEvent
+  type: has_one
+  via: estimate_id
+  note: Links a realised event back to the estimate that predicted it.
+- from: Transcript
+  to: Event
+  type: belongs_to
+  via: event_id
+- from: Transcript
+  to: TranscriptSpeaker
+  type: belongs_to
+  via: speaker_id
+- from: TranscriptSpeaker
+  to: Person
+  type: belongs_to
+  via: person representation
+- from: TranscriptSpeaker
+  to: Firm
+  type: belongs_to
+  via: firm ($ref Firm)
+- from: Person
+  to: TranscriptSpeaker
+  type: has_many
+  via: representations
+- from: Person
+  to: BasicEvent
+  type: has_many
+  via: events
+- from: Person
+  to: Person
+  type: belongs_to
+  via: parent_id
+  note: Self-reference used to fold duplicate person records into a canonical one.
+- from: Company
+  to: CompanyURL
+  type: has_many
+  via: urls
+- from: Filing
+  to: FilingEquity
+  type: has_one
+  via: equity
+- from: Filing
+  to: FilingDatafile
+  type: has_many
+  via: datafiles
+- from: Summary
+  to: Event
+  type: belongs_to
+  via: event_id
+- from: Sentiment
+  to: SentimentBreakout
+  type: has_many
+- from: PriceData
+  to: SegmentPrice
+  type: has_many
+- from: Topic
+  to: Equity
+  type: has_many
+  via: /topics/{topic_id}/equities
+- from: Topic
+  to: Event
+  type: has_many
+  via: /topics/{topic_id}/events
+- from: Transcrippet
+  to: Transcript
+  type: belongs_to
+  via: transcript item selection
+- from: CalendarEvent
+  to: CalendarEquity
+  type: belongs_to
+summary:
+  schema_count: 104
+  entities_documented: 19
+  relationships: 30
+  root_entity: Event
+  dictionary_docs: https://rest.aiera.com/docs/dictionary-event

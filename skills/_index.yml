@@ -1,0 +1,30 @@
+generated: '2026-09-14'
+method: generated
+source: openapi/aiera-rest-api-openapi.json, mcp/aiera-mcp.yml, https://rest.aiera.com/
+description: >-
+  Packaged Agent Skills for Aiera's published surfaces. Every operationId referenced in these skills
+  was read out of the served OpenAPI at https://premium.aiera.com/api/swagger.json; no operation is
+  invented. Aiera publishes no skills or AGENTS.md of its own, so these are generated.
+provider_published: false
+skills:
+- name: aiera-earnings-call-research
+  file: aiera-earnings-call-research.md
+  api: Aiera REST API
+  description: Resolve a company by symbology, find its most recent earnings call, and pull the transcript with speaker and firm attribution.
+  operations: [get_get_equities, get_get_events, get_get_event, get_get_event_transcripts, get_get_event_transcripts_text]
+- name: aiera-sec-filings-and-documents
+  file: aiera-sec-filings-and-documents.md
+  api: Aiera REST API
+  description: Retrieve SEC filings by EDGAR form number and company-published documents, including the category/keyword vocabulary and the text/PDF renditions.
+  operations: [get_get_filings, get_get_filing, get_get_filing_text, get_get_filing_json, get_get_filing_datafile, get_get_docs, get_get_doc, get_get_doc_text, get_doc_categories, get_doc_keywords]
+- name: aiera-event-calendar-monitoring
+  file: aiera-event-calendar-monitoring.md
+  api: Aiera REST API
+  description: Track confirmed and estimated upcoming events, sync incrementally with modified_since, and subscribe to the iCal feeds.
+  operations: [get_get_calendar, get_get_calendar_entry, get_get_event_estimates, get_equities_covered, get_calendar_ical_user, get_get_high_priority_calendar, get_get_events]
+- name: aiera-mcp-agent-access
+  file: aiera-mcp-agent-access.md
+  api: Aiera MCP Server
+  description: Connect an agent over OAuth or an api_key query parameter, and know which capabilities are MCP-only versus REST-only.
+  operations: [tools/list]
+skill_count: 4

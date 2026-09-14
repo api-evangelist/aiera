@@ -1,0 +1,51 @@
+generated: '2026-09-14'
+method: searched
+source: https://rest.aiera.com/docs/component-aierachat, https://rest.aiera.com/docs/component-aieracast, https://rest.aiera.com/docs/component-eventlist, https://aiera.com/integrations/custom-components/
+description: >-
+  Aiera ships embeddable, iframe-hosted UI components that reproduce parts of the Aiera product inside a
+  host application. They are distinct from the REST SDK: a loader script is added to the page, an iframe
+  is placed where the component should render, and an Aiera.Module instance is pointed at the component's
+  hosted URL, authenticated with a public API key restricted to white-listed domains.
+loader:
+  script: https://public.aiera.com/aiera-sdk/0.0.81/embed.js
+  global: Aiera.Module
+  constructor: new Aiera.Module('<component url>', '<YOUR-IFRAME-ID>')
+  version_pinned: true
+  version: 0.0.81
+  source_code: https://github.com/aiera-inc/aiera-client-sdk
+authentication:
+  method: public_api_key
+  call: 'module.load().then(() => module.authenticateApiKey("<publicApiKeyHash>"))'
+  event: authenticated
+  constraint: >-
+    Aiera's documentation states the public API key must only be used on white-listed domains. A
+    separate deeper SSO / user-level integration is available on request.
+families:
+- name: Aieracast
+  url: https://public.aiera.com/aiera-sdk/0.0.81/modules/Aieracast/index.html
+  docs: https://rest.aiera.com/docs/component-aieracast
+  description: Replicates Aiera's Aieracast multi-event listening and transcript experience in component form.
+  configuration:
+    top_level: [hideSettings, overrides, tracking, options]
+    options: [darkMode, relativeTimestamps, eventListView, eventListFilters, showSentiment]
+    event_list_view_values: [tabs, combined]
+    event_list_filters: [transcripts, earningsOnly]
+- name: AieraChat
+  docs: https://rest.aiera.com/docs/component-aierachat
+  description: Embeds Aiera's chat experience over the financial research corpus.
+- name: EventList
+  docs: https://rest.aiera.com/docs/component-eventlist
+  demo: https://aiera-inc.github.io/aiera-client-sdk/demo/EventList.html
+  description: Embeds a filterable list of corporate events with access to live and historical transcripts.
+styling:
+  mechanism: overrides.style
+  note: A CSS stylesheet string passed through configure() overrides Aiera's named classes and Tailwind utility classes.
+tracking:
+  mechanism: tracking.userId
+  note: >-
+    Aiera asks integrators to pass an anonymized userId so unique-user engagement can be counted for
+    reporting and billing.
+additional_demos:
+- https://aiera-inc.github.io/aiera-client-sdk/demo/NewsList.html
+- https://aiera-inc.github.io/aiera-client-sdk/demo/RecordingList.html
+sdk_documentation: https://aiera-inc.github.io/aiera-client-sdk/docs/index.html

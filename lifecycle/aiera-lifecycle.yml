@@ -1,0 +1,75 @@
+generated: '2026-09-14'
+method: searched
+source: https://status.aiera.com/, https://rest.aiera.com/, https://github.com/aiera-inc/aiera-mcp, openapi/aiera-rest-api-openapi.json
+description: >-
+  Aiera runs a public status page and versions its API by resource path, but publishes no deprecation
+  policy, no changelog and no SLA. The clearest lifecycle signal it does publish is a banner on its own
+  REST documentation announcing that those docs are being deprecated in favour of a new platform site.
+status_page:
+  url: https://status.aiera.com/
+  http_status: 200
+  provider_hosted: true
+  components:
+  - name: V3 APIs and UIs
+    state: Operational
+  - name: app.aiera.com
+    uptime_90d: 100%
+    state: Operational
+  history: Per-day operational history is published for a rolling ~90-day window.
+  incidents_section: true
+  maintenance_section: true
+  observed: '2026-09-14'
+versioning:
+  style: path_segment
+  detail: >-
+    Versions are per-resource and coexist rather than applying to the API as a whole — events-v2,
+    equities-v2 and calendar-v2 sit alongside filings-v1, people-v1, chat-v1, company-docs-v1,
+    companies-v1, expert-access-v1, transcrippets-v1, users-v1 and user-admin-v1. The status page names
+    the current generation "V3 APIs and UIs", a label that does not appear in any path or spec.
+  info_version: '1.0'
+  version_header: null
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  deprecated_operations: []
+  detail: >-
+    No operation in either published spec carries deprecated: true, and the specs contain no occurrence
+    of "deprecated" or "sunset". Aiera publishes no deprecation policy, no notice period and no
+    migration guarantee.
+  observed_deprecations:
+  - subject: REST API documentation site
+    signal: >-
+      Every page of https://rest.aiera.com/ carries the banner "These documents are being deprecated and
+      replaced by the Aiera Platform", linking to https://platform.aiera.com.
+    replacement: https://platform.aiera.com (docs served at https://docs.aiera.com/)
+    date_announced: null
+    sunset_date: null
+    note: >-
+      No date is given and no mapping from the old docs to the new site is published. The replacement
+      docs host is a client-rendered single-page app that serves the same HTML shell for every path,
+      so its content could not be read without a browser — meaning the successor to the surface being
+      deprecated is currently less machine-readable than the surface it replaces.
+  - subject: aiera-mcp Python package
+    signal: 'Repository README: "This project is experimental and could be subject to breaking changes."'
+    source: https://github.com/aiera-inc/aiera-mcp
+changelog:
+  published: false
+  detail: No dated changelog, release-notes page or versioning announcement was found on aiera.com, rest.aiera.com or docs.aiera.com.
+sla:
+  published: false
+  detail: >-
+    No uptime commitment, support-response target or credit schedule is published. Aiera sells
+    enterprise API access through a demo request, so SLA terms are presumably contractual.
+support:
+  channel: https://support.aiera.com/hc/en-us
+  note: Zendesk help center; returns HTTP 403 to non-browser clients (bot challenge), not a dead link.
+  request_form: https://support.aiera.com/hc/en-us/requests/new
+  in_api_feedback:
+  - post_report_event_issue
+  - post_request_new_event
+  - post_add_connection_details
+terms:
+  terms_of_service: https://aiera.com/terms-of-service/
+  privacy_policy: https://aiera.com/privacy-policy/

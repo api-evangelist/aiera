@@ -64,5 +64,45 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Aiera is a company surfaced via the API Evangelist harvest backlog (source: secondary-market) and added to the network as a stub for full-pipeline profiling.
-- https://www.nasdaqprivatemarket.com/
+Aiera is a financial research technology company providing real-time and historical intelligence on
+public-company events. Its platform covers earnings calls, investor days, conferences and shareholder
+meetings with live AI transcription plus human-edited transcripts, layered with AI-generated summaries,
+topic and tonal-sentiment analysis, SEC filings, company-published documents, broker research,
+expert-insight content (including Third Bridge) and financial news.
+
+## API surface
+
+| Surface | Where | Auth |
+|---|---|---|
+| Aiera REST API | `https://premium.aiera.com/api` — docs at https://rest.aiera.com/ | `X-API-Key` header (or `api_key` query) |
+| Aiera MCP Server | `https://mcp-pub.aiera.com/` | OAuth 2.1 (Cognito, PKCE, dynamic client registration) or `api_key` query |
+| Embedded components | `https://public.aiera.com/aiera-sdk/0.0.81/` | public, domain-white-listed API key |
+
+## Contracts captured
+
+- `openapi/aiera-rest-api-openapi.json` — OpenAPI 3.0.3, 50 paths / 53 operations, served live at
+  `https://premium.aiera.com/api/swagger.json`.
+- `openapi/aiera-unified-openapi.yaml` and three companions — OpenAPI 3.1.0, published by Aiera at
+  https://github.com/aiera-inc/aiera-rest-openapi.
+
+The two spec families share exactly one path. Together they describe 78 distinct paths.
+
+## Notable findings
+
+- **The MCP surface and the REST contract are only partly overlapping projections of the same corpus.**
+  25 of Aiera's 39 MCP tools have no operation in either published spec — financials, ratios, KPIs and
+  segments, indexes, watchlists, conferences, all four embedding-based semantic search tools, and the
+  entire broker-research family. See `mcp/aiera-tool-crosswalk.yml`.
+- **The data model speaks capital-markets standards natively** — ISIN (ISO 6166), MIC (ISO 10383),
+  CUSIP, GICS, PermID and RIC are first-class lookup keys, and SEC filings are addressed by EDGAR form
+  number. See `conformance/aiera-conformance.yml`.
+- **The MCP server publishes a complete OAuth 2.1 discovery stack** (RFC 8414 + RFC 9728 + PKCE +
+  RFC 7591 dynamic client registration), which is what lets the Claude and ChatGPT connector
+  directories register against it.
+- **Gaps:** no idempotency mechanism on any of the four mutating operations, no published rate limits
+  or 429, no declared error body schema, no deprecation policy, no changelog, and no published pricing.
+- Aiera's REST documentation carries a banner announcing it is being deprecated in favour of
+  https://platform.aiera.com, with no date and no migration mapping. The replacement docs host is a
+  client-rendered SPA that serves the same HTML shell for every path.
+
+- https://aiera.com/

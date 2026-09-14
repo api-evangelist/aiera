@@ -1,0 +1,148 @@
+generated: '2026-09-14'
+method: derived
+source: openapi/aiera-rest-api-openapi.json, openapi/aiera-unified-openapi.yaml, https://rest.aiera.com/docs/authentication, https://rest.aiera.com/docs/find-events
+description: >-
+  Cross-cutting runtime semantics for the Aiera REST API, derived from the served OpenAPI and confirmed
+  against Aiera's own documentation. Aiera is a read-heavy research API: 49 of its 53 published
+  operations are GETs, and the conventions below reflect that shape.
+authentication:
+  style: api_key
+  header: X-API-Key
+  alternate: api_key query parameter
+  base_url: https://premium.aiera.com/api
+  spec_servers: https://rest-api.aiera.com/api
+  applied_globally: true
+  test_endpoint: https://premium.aiera.com/api/status
+  docs: https://rest.aiera.com/docs/authentication
+  detail: authentication/aiera-authentication.yml
+idempotency:
+  coverage: none
+  mechanism: null
+  header: null
+  scope: []
+  detail: >-
+    Aiera documents no idempotency mechanism and the served OpenAPI contains no occurrence of
+    "Idempotency-Key", "idempotency" or any equivalent replay-protection header. Four of 53 published
+    operations mutate state (create/delete a Transcrippet, create/update/delete a chat session, send a
+    chat prompt, and the three events-v2 write-backs), none of which accept a client-supplied
+    idempotency key. An agent that retries a POST to /transcrippets-v1/create or
+    /events-v2/request-event after a timeout has no way to avoid creating a duplicate.
+  evidence: openapi/aiera-rest-api-openapi.json (zero matches for /idempoten/i)
+reversibility:
+  grade: documented
+  overall: >-
+    One of the three write surfaces has an explicit reversal operation with a matching operationId. No
+    reversal window is stated anywhere in Aiera's documentation, so this grades as documented rather
+    than verified.
+  write_surfaces:
+  - surface: Transcrippets
+    create: post_create_transcrippet
+    reversal: post_delete_transcrippet
+    reversal_path: /transcrippets-v1/{transcrippet_id}/delete
+    window: null
+    window_source: null
+    note: >-
+      A created Transcrippet can be deleted by id. Aiera publishes no statement of how long deletion
+      remains possible, whether deletion is soft or hard, or whether a shared Transcrippet URL keeps
+      resolving after deletion.
+  - surface: Chat sessions
+    create: post_chat_sessions
+    reversal: delete_chat_session_detail
+    reversal_path: /chat-v1/sessions/{session_id}
+    window: null
+    window_source: null
+    note: >-
+      Sessions can be deleted, and post_chat_session_clear_sources clears a session's accumulated
+      sources without deleting it. Prompts already sent (post_chat_session_prompt) have no individual
+      reversal.
+  - surface: Event write-backs
+    create: [post_add_connection_details, post_report_event_issue, post_request_new_event]
+    reversal: null
+    window: null
+    note: >-
+      Submitting connection details, reporting an event issue, or requesting a new event has no
+      documented cancel, withdraw or delete operation. These reach Aiera's operations team, so an agent
+      that fires one cannot take it back through the API.
+  read_only_majority: >-
+    49 of 53 published operations are GETs against research content and carry no reversibility question.
+pagination:
+  style: page_number
+  params:
+  - name: page
+    description: 1-indexed page number.
+    default: 1
+  - name: page_size
+    description: Items per page.
+    default: 25
+    maximum: 25
+    note: >-
+      The MCP tool reference states page_size default 25, max 25 for the catalog-style tools, while the
+      aiera-mcp package defaults to 50 with a 100 maximum (DEFAULT_PAGE_SIZE / DEFAULT_MAX_PAGE_SIZE).
+      The two surfaces do not agree.
+  response_field: pagination
+  response_schema: Pagination (also CalendarPagination for the calendar-v2 surface)
+  cursor_variant:
+    used_by: the four MCP semantic-search tools
+    param: search_after
+    note: Embedding-based search paginates with an opaque search_after cursor from the prior response, not with page numbers.
+  applied_to: 15 of 53 published operations declare page and page_size.
+field_selection:
+  mechanism: X-Fields header
+  present_on: 9 operations
+  note: >-
+    A Flask-RESTX style response-field mask. Aiera does not document it on the docs site; it is visible
+    only in the served OpenAPI, so it is best treated as an undocumented capability rather than a
+    supported contract.
+filtering:
+  symbology: >-
+    Most collection endpoints accept a company by any of bloomberg_ticker, isin, ric, permid, cusip or
+    ticker, which is the single most consistent convention across the API. company_rollup groups
+    multiple listings of one issuer.
+  time_range: start_date / end_date on collection endpoints; modified_since for incremental sync on five operations.
+  inclusion_flags: include_deleted, include_delisted, include_everything, include_company_metadata, live_only, improved_only
+  content_flags: linguistics, pricing, word_offsets
+versioning:
+  style: path_segment
+  detail: >-
+    The version is baked into each resource prefix rather than applied to the API as a whole, and
+    versions coexist: events-v2, equities-v2 and calendar-v2 sit alongside filings-v1, people-v1,
+    chat-v1, company-docs-v1, companies-v1, expert-access-v1, transcrippets-v1, users-v1 and
+    user-admin-v1. There is no global version header or query parameter, and the two published spec
+    families use different path roots for the same concepts (/events vs /events-v2, /calendar vs
+    /calendar-v2).
+  info_version: '1.0'
+error_envelope:
+  format: non_rfc9457
+  detail: >-
+    No 4xx/5xx response in the served OpenAPI declares a response body schema or a content type — 400
+    and 404 carry only a description string. Observed bodies on the live hosts are a flat JSON object:
+    {"detail": "Not Found"} from the FastAPI-fronted api.aiera.com, and {"message":"Forbidden"} /
+    {"message":"Missing Authentication Token"} from the API Gateway in front of premium.aiera.com. The
+    envelope is therefore gateway-dependent and undeclared.
+  catalog: errors/aiera-problem-types.yml
+rate_limit_signaling:
+  documented: false
+  detail: >-
+    No rate limit, quota, 429 response, Retry-After header or X-RateLimit/RateLimit-* header appears in
+    the served OpenAPI or anywhere in Aiera's public documentation.
+  catalog: rate-limits/aiera-rate-limits.yml
+request_id_tracing:
+  documented: false
+  detail: No request-id, correlation-id or trace header is documented or declared in the spec.
+dry_run_mode:
+  supported: false
+  detail: No preview, validate-only or dry-run parameter exists on any published write operation.
+content_negotiation:
+  default: application/json
+  renditions: >-
+    Several resources publish alternate renditions as distinct paths rather than via Accept
+    negotiation — /transcript/html, /transcript/pdf, /transcript/text, /filings-v1/{id}/pdf,
+    /filings-v1/{id}/text, /filings-v1/{id}/json, /company-docs-v1/{id}/pdf,
+    /company-docs-v1/{id}/text, /events/audio/transcript/csv, /events-v2/tonal/export/csv, plus two
+    iCal calendar feeds.
+cross_links:
+  authentication: authentication/aiera-authentication.yml
+  errors: errors/aiera-problem-types.yml
+  lifecycle: lifecycle/aiera-lifecycle.yml
+  rate_limits: rate-limits/aiera-rate-limits.yml
+  scopes: scopes/aiera-scopes.yml

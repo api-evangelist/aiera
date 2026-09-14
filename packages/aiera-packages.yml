@@ -1,0 +1,78 @@
+generated: '2026-09-14'
+method: searched
+source: https://registry.npmjs.org/aiera-sdk, https://github.com/aiera-inc, https://rest.aiera.com/docs/component-aieracast, https://public.aiera.com/aiera-sdk/0.0.81/embed.js
+note: >-
+  Aiera publishes one first-party npm package and two first-party GitHub-distributed packages. Nothing
+  first-party is on PyPI: the MCP package is installed straight from git, and the embeddable widget build
+  is distributed from Aiera's own CDN rather than a registry. Package ownership on npm was confirmed from
+  the maintainer list, which is entirely @aiera.com addresses.
+packages:
+- name: aiera-sdk
+  registry: npm
+  url: https://www.npmjs.com/package/aiera-sdk
+  official: true
+  language: javascript
+  version: 1.0.31
+  published: '2025-12-11'
+  description: >-
+    Aiera client SDK — the loader/messaging layer (Aiera.Module) used to embed and drive Aiera's
+    iframe-hosted widgets from a host page.
+  evidence: >-
+    npm maintainers are burton.sickler@aiera.com, elliot@aiera.com, brandon.cantello@aiera.com,
+    bryan@aiera.com and michael@aiera.com — all Aiera staff addresses. The package carries no repository
+    or homepage field, so first-party status rests on the maintainer set.
+- name: '@aiera/client-sdk'
+  registry: cdn
+  url: https://public.aiera.com/aiera-sdk/0.0.81/embed.js
+  source_code: https://github.com/aiera-inc/aiera-client-sdk
+  official: true
+  language: typescript
+  version: 0.0.81
+  published: null
+  description: >-
+    The Aiera Client SDK — React components, hooks and utilities for Aiera's embeddable widgets
+    (AieraChat, Aieracast, EventList, NewsList, RecordingList), plus the embed.js loader.
+  license: CC-BY-NC-ND-4.0
+  note: >-
+    Not published to npm — the name @aiera/client-sdk returns "Not found" on registry.npmjs.org. The
+    build is deployed to Aiera's own CDN under https://public.aiera.com/aiera-sdk/<version>/ and the
+    docs pin an explicit version in the script tag, so a consumer can tell exactly what they are
+    getting. Version 0.0.81 read from the pinned URL in Aiera's component documentation and confirmed
+    against package.json on the repository's default branch; 0.0.81 returns HTTP 200 on the CDN and
+    0.0.82 returns 403, so 0.0.81 is the current published build. No registry metadata endpoint exists
+    for a CDN distribution, hence published: null.
+- name: aiera-mcp-tools
+  registry: github
+  url: https://github.com/aiera-inc/aiera-mcp
+  official: true
+  language: python
+  version: null
+  published: null
+  description: >-
+    Model Context Protocol package exposing Aiera API endpoints as MCP tools, shipped both as a
+    standalone stdio server and as a reusable Python package.
+  install: pip install git+https://github.com/aiera-inc/aiera-mcp.git
+  note: >-
+    Checked and absent from PyPI — both aiera-mcp-tools and aiera-mcp return HTTP 404 on
+    pypi.org/pypi/<name>/json. Aiera's own README installs it from git, and the repository README marks
+    the project experimental and subject to breaking changes. Because it is git-installed with no
+    registry release, there is no published version or release date to record; the repository's last
+    push was 2026-08-30.
+- name: aiera-rest-openapi
+  registry: github
+  url: https://github.com/aiera-inc/aiera-rest-openapi
+  official: true
+  language: yaml
+  version: null
+  published: null
+  description: >-
+    Aiera's published OpenAPI specifications for its REST endpoints, packaged for LangChain's OpenAPI
+    toolkit and function-calling integrations. Distribution is by clone, not by registry release.
+  note: Not a client library; recorded here because it is the distribution channel for the specs in openapi/. MIT licensed.
+summary:
+  official_count: 4
+  registry_published: 1
+  cdn_distributed: 1
+  git_installed: 2
+  languages: [javascript, typescript, python]
+  oldest_release: '2025-12-11'

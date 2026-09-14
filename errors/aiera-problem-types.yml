@@ -1,0 +1,72 @@
+generated: '2026-09-14'
+method: derived
+source: openapi/aiera-rest-api-openapi.json, openapi/aiera-unified-openapi.yaml, live probes of https://premium.aiera.com/api/* and https://api.aiera.com/
+format: non_rfc9457
+description: >-
+  Aiera's served OpenAPI declares error status codes but no error bodies: every 400, 403 and 404 response
+  carries a description string and nothing else — no schema, no content type, no example. The shapes
+  below were observed on live anonymous requests to Aiera's own hosts and differ by which gateway answers,
+  which is itself the finding: an agent cannot parse Aiera errors from the contract alone.
+envelope:
+  declared_in_spec: false
+  observed_shapes:
+  - shape: '{"detail": "<string>"}'
+    host: api.aiera.com
+    stack: FastAPI
+    evidence: 'GET https://api.aiera.com/ -> 404 {"detail":"Not Found"}'
+  - shape: '{"message": "<string>"}'
+    host: premium.aiera.com
+    stack: AWS API Gateway
+    evidence: 'GET https://premium.aiera.com/api/status -> 403 {"message":"Forbidden"}; GET https://premium.aiera.com/openapi.json -> 403 {"message":"Missing Authentication Token"}'
+  - shape: '{"error": <int>, "name": "<string>", "description": "<string>"}'
+    host: graphql.aiera.com
+    evidence: 'POST https://graphql.aiera.com/api -> 405 {"error": 405, "name": "Method Not Allowed", "description": "The method is not allowed for the requested URL."}'
+  - shape: '{"error": "<slug>", "message": "<string>", "oauth_discovery_url": "<url>", "authorization_required": <bool>}'
+    host: mcp-pub.aiera.com
+    evidence: 'POST https://mcp-pub.aiera.com/ tools/list -> 401 {"error":"authentication_required", ...}'
+problem_types:
+- status: 400
+  title: Bad request
+  occurrences: 25
+  detail: >-
+    Declared on 25 of 53 operations, almost always for malformed or mutually exclusive query
+    parameters — a bad symbology identifier, an invalid date range, or a page_size above the documented
+    maximum of 25.
+  body_schema: undeclared
+  remediation: Validate identifiers and date ranges before the call; there is no machine-readable field pointer in the response.
+- status: 401
+  title: Unauthorized
+  occurrences: 0
+  declared_in_spec: false
+  detail: >-
+    Not declared on any operation even though every operation requires the X-API-Key header. Observed
+    on the MCP endpoint as an OAuth challenge carrying oauth_discovery_url.
+  remediation: Supply X-API-Key (REST) or complete the OAuth flow at https://mcp-pub.aiera.com/.well-known/oauth-protected-resource (MCP).
+- status: 403
+  title: Forbidden
+  occurrences: 1
+  detail: >-
+    Declared on a single operation in the spec but returned by the API Gateway for every unauthenticated
+    request to premium.aiera.com. Because Aiera is entitlement-gated, 403 is also the expected answer
+    when a valid key lacks entitlement to the requested content — the spec does not distinguish the two.
+  body_schema: undeclared
+  remediation: Check the key, then check the account's entitlements for that content set.
+- status: 404
+  title: Not found
+  occurrences: 25
+  detail: >-
+    Declared on 25 of 53 operations, for an unknown event_id, equity_id, filing_id, doc_id, person_id,
+    session_id or transcrippet_id.
+  body_schema: undeclared
+  remediation: Resolve the id through the matching find_* / collection operation first.
+gaps:
+- No 429 response is declared on any operation, and no rate-limit documentation exists (see rate-limits/aiera-rate-limits.yml).
+- No 5xx response is declared on any operation.
+- No error body schema, content type or example is declared anywhere in either published spec.
+- No application/problem+json (RFC 9457) usage; no error code vocabulary, no machine-readable error slugs on the REST surface.
+- 401 is undeclared despite authentication being globally required.
+summary:
+  declared_status_codes: [200, 201, 400, 403, 404]
+  error_codes_declared: 3
+  rfc9457: false
+  error_catalog_published: false

@@ -1,0 +1,233 @@
+generated: '2026-09-14'
+method: probed
+source: https://rest.aiera.com/docs/mcp (and /docs/mcp-tools, /docs/mcp-platforms, /docs/mcp-sdks); live POST tools/list against https://mcp-pub.aiera.com/; https://github.com/aiera-inc/aiera-mcp
+name: Aiera MCP Server
+description: >-
+  Aiera ships a hosted remote MCP server exposing its financial research corpus — earnings calls and
+  transcripts, calendars, equities and financials, SEC filings, company-published documents, Third Bridge
+  expert insights, broker research and trusted web search — as specialized tools for LLM and agentic
+  workflows. It also publishes an open-source Python package (aiera-mcp-tools) that runs the same tool
+  surface locally over stdio, so both delivery modes are real.
+deployment:
+  mode: both
+  endpoint: https://mcp-pub.aiera.com/
+  install: pip install git+https://github.com/aiera-inc/aiera-mcp.git
+  package: https://github.com/aiera-inc/aiera-mcp
+  auth: oauth
+  verified: probed
+  note: >-
+    The remote endpoint accepts an API key as a query parameter (https://mcp-pub.aiera.com/?api_key=...)
+    per the provider's own OpenAI and Anthropic SDK examples, and OAuth 2.1 for the Claude and ChatGPT
+    connector directories. An anonymous POST of tools/list returned HTTP 401
+    {"error":"authentication_required", ..., "oauth_discovery_url":"https://mcp-pub.aiera.com/.well-known/oauth-protected-resource"},
+    which is what establishes the endpoint as a live, OAuth-gated MCP server.
+transport:
+  protocol: http
+  endpoint: https://mcp-pub.aiera.com/
+  local_command: uv run entrypoint.py
+authentication:
+  remote:
+    primary: oauth2
+    authorization_server: https://mcp-pub.aiera.com (issuer https://cognito-idp.us-east-1.amazonaws.com/us-east-1_vFMHse86f)
+    metadata:
+    - well-known/aiera-mcp-pub-oauth-authorization-server.json
+    - well-known/aiera-mcp-pub-oauth-protected-resource.json
+    scopes:
+    - openid
+    - profile
+    - email
+    pkce: S256
+    dynamic_client_registration: true
+    alternate: api_key query parameter (api_key=)
+  local:
+    method: api_key
+    env: AIERA_API_KEY
+    base_url_env: AIERA_BASE_URL
+    base_url_default: https://graphql.aiera.com/api
+x-evidence:
+  fetched: '2026-09-14'
+  probes:
+  - url: https://mcp-pub.aiera.com/
+    method: 'POST {"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+    http_status: 401
+    body: '{"error":"authentication_required","message":"This MCP server requires OAuth authentication. Please authenticate to continue.","oauth_discovery_url":"https://mcp-pub.aiera.com/.well-known/oauth-protected-resource","authorization_required":true}'
+  - url: https://mcp-pub.aiera.com/.well-known/oauth-protected-resource
+    http_status: 200
+  - url: https://mcp-pub.aiera.com/.well-known/oauth-authorization-server
+    http_status: 200
+schema_note: >-
+  Live tools/list introspection is OAuth-gated, so per-tool inputSchema could not be captured
+  anonymously. The tool inventory below is transcribed from Aiera's own published tool reference at
+  https://rest.aiera.com/docs/mcp-tools, which names each tool and its parameters. Parameter names are
+  the provider's; full JSON Schema types require an authenticated tools/list call.
+clients:
+  directories:
+  - name: Claude connector directory
+    note: Search "Aiera" in the Claude Settings > Connectors store; authenticates with Aiera dashboard credentials.
+    source: https://rest.aiera.com/docs/mcp-platforms
+  - name: ChatGPT connector marketplace
+    note: Search "Aiera" in the ChatGPT Connectors admin page; authenticates with Aiera dashboard credentials.
+    source: https://rest.aiera.com/docs/mcp-platforms
+  sdk_examples:
+  - vendor: OpenAI
+    shape: 'tools[{type: mcp, server_label: Aiera, server_url: https://mcp-pub.aiera.com/?api_key=...}]'
+  - vendor: Anthropic
+    shape: 'mcp_servers[{type: url, name: Aiera, url: https://mcp-pub.aiera.com/?api_key=...}]'
+tool_count: 39
+tools:
+- name: find_equities
+  category: Equities & Market Data
+  description: Search for equities using various identifiers or search terms.
+  parameters: [bloomberg_ticker, isin, ric, permid, search, sector_id, subsector_id, page, page_size]
+- name: get_equity_summaries
+  category: Equities & Market Data
+  description: Retrieve detailed summary information about specific equities.
+  parameters: [bloomberg_ticker]
+- name: get_financials
+  category: Equities & Market Data
+  description: Retrieve financial data including income statements, balance sheets, and cash flow statements.
+  parameters: [bloomberg_ticker, source, calendar_year, source_type, period, calendar_quarter, metric_id, metric_type, ratio_id]
+- name: get_ratios
+  category: Equities & Market Data
+  description: Retrieve ratio metrics like profitability, liquidity, and valuation ratios for a specific company.
+  parameters: [bloomberg_ticker, calendar_year, period, calendar_quarter, ratio_id]
+- name: get_kpis_and_segments
+  category: Equities & Market Data
+  description: Retrieve key performance indicators and segment-level metrics for a company.
+  parameters: [bloomberg_ticker, calendar_year, period, calendar_quarter, metric_id, metric_type]
+- name: get_sectors_and_subsectors
+  category: Equities & Market Data
+  description: Retrieve a list of all available sectors and subsectors.
+  parameters: [search, page, page_size]
+- name: get_available_indexes
+  category: Indexes & Watchlists
+  description: Retrieve the list of available market indexes.
+  parameters: []
+- name: get_index_constituents
+  category: Indexes & Watchlists
+  description: Retrieve all equities within a specific index.
+  parameters: [index, page, page_size]
+- name: get_available_watchlists
+  category: Indexes & Watchlists
+  description: Retrieve the list of available watchlists.
+  parameters: [page, page_size]
+- name: get_watchlist_constituents
+  category: Indexes & Watchlists
+  description: Retrieve all equities within a specific watchlist.
+  parameters: [watchlist_id, page, page_size]
+- name: find_events
+  category: Events
+  description: Search for corporate events including earnings calls, investor presentations, and shareholder meetings.
+  parameters: [start_date, end_date, search, bloomberg_ticker, watchlist_id, index_id, sector_id, subsector_id, event_type, conference_id, page, page_size]
+- name: get_event
+  category: Events
+  description: Retrieve detailed information about a specific event, including transcripts and metadata.
+  parameters: [event_id]
+- name: get_upcoming_events
+  category: Events
+  description: Retrieve confirmed and estimated upcoming events.
+  parameters: [start_date, end_date, bloomberg_ticker, watchlist_id, index_id, sector_id, subsector_id]
+- name: find_conferences
+  category: Events
+  description: Search for conferences by date range.
+  parameters: [start_date, end_date, search, page, page_size]
+- name: search_transcripts
+  category: Events
+  description: Perform a semantic search across event transcripts using embedding-based matching.
+  parameters: [query_text, equity_ids, event_ids, event_type, transcript_section, start_date, end_date, search_after]
+- name: find_filings
+  category: Filings
+  description: Retrieve SEC filings filtered by date range and various criteria.
+  parameters: [start_date, end_date, form_number, bloomberg_ticker, page, page_size]
+- name: get_filing
+  category: Filings
+  description: Retrieve detailed information about a specific SEC filing.
+  parameters: [filing_id]
+- name: search_filings
+  category: Filings
+  description: Perform a semantic search across SEC filing documents using embedding-based matching.
+  parameters: [query_text, filing_ids, filing_type, equity_ids, start_date, end_date, search_after]
+- name: find_company_docs
+  category: Company Documents
+  description: Retrieve company-published documents filtered by various criteria.
+  parameters: [start_date, end_date, bloomberg_ticker, categories, keywords, exclude_categories, exclude_keywords, page, page_size]
+- name: get_company_doc
+  category: Company Documents
+  description: Retrieve the raw text from a specific company document.
+  parameters: [company_doc_id]
+- name: get_company_doc_categories
+  category: Company Documents
+  description: Retrieve all available document categories.
+  parameters: []
+- name: get_company_doc_keywords
+  category: Company Documents
+  description: Retrieve all available document keywords.
+  parameters: []
+- name: search_company_docs
+  category: Company Documents
+  description: Perform a semantic search within company document chunks for specific content, disclosures, or topics.
+  parameters: [query_text, company_doc_ids, company_ids, start_date, end_date, search_after]
+- name: find_third_bridge_events
+  category: Expert Access
+  description: Retrieve expert insight events from Third Bridge.
+  parameters: [start_date, end_date, content_type, page, page_size]
+- name: get_third_bridge_event
+  category: Expert Access
+  description: Retrieve detailed information about specific Third Bridge events.
+  parameters: [thirdbridge_event_id, aiera_event_id]
+- name: search_thirdbridge
+  category: Expert Access
+  description: Perform a semantic search within Third Bridge expert interview transcripts.
+  parameters: [query_text, aiera_event_ids, thirdbridge_ids, event_content_type, start_date, end_date, search_after]
+- name: find_research
+  category: Research
+  description: Find research reports filtered by authors, providers, regions, countries, and date ranges.
+  parameters: [author_ids, aiera_provider_ids, asset_classes, asset_types, product_focuses, discipline_types, start_date, end_date, page, page_size]
+- name: get_research
+  category: Research
+  description: Retrieve detailed information about a specific research report including content.
+  parameters: [document_id]
+- name: search_research
+  category: Research
+  description: Semantic search within research content for specific topics, analyses, or insights.
+  parameters: [query_text, document_ids, start_date, end_date, search_after]
+- name: get_research_providers
+  category: Research
+  description: Retrieve all available research providers with their IDs and names.
+  parameters: []
+- name: get_research_authors
+  category: Research
+  description: Search for research authors by name or provider.
+  parameters: [search, provider_id]
+- name: get_research_asset_classes
+  category: Research
+  description: Retrieve all available research asset classes with document counts.
+  parameters: []
+- name: get_research_asset_types
+  category: Research
+  description: Retrieve all available research asset types with document counts.
+  parameters: []
+- name: get_research_subjects
+  category: Research
+  description: Retrieve all available research subjects with document counts.
+  parameters: []
+- name: get_research_product_focuses
+  category: Research
+  description: Retrieve all available research product focus values with document counts.
+  parameters: []
+- name: get_research_discipline_types
+  category: Research
+  description: Retrieve all available research discipline types with document counts.
+  parameters: []
+- name: get_research_region_types
+  category: Research
+  description: Retrieve all available research region types with document counts.
+  parameters: []
+- name: get_research_country_codes
+  category: Research
+  description: Retrieve all available research country codes with document counts.
+  parameters: []
+- name: trusted_web_search
+  category: Other
+  description: Search the web using only trusted/approved domains relevant to financial professionals.
+  parameters: [query_text, allowed_domains]
