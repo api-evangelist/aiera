@@ -24,8 +24,8 @@ tags:
 - Financial Data
 - Broker Research
 - Expert Networks
-- Speech To Text
-- Financial Services
+- Speech-to-Text
+- Financial-Services
 - MCP
 - agent-native
 tags_raw:
@@ -42,60 +42,15 @@ tags_raw:
 - mcp
 - agent-native
 apis:
-- name: Aiera REST API
-  description: >-
-    Entitlement-aware REST API over Aiera's financial research corpus — corporate events and transcripts,
-    calendars and estimated events, equities and sectors, companies and people, SEC filings, company-published
-    documents, broker research, Third Bridge expert-access content, Transcrippets and chat sessions. Authenticated
-    with an issued API key passed in the X-API-Key header (an api_key query parameter is also accepted).
-  humanURL: https://rest.aiera.com/
-  baseURL: https://premium.aiera.com/api
-  image: https://aiera.com/wp-content/uploads/2025/09/aiera-default-feature.jpg
-  position: Producing
-  tags:
-  - Financial Research
-  - Earnings Calls
-  - Transcripts
-  - SEC Filings
-  - Market Data
-  - Financial Data
-  properties:
-  - type: Documentation
-    url: https://rest.aiera.com/
-  - type: APIReference
-    url: https://rest.aiera.com/docs/authentication
-  - type: GettingStarted
-    url: https://rest.aiera.com/#quick-start
-  - type: OpenAPI
-    url: openapi/aiera-rest-api-openapi.json
-  - type: OpenAPI
-    url: openapi/aiera-unified-openapi.yaml
-  - type: OpenAPI
-    url: openapi/aiera-equity-openapi.yaml
-  - type: OpenAPI
-    url: openapi/aiera-tonal-sentiments-openapi.yaml
-  - type: OpenAPI
-    url: openapi/aiera-transcrippets-openapi.yaml
-  - type: Authentication
-    url: authentication/aiera-authentication.yml
-  - type: Conventions
-    url: conventions/aiera-conventions.yml
-  - type: ErrorCatalog
-    url: errors/aiera-problem-types.yml
-  - type: DataModel
-    url: data-model/aiera-data-model.yml
-  - type: Overlay
-    url: overlays/aiera-rest-api-overlay.yaml
-  - type: SourceCode
-    url: https://github.com/aiera-inc/aiera-rest-openapi
 - name: Aiera MCP Server
   description: >-
-    Aiera's hosted remote Model Context Protocol server, exposing the financial research corpus to LLMs and
-    agentic workflows as roughly three dozen specialized tools across equities and financials, indexes and
-    watchlists, events and transcripts, SEC filings, company documents, Third Bridge expert insights, broker
-    research and trusted web search. Reachable over HTTP at https://mcp-pub.aiera.com/ with an API key, or via
-    OAuth 2.1 (Amazon Cognito issuer, PKCE, dynamic client registration) as used by the Claude and ChatGPT
-    connector directories. An open-source Python package runs the same tool surface over stdio.
+    Aiera's hosted remote Model Context Protocol server, exposing the financial research corpus to LLMs
+    and agentic workflows as roughly three dozen specialized tools across equities and financials, indexes
+    and watchlists, events and transcripts, SEC filings, company documents, Third Bridge expert insights,
+    broker research and trusted web search. Reachable over HTTP at https://mcp-pub.aiera.com/ with an
+    API key, or via OAuth 2.1 (Amazon Cognito issuer, PKCE, dynamic client registration) as used by the
+    Claude and ChatGPT connector directories. An open-source Python package runs the same tool surface
+    over stdio.
   humanURL: https://rest.aiera.com/docs/mcp
   baseURL: https://mcp-pub.aiera.com
   image: https://aiera.com/wp-content/uploads/2025/09/aiera-default-feature.jpg
@@ -120,7 +75,555 @@ apis:
     url: scopes/aiera-scopes.yml
   - type: SourceCode
     url: https://github.com/aiera-inc/aiera-mcp
+- aid: aiera:aiera-calendar-api
+  name: Aiera Calendar API
+  description: The Calendar API from Aiera — 3 operation(s) for calendar.
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Calendar
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-calendar-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-calendar-v2-api
+  name: Aiera Calendar v2 API
+  description: Event calendar, coverage, and estimates
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Calendar v2
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-calendar-v2-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-calendars-v1-api
+  name: Aiera Calendars v1 API
+  description: iCal calendar subscriptions
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Calendars v1
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-calendars-v1-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-chat-v1-api
+  name: Aiera Chat v1 API
+  description: AieraChat
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Chat v1
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-chat-v1-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-companies-v1-api
+  name: Aiera Companies v1 API
+  description: Company information and lookup
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Companies v1
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-companies-v1-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-company-docs-v1-api
+  name: Aiera Company Docs v1 API
+  description: Company-published documents
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Company Docs v1
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-company-docs-v1-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-content-api
+  name: Aiera Content API
+  description: The Content API from Aiera — 2 operation(s) for content.
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Content
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-content-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-corporate-activity-api
+  name: Aiera Corporate Activity API
+  description: The Corporate Activity API from Aiera — 4 operation(s) for corporate activity.
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Corporate Activity
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-corporate-activity-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-dashboards-api
+  name: Aiera Dashboards API
+  description: The Dashboards API from Aiera — 1 operation(s) for dashboards.
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Dashboards
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-dashboards-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-equities-v2-api
+  name: Aiera Equities V2 API
+  description: The Equities V2 API from Aiera — 7 operation(s) for equities v2.
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Equities V2
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-equities-v2-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-events-api
+  name: Aiera Events API
+  description: The Events API from Aiera — 3 operation(s) for events.
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Events
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-events-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-events-v2-api
+  name: Aiera Events v2 API
+  description: Event data and transcripts
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Events v2
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-events-v2-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-expert-access-v1-api
+  name: Aiera Expert Access v1 API
+  description: Third-party expert insights content
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Expert Access v1
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-expert-access-v1-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-filings-v1-api
+  name: Aiera Filings v1 API
+  description: SEC regulatory filings
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Filings v1
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-filings-v1-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-people-v1-api
+  name: Aiera People v1 API
+  description: People and speaker lookup
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - People v1
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-people-v1-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-summaries-api
+  name: Aiera Summaries API
+  description: The Summaries API from Aiera — 3 operation(s) for summaries.
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Summaries
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-summaries-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-topics-api
+  name: Aiera Topics API
+  description: The Topics API from Aiera — 6 operation(s) for topics.
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Topics
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-topics-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-transcrippets-api
+  name: Aiera Transcrippets API
+  description: The Transcrippets API from Aiera — 1 operation(s) for transcrippets.
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Transcrippets
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-transcrippets-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-transcrippets-v1-api
+  name: Aiera Transcrippets v1 API
+  description: Shareable transcript snippets
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Transcrippets v1
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-transcrippets-v1-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-user-admin-v1-api
+  name: Aiera User Admin v1 API
+  description: Organization user management
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - User Admin v1
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-user-admin-v1-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
+- aid: aiera:aiera-users-v1-api
+  name: Aiera Users v1 API
+  description: User entitlements and permissions
+  humanURL: https://rest.aiera.com/
+  baseURL: https://premium.aiera.com/api
+  tags:
+  - Users v1
+  properties:
+  - type: OpenAPI
+    url: openapi/aiera-users-v1-api-openapi.yml
+  - type: Documentation
+    url: https://rest.aiera.com/
+  - type: APIReference
+    url: https://rest.aiera.com/docs/authentication
+  - type: GettingStarted
+    url: https://rest.aiera.com/#quick-start
+  - type: Authentication
+    url: authentication/aiera-authentication.yml
+  - type: Conventions
+    url: conventions/aiera-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aiera-problem-types.yml
+  - type: DataModel
+    url: data-model/aiera-data-model.yml
+  - type: SourceCode
+    url: https://github.com/aiera-inc/aiera-rest-openapi
 common:
+- type: Overlay
+  url: overlays/aiera-rest-api-overlay.yaml
 - type: Website
   url: https://aiera.com/
 - type: DeveloperPortal
