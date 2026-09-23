@@ -1,0 +1,515 @@
+openapi: 3.2.0
+info:
+  title: Aiera REST Chat v1 API
+  version: '1.0'
+  description: Aiera financial data API
+servers:
+- url: https://rest-api.aiera.com/api
+security:
+- apiKeyHeader: []
+tags:
+- name: Chat v1
+  description: AieraChat
+paths:
+  /chat-v1/sessions:
+    get:
+      tags:
+      - Chat v1
+      summary: List Chat Sessions
+      description: 'List the user''s chat sessions, ordered most-recently-updated first, with pagination.
+
+
+        **Notes:**
+
+        - Session summaries returned by this endpoint omit the `messages` array. Fetch a specific session with `include_messages=true` to retrieve full conversation history.'
+      operationId: get_chat_sessions
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: page
+        in: query
+        description: Page number (default 1)
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - name: page_size
+        in: query
+        description: Results per page (default 20, max 100)
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+          maximum: 100
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatSessionsList'
+    post:
+      tags:
+      - Chat v1
+      summary: Create Chat Session
+      description: 'Create a new chat session, optionally with an initial prompt
+
+
+        Create a new chat session. If a `prompt` is supplied in the request body, the first message is sent immediately and the session begins generating a response — the new session is returned with status `finding_sources` and an `initial_prompt` field echoing the submitted prompt.
+
+
+        **Notes:**
+
+        - When `prompt` is provided, the session starts in `finding_sources` status. Poll `GET /chat-v1/sessions/{id}?include_messages=true` until `status` is `active` to retrieve the response.
+
+        - The `initial_prompt` field in the response is only present when a `prompt` was included in the request.'
+      operationId: post_chat_sessions
+      security:
+      - apiKeyHeader: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChatSession'
+      responses:
+        '400':
+          description: Bad request
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatSession'
+  /chat-v1/sessions/{session_id}:
+    parameters:
+    - description: Unique identifier of the chat session
+      name: session_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      tags:
+      - Chat v1
+      summary: Get Chat Session
+      description: 'Retrieve a chat session by its ID. Optionally include the full message history, per-response status events, and user votes on messages.
+
+
+        Callers typically poll this endpoint after sending a prompt to watch for status to return to `active` and pick up the generated response.
+
+
+        **Notes:**
+
+        - Returns `404` if the session does not exist or does not belong to the user.
+
+        - While the response is still being generated, the session `status` will be `finding_sources` or `generating_response` and the response message may be absent from `messages`. Poll until `status` is `active`.'
+      operationId: get_chat_session_detail
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: include_messages
+        in: query
+        description: Include all messages in the session
+        schema:
+          type: boolean
+          default: false
+      - name: include_statuses
+        in: query
+        description: Include status messages for responses
+        schema:
+          type: boolean
+          default: false
+      - name: include_votes
+        in: query
+        description: Include votes on messages
+        schema:
+          type: boolean
+          default: true
+      responses:
+        '404':
+          description: Session not found
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatSession'
+    patch:
+      tags:
+      - Chat v1
+      summary: Update Chat Session
+      description: 'Update a chat session''s title or its sources. Only the fields present in the request body are changed — omitted fields are left as-is.
+
+
+        **Notes:**
+
+        - Returns `404` if the session does not exist or does not belong to the user.
+
+        - To clear a session''s sources, use `POST /chat-v1/sessions/{id}/sources/clear` — passing `sources: []` in this endpoint is not equivalent.'
+      operationId: patch_chat_session_detail
+      security:
+      - apiKeyHeader: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateChatSession'
+      responses:
+        '404':
+          description: Session not found
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatSession'
+    delete:
+      tags:
+      - Chat v1
+      summary: Delete Chat Session
+      description: 'Delete a chat session.
+
+
+        This is a soft delete — the session and its messages are no longer returned by list or get endpoints.
+
+
+        **Notes:**
+
+        - Returns `404` if the session does not exist or does not belong to the user.'
+      operationId: delete_chat_session_detail
+      security:
+      - apiKeyHeader: []
+      responses:
+        '404':
+          description: Session not found
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteChatSessionResponse'
+  /chat-v1/sessions/{session_id}/prompt:
+    parameters:
+    - description: Unique identifier of the chat session
+      name: session_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    post:
+      tags:
+      - Chat v1
+      summary: Send Chat Prompt
+      description: 'Send a prompt to an existing chat session.
+
+
+        The session begins generating a response asynchronously — poll `GET /chat-v1/sessions/{id}` with `include_messages=true` to retrieve the response when the session returns to `active` status.
+
+
+        **Notes:**
+
+        - Returns `400` if `content` is missing or empty; `404` if the session does not exist or does not belong to the user.
+
+        - The prompt is created synchronously and returned immediately. Generation runs in the background — the session transitions `finding_sources` → `generating_response` → `active`.'
+      operationId: post_chat_session_prompt
+      security:
+      - apiKeyHeader: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatPrompt'
+      responses:
+        '404':
+          description: Session not found
+        '400':
+          description: Bad request
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatPromptResponse'
+  /chat-v1/sessions/{session_id}/sources/clear:
+    parameters:
+    - description: Unique identifier of the chat session
+      name: session_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    post:
+      tags:
+      - Chat v1
+      summary: Clear Chat Session Sources
+      description: 'Remove all sources from a chat session. Subsequent prompts fall back to the agent''s default source selection.
+
+
+        **Notes:**
+
+        - Returns `404` if the session does not exist or does not belong to the user.
+
+        - This endpoint only clears the session-level sources set via Create Session or Update Session. Per-message citations on existing responses are preserved.'
+      operationId: post_chat_session_clear_sources
+      security:
+      - apiKeyHeader: []
+      responses:
+        '404':
+          description: Session not found
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatSession'
+components:
+  schemas:
+    CreateChatSession:
+      properties:
+        title:
+          type: string
+          description: Optional session title. If omitted, a title is generated.
+        prompt:
+          type: string
+          description: Optional initial prompt — if provided, the first message is sent immediately and the session begins generating a response.
+        sources:
+          type: object
+          description: Optional initial sources array to scope the session to specific documents, events, or companies. See [Chat](../../chat) for source shape.
+      type: object
+    ChatSession:
+      properties:
+        id:
+          type: integer
+          description: Session ID
+        title:
+          type: string
+          description: Session title
+        title_status:
+          type: string
+          description: Title status
+          enum:
+          - generated
+          - user
+        status:
+          type: string
+          description: Session status
+          enum:
+          - active
+          - cancelling_response
+          - deleted
+          - finding_sources
+          - finding_sources_error
+          - generating_response
+          - generating_response_error
+        active_message_id:
+          type: integer
+          description: ID of the currently active message
+        sources:
+          type: array
+          description: Session-level sources
+          items:
+            $ref: '#/components/schemas/ChatSource'
+        messages:
+          type: array
+          description: Messages (when `include_messages=true`)
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+        user_id:
+          type: integer
+          description: User ID
+        created_at:
+          type: string
+          format: date-time
+          description: Created timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Updated timestamp
+      type: object
+    ChatSessionsList:
+      properties:
+        data:
+          type: array
+          description: List of chat sessions
+          items:
+            $ref: '#/components/schemas/ChatSession'
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/ChatSessionPagination'
+      type: object
+    ChatPromptResponse:
+      properties:
+        id:
+          type: integer
+          description: Prompt message ID
+        content:
+          type: string
+          description: Prompt content
+        session_id:
+          type: integer
+          description: Session ID
+        message_type:
+          type: string
+          description: Message type (prompt)
+        created_at:
+          type: string
+          format: date-time
+          description: Created timestamp
+      type: object
+    ChatCitation:
+      properties:
+        marker:
+          type: string
+          description: Citation marker (e.g. [1])
+        quote:
+          type: string
+          description: Quoted text from the source
+        date:
+          type: string
+          format: date
+          description: Source date
+        author:
+          type: string
+          description: Source author
+        url:
+          type: string
+          description: Source URL
+        source:
+          type: object
+          description: Source reference object
+      type: object
+    UpdateChatSession:
+      properties:
+        title:
+          type: string
+          description: New session title
+        sources:
+          type: object
+          description: Updated sources array
+      type: object
+    ChatPrompt:
+      required:
+      - content
+      properties:
+        content:
+          type: string
+          description: The prompt message text
+        tool_settings:
+          type: object
+          description: Optional tool settings (`source_filters`, `web_search_enabled`)
+      type: object
+    ChatSource:
+      properties:
+        id:
+          type: string
+          description: Source identifier
+        name:
+          type: string
+          description: Source display name
+        type:
+          type: string
+          description: Source type (company, event, filing, research, etc.)
+        meta:
+          type: object
+          description: Source metadata
+        parent:
+          type: object
+          description: Parent source reference
+      type: object
+    ChatContentBlock:
+      properties:
+        type:
+          type: string
+          description: Block type (text)
+        content:
+          type: string
+          description: Text content
+        citations:
+          type: array
+          description: Citations in this block
+          items:
+            $ref: '#/components/schemas/ChatCitation'
+      type: object
+    ChatSessionPagination:
+      properties:
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Items per page
+        total_pages:
+          type: integer
+          description: Total number of pages
+        total_count:
+          type: integer
+          description: Total number of sessions
+        has_next:
+          type: boolean
+          description: Whether there is a next page
+        has_previous:
+          type: boolean
+          description: Whether there is a previous page
+      type: object
+    ChatMessage:
+      properties:
+        id:
+          type: integer
+          description: Message ID
+        message_type:
+          type: string
+          description: Message type
+          enum:
+          - prompt
+          - response
+          - source_confirmation
+          - status
+        content:
+          type: string
+          description: Message content (for prompts)
+        blocks:
+          type: array
+          description: Content blocks (for responses)
+          items:
+            $ref: '#/components/schemas/ChatContentBlock'
+        sources:
+          type: array
+          description: Sources referenced
+          items:
+            $ref: '#/components/schemas/ChatSource'
+        session_id:
+          type: integer
+          description: Parent session ID
+        prompt_message_id:
+          type: integer
+          description: ID of the prompt this responds to
+        ordinal_id:
+          type: string
+          description: Ordering identifier
+        created_at:
+          type: string
+          format: date-time
+          description: Created timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Updated timestamp
+      type: object
+    DeleteChatSessionResponse:
+      properties:
+        success:
+          type: boolean
+          description: Whether the deletion was successful
+      type: object
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Issued API key
+    apiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: Issued API key

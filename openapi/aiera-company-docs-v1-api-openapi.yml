@@ -1,0 +1,613 @@
+openapi: 3.2.0
+info:
+  title: Aiera REST Company Docs v1 API
+  version: '1.0'
+  description: Aiera financial data API
+servers:
+- url: https://rest-api.aiera.com/api
+security:
+- apiKeyHeader: []
+tags:
+- name: Company Docs v1
+  description: Company-published documents
+paths:
+  /company-docs-v1/:
+    get:
+      tags:
+      - Company Docs v1
+      summary: Find Company Documents
+      description: 'Retrieve company documents filtered by category, keyword, or supported identifiers.
+
+
+        **Notes:**
+
+        - Only **one** identifier should be used per request
+
+        - At least one company filter is required'
+      operationId: get_get_docs
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: search
+        in: query
+        description: Search term for document title or category
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        description: Start date (default 1 week ago)
+        schema:
+          type: string
+          format: date-time
+      - name: end_date
+        in: query
+        description: End date (default now)
+        schema:
+          type: string
+          format: date-time
+      - name: categories
+        in: query
+        description: Comma-separated list of categories to include
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude_categories
+        in: query
+        description: Comma-separated list of categories to exclude
+        schema:
+          type: array
+          items:
+            type: string
+      - name: keywords
+        in: query
+        description: Comma-separated list of keywords to include
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exclude_keywords
+        in: query
+        description: Comma-separated list of keywords to exclude
+        schema:
+          type: array
+          items:
+            type: string
+      - name: bloomberg_ticker
+        in: query
+        description: Filter to one or more Bloomberg tickers, comma-separated (e.g. AAPL:US)
+        schema:
+          type: string
+      - name: isin
+        in: query
+        description: Filter to one or more ISINs, comma-separated
+        schema:
+          type: string
+      - name: cusip
+        in: query
+        description: Filter to one or more CUSIPs, comma-separated
+        schema:
+          type: string
+      - name: ric
+        in: query
+        description: Filter to one or more RICs, comma-separated
+        schema:
+          type: string
+      - name: ticker
+        in: query
+        description: Filter to one or more ticker symbols, comma-separated
+        schema:
+          type: string
+      - name: permid
+        in: query
+        description: Filter to one or more PermIDs, comma-separated
+        schema:
+          type: string
+      - name: watchlist_id
+        in: query
+        description: Filter by watchlist ID
+        schema:
+          type: integer
+      - name: index_id
+        in: query
+        description: Filter by market index ID
+        schema:
+          type: integer
+      - name: sector_id
+        in: query
+        description: Filter by GICS sector ID
+        schema:
+          type: integer
+      - name: subsector_id
+        in: query
+        description: Filter by GICS sub-sector ID
+        schema:
+          type: integer
+      - name: include_delisted
+        in: query
+        description: Whether to include delisted equities
+        schema:
+          type: boolean
+          default: true
+      - name: company_rollup
+        in: query
+        description: Whether to roll up to all company equities
+        schema:
+          type: boolean
+          default: true
+      - name: page
+        in: query
+        description: Page number
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        description: Results per page
+        schema:
+          type: integer
+          default: 100
+          minimum: 10
+          maximum: 100
+      responses:
+        '400':
+          description: Bad request
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocsResponse'
+  /company-docs-v1/categories:
+    get:
+      tags:
+      - Company Docs v1
+      summary: Get Document Categories
+      description: 'Get document categories with counts.
+
+
+        **Notes:**
+
+        - At least one equity identifier is **required**, and only **one** identifier should be used per request.'
+      operationId: get_doc_categories
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: search
+        in: query
+        description: Search term for filtering
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Page number
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        description: Results per page
+        schema:
+          type: integer
+          default: 100
+          minimum: 10
+          maximum: 100
+      - name: bloomberg_ticker
+        in: query
+        description: Filter to one or more Bloomberg tickers, comma-separated (e.g. AAPL:US)
+        schema:
+          type: string
+      - name: isin
+        in: query
+        description: Filter to one or more ISINs, comma-separated
+        schema:
+          type: string
+      - name: cusip
+        in: query
+        description: Filter to one or more CUSIPs, comma-separated
+        schema:
+          type: string
+      - name: ric
+        in: query
+        description: Filter to one or more RICs, comma-separated
+        schema:
+          type: string
+      - name: ticker
+        in: query
+        description: Filter to one or more ticker symbols, comma-separated
+        schema:
+          type: string
+      - name: permid
+        in: query
+        description: Filter to one or more PermIDs, comma-separated
+        schema:
+          type: string
+      - name: sector_id
+        in: query
+        description: Filter by GICS sector ID
+        schema:
+          type: integer
+      - name: subsector_id
+        in: query
+        description: Filter by GICS sub-sector ID
+        schema:
+          type: integer
+      - name: include_delisted
+        in: query
+        description: Whether to include delisted equities
+        schema:
+          type: boolean
+          default: true
+      - name: company_rollup
+        in: query
+        description: Whether to roll up to all company equities
+        schema:
+          type: boolean
+          default: true
+      responses:
+        '400':
+          description: Bad request
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriesResponse'
+  /company-docs-v1/coverage:
+    get:
+      tags:
+      - Company Docs v1
+      summary: Get Document Coverage
+      description: Get document coverage counts
+      operationId: get_doc_coverage
+      security:
+      - apiKeyHeader: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoverageResponse'
+  /company-docs-v1/keywords:
+    get:
+      tags:
+      - Company Docs v1
+      summary: Get Document Keywords
+      description: 'Get document keywords with counts.
+
+
+        **Notes:**
+
+        - At least one equity identifier is **required**, and only **one** identifier should be used per request.'
+      operationId: get_doc_keywords
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: search
+        in: query
+        description: Search term for filtering
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Page number
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        description: Results per page
+        schema:
+          type: integer
+          default: 100
+          minimum: 10
+          maximum: 100
+      - name: bloomberg_ticker
+        in: query
+        description: Filter to one or more Bloomberg tickers, comma-separated (e.g. AAPL:US)
+        schema:
+          type: string
+      - name: isin
+        in: query
+        description: Filter to one or more ISINs, comma-separated
+        schema:
+          type: string
+      - name: cusip
+        in: query
+        description: Filter to one or more CUSIPs, comma-separated
+        schema:
+          type: string
+      - name: ric
+        in: query
+        description: Filter to one or more RICs, comma-separated
+        schema:
+          type: string
+      - name: ticker
+        in: query
+        description: Filter to one or more ticker symbols, comma-separated
+        schema:
+          type: string
+      - name: permid
+        in: query
+        description: Filter to one or more PermIDs, comma-separated
+        schema:
+          type: string
+      - name: sector_id
+        in: query
+        description: Filter by GICS sector ID
+        schema:
+          type: integer
+      - name: subsector_id
+        in: query
+        description: Filter by GICS sub-sector ID
+        schema:
+          type: integer
+      - name: include_delisted
+        in: query
+        description: Whether to include delisted equities
+        schema:
+          type: boolean
+          default: true
+      - name: company_rollup
+        in: query
+        description: Whether to roll up to all company equities
+        schema:
+          type: boolean
+          default: true
+      responses:
+        '400':
+          description: Bad request
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeywordsResponse'
+  /company-docs-v1/{doc_id}:
+    get:
+      tags:
+      - Company Docs v1
+      summary: Get Company Document
+      description: Get a company document
+      operationId: get_get_doc
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: doc_id
+        in: path
+        required: true
+        description: Identifier for a specific company document to retrieve
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Document not found
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocItem'
+  /company-docs-v1/{doc_id}/pdf:
+    get:
+      tags:
+      - Company Docs v1
+      summary: Get Company Document PDF
+      description: Download the document PDF
+      operationId: get_get_doc_pdf
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: doc_id
+        in: path
+        required: true
+        description: The unique identifier for a company document
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Document not found
+        '400':
+          description: PDF not available
+        '200':
+          description: PDF document
+  /company-docs-v1/{doc_id}/text:
+    get:
+      tags:
+      - Company Docs v1
+      summary: Get Company Document Text
+      description: Download the document plain text
+      operationId: get_get_doc_text
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: doc_id
+        in: path
+        required: true
+        description: The unique identifier for a company document
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Document not found
+        '400':
+          description: Text not available
+        '200':
+          description: Plain text document
+components:
+  schemas:
+    CoverageResponse:
+      properties:
+        counts:
+          description: Coverage counts and breakdowns
+          allOf:
+          - $ref: '#/components/schemas/CoverageCounts'
+        results:
+          type: object
+          description: Company details (when identifier filter is provided)
+      type: object
+    DocPagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
+      type: object
+    CoverageCounts:
+      properties:
+        companies:
+          type: integer
+          description: Number of companies covered
+        equities:
+          type: integer
+          description: Number of equities covered
+        gics_sectors:
+          type: object
+          description: Count by GICS sector
+        gics_subsectors:
+          type: object
+          description: Count by GICS sub-sector
+        countries:
+          type: object
+          description: Count by country
+        regions:
+          type: object
+          description: Count by region
+        subregions:
+          type: object
+          description: Count by subregion
+      type: object
+    DocItem:
+      properties:
+        doc_id:
+          type: integer
+          description: Document ID
+        company:
+          description: Company information
+          allOf:
+          - $ref: '#/components/schemas/DocCompany'
+        publish_date:
+          type: string
+          format: date
+          description: Publish date
+        category:
+          type: string
+          description: Document category
+          enum:
+          - announcement
+          - annual_report
+          - earnings_release
+          - financial_report
+          - investor_update
+          - press_release
+          - sec_filing
+          - slide_presentation
+          - sustainability_report
+        title:
+          type: string
+          description: Document title
+        source_url:
+          type: string
+          description: Original source URL
+        summary:
+          type: object
+          description: AI-generated summary
+        keywords:
+          type: object
+          description: Extracted keywords
+        processed:
+          type: string
+          format: date-time
+          description: Processing date
+        event_id:
+          type: integer
+          description: Mapped event (scheduled_audio_call) ID, if the doc maps to an event
+        event_map_type:
+          type: string
+          description: How the doc maps to the event
+          enum:
+          - press_release
+          - slide_presentation
+          - earnings_release
+        created:
+          type: string
+          format: date-time
+          description: Created date
+        modified:
+          type: string
+          format: date-time
+          description: Modified date
+      type: object
+    KeywordsResponse:
+      properties:
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/DocPagination'
+        data:
+          type: object
+          description: Map of keyword to document count
+      type: object
+    DocCompany:
+      properties:
+        company_id:
+          type: integer
+          description: Company ID
+        common_name:
+          type: string
+          description: Common name
+        legal_name:
+          type: string
+          description: Legal name
+        incorporated_country_code:
+          type: string
+          description: Country of incorporation
+        domiciled_country_code:
+          type: string
+          description: Country of domicile
+      type: object
+    CategoriesResponse:
+      properties:
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/DocPagination'
+        data:
+          type: object
+          description: Map of category name to document count
+      type: object
+    DocsResponse:
+      properties:
+        params:
+          type: object
+          description: Echoed request parameters
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/DocPagination'
+        data:
+          type: array
+          description: List of documents
+          items:
+            $ref: '#/components/schemas/DocItem'
+      type: object
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Issued API key
+    apiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: Issued API key

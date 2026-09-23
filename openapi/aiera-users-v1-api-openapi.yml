@@ -1,0 +1,62 @@
+openapi: 3.2.0
+info:
+  title: Aiera REST Users v1 API
+  version: '1.0'
+  description: Aiera financial data API
+servers:
+- url: https://rest-api.aiera.com/api
+security:
+- apiKeyHeader: []
+tags:
+- name: Users V1
+  description: User entitlements and permissions
+paths:
+  /users-v1/entitlements:
+    get:
+      tags:
+      - Users V1
+      summary: Get Entitlements
+      description: Get the current user's research entitlements and exclusions
+      operationId: get_get_entitlements
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: skip_cache
+        in: query
+        description: Bypass the 5-minute cache and re-fetch entitlements from the upstream service
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementsResponse'
+components:
+  schemas:
+    EntitlementsResponse:
+      properties:
+        entitlements:
+          type: array
+          description: List of entitlement tags
+          items:
+            type: string
+        exclusions:
+          type: array
+          description: List of exclusion tags
+          items:
+            type: string
+      type: object
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Issued API key
+    apiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: Issued API key

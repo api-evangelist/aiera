@@ -1,0 +1,291 @@
+openapi: 3.2.0
+info:
+  title: Aiera REST Expert Access v1 API
+  version: '1.0'
+  description: Aiera financial data API
+servers:
+- url: https://rest-api.aiera.com/api
+security:
+- apiKeyHeader: []
+tags:
+- name: Expert Access v1
+  description: Third-party expert insights content
+paths:
+  /expert-access-v1/status:
+    get:
+      tags:
+      - Expert Access v1
+      summary: Expert Access Status
+      description: Check the expert access service status
+      operationId: get_get_status
+      security:
+      - apiKeyHeader: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpertStatus'
+  /expert-access-v1/{provider}/:
+    get:
+      tags:
+      - Expert Access v1
+      summary: Find Expert Access Events
+      description: 'Find expert access events and content by provider.
+
+
+        **Notes:**
+
+        - Results are sorted by `call_date` in descending order (most recent first)
+
+        - The list endpoint returns a simplified view; use the detail endpoint for full event data
+
+        - The `insights` field in the list response corresponds to `keyInsights` in the detail endpoint'
+      operationId: get_get_provider_events
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: provider
+        in: path
+        required: true
+        description: Which expert access provider to search (i.e. thirdbridge)
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        description: Start date (default 2 weeks ago)
+        schema:
+          type: string
+          format: date-time
+      - name: end_date
+        in: query
+        description: End date (default 2 weeks from now)
+        schema:
+          type: string
+          format: date-time
+      - name: content_type
+        in: query
+        description: Content types to include
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - COMMUNITY
+            - FORUM
+            - PRIMER
+      - name: page
+        in: query
+        description: Page number
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        description: Results per page
+        schema:
+          type: integer
+          default: 100
+          minimum: 10
+          maximum: 100
+      responses:
+        '404':
+          description: Provider not available
+        '400':
+          description: Bad request
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpertEventsResponse'
+  /expert-access-v1/{provider}/{event_id}:
+    get:
+      tags:
+      - Expert Access v1
+      summary: Get Expert Access Event
+      description: 'Get a specific expert access event from a specific provider.
+
+
+        **Notes:**
+
+        - The detail endpoint returns full event data including transcript, expert biographies, and company details
+
+        - The `keyInsights` field in the detail response corresponds to `insights` in the list endpoint'
+      operationId: get_get_provider_event
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: provider
+        in: path
+        required: true
+        description: Which expert access provider to search (Third Bridge)
+        schema:
+          type: string
+      - name: event_id
+        in: path
+        required: true
+        description: Which event ID to return
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Event not found
+        '400':
+          description: Bad request
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpertEventDetail'
+components:
+  schemas:
+    ExpertEvent:
+      properties:
+        event_id:
+          type: string
+          description: Provider event ID
+        content_type:
+          type: string
+          description: Content type
+          enum:
+          - COMMUNITY
+          - FORUM
+          - PRIMER
+        call_date:
+          type: string
+          format: date-time
+          description: Call date
+        title:
+          type: string
+          description: Event title
+        language:
+          type: string
+          description: Content language
+        agenda:
+          type: array
+          description: Agenda items
+          items:
+            type: string
+        insights:
+          type: array
+          description: Key insights
+          items:
+            type: string
+      type: object
+    ExpertEventsResponse:
+      properties:
+        params:
+          type: object
+          description: Echoed request parameters
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/ExpertPagination'
+        data:
+          type: array
+          description: List of events
+          items:
+            $ref: '#/components/schemas/ExpertEvent'
+      type: object
+    ExpertStatus:
+      properties:
+        status:
+          type: string
+          description: Service status
+      type: object
+    ExpertPagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
+      type: object
+    ExpertEventDetail:
+      properties:
+        thirdbridge_id:
+          type: string
+          description: Third Bridge event ID
+        content_type:
+          type: string
+          description: Content type
+          enum:
+          - COMMUNITY
+          - FORUM
+          - PRIMER
+        title:
+          type: string
+          description: Event title
+        call_date:
+          type: string
+          format: date-time
+          description: Call date
+        language:
+          type: string
+          description: Content language
+        agenda:
+          type: array
+          description: Agenda items
+          items:
+            type: string
+        keyInsights:
+          type: array
+          description: Key insights
+          items:
+            type: string
+        expertBiographies:
+          type: array
+          description: Expert biographies
+          items:
+            $ref: '#/components/schemas/ExpertBiography'
+        companies:
+          type: array
+          description: Related companies
+          items:
+            $ref: '#/components/schemas/ExpertCompany'
+        transcript:
+          type: string
+          description: Full transcript text
+      type: object
+    ExpertCompany:
+      properties:
+        name:
+          type: string
+          description: Company name
+        ticker:
+          type: string
+          description: Company ticker
+        exchange:
+          type: string
+          description: Exchange name
+      type: object
+    ExpertBiography:
+      properties:
+        name:
+          type: string
+          description: Expert name
+        biography:
+          type: string
+          description: Expert biography text
+      type: object
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Issued API key
+    apiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: Issued API key

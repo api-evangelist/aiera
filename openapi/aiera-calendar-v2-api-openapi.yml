@@ -1,0 +1,618 @@
+openapi: 3.2.0
+info:
+  title: Aiera REST Calendar v2 API
+  version: '1.0'
+  description: Aiera financial data API
+servers:
+- url: https://rest-api.aiera.com/api
+security:
+- apiKeyHeader: []
+tags:
+- name: Calendar v2
+  description: Event calendar, coverage, and estimates
+paths:
+  /calendar-v2/:
+    get:
+      tags:
+      - Calendar v2
+      summary: Get Calendar
+      description: 'Retrieve calendar events filtered by specific equities or watchlists, with flexible date ranges and event type filtering.
+
+
+        **Notes:**
+
+        - `modified_since` can be used to synchronize with an external system.
+
+        - All dates (`event_date`, `created`, `modified`) are in Eastern Time (America/New_York timezone) and formatted in ISO 8601.
+
+        - By default, `start_date` and `end_date` are set to +/- 2 weeks.
+
+        - Only **one** of the equity identifiers (`bloomberg_ticker`, `isin`, `cusip`, `permid`, `ric`, or `ticker`) should be used per request. Using multiple equity identifier query parameters will end up resolving only one of them.
+
+        - You can only pull a maximum of 365 days worth of calendar data at a time (using `start_date` and `end_date`, or `modified_since`). You could extend this range to 730 days by filtering to specific equities using one of the supported identifiers (or the `watchlist_id` parameter).'
+      operationId: get_get_calendar
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: start_date
+        in: query
+        description: Start date (default 2 weeks ago)
+        schema:
+          type: string
+          format: date-time
+      - name: end_date
+        in: query
+        description: End date (default 2 weeks from now)
+        schema:
+          type: string
+          format: date-time
+      - name: event_type
+        in: query
+        description: Event types to include
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - earnings
+            - presentation
+            - shareholder_meeting
+            - investor_meeting
+            - special_situation
+            - earnings_release
+      - name: modified_since
+        in: query
+        description: Returns events modified after the date passed in
+        schema:
+          type: string
+          format: date-time
+      - name: bloomberg_ticker
+        in: query
+        description: Filter to one or more Bloomberg tickers, comma-separated
+        schema:
+          type: string
+      - name: isin
+        in: query
+        description: Filter to one or more ISINs, comma-separated
+        schema:
+          type: string
+      - name: cusip
+        in: query
+        description: Filter to one or more CUSIPs, comma-separated
+        schema:
+          type: string
+      - name: ric
+        in: query
+        description: Filter to one or more RICs, comma-separated
+        schema:
+          type: string
+      - name: ticker
+        in: query
+        description: Filter to one or more ticker symbols, comma-separated
+        schema:
+          type: string
+      - name: permid
+        in: query
+        description: Filter to one or more PermIDs, comma-separated
+        schema:
+          type: string
+      - name: watchlist_id
+        in: query
+        description: Filter to a watchlist ID
+        schema:
+          type: integer
+      - name: company_rollup
+        in: query
+        description: Whether to roll up matches to the corresponding company entity
+        schema:
+          type: boolean
+      - name: include_deleted
+        in: query
+        description: Whether to include deleted event records (for reconciliation)
+        schema:
+          type: boolean
+      - name: include_private
+        in: query
+        description: Whether to include private events
+        schema:
+          type: boolean
+      - name: sort_key
+        in: query
+        description: Sort key for results
+        schema:
+          type: string
+          enum:
+          - event_id_asc
+          - event_id_desc
+          - event_date_asc
+          - event_date_desc
+      - name: page
+        in: query
+        description: Page number
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        description: Results per page
+        schema:
+          type: integer
+          default: 100
+          minimum: 10
+          maximum: 100
+      responses:
+        '400':
+          description: Bad request
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarResponse'
+  /calendar-v2/coverage:
+    get:
+      tags:
+      - Calendar v2
+      summary: Calendar Coverage
+      description: 'Fetch calendar coverage information (companies and equities).
+
+
+        **Notes:**
+
+        - Only **one** of the equity identifiers (`bloomberg_ticker`, `isin`, `cusip`, `ric`, or `permid`) should be used per request. Using multiple equity identifier query parameters will end up resolving only one of them.
+
+        - When filtering by a specific identifier or `watchlist_id`, the response includes a `results` object containing matched company and equity details in addition to the `counts` summary. When no filter is applied, only `counts` is returned.
+
+        - The equity schema in this endpoint uses `gics_subsector` (no underscore). Note that this differs from the `/calendar-v2/estimated` endpoint, which uses `gics_sub_sector` (with underscore).'
+      operationId: get_equities_covered
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: bloomberg_ticker
+        in: query
+        description: Filter to one or more Bloomberg tickers, comma-separated
+        schema:
+          type: string
+      - name: isin
+        in: query
+        description: Filter to one or more ISINs, comma-separated
+        schema:
+          type: string
+      - name: cusip
+        in: query
+        description: Filter to one or more CUSIPs, comma-separated
+        schema:
+          type: string
+      - name: ric
+        in: query
+        description: Filter to one or more RICs, comma-separated
+        schema:
+          type: string
+      - name: ticker
+        in: query
+        description: Filter to one or more ticker symbols, comma-separated
+        schema:
+          type: string
+      - name: permid
+        in: query
+        description: Filter to one or more PermIDs, comma-separated
+        schema:
+          type: string
+      - name: watchlist_id
+        in: query
+        description: Filter to a watchlist ID
+        schema:
+          type: integer
+      - name: company_rollup
+        in: query
+        description: Whether to roll up matches to the corresponding company entity
+        schema:
+          type: boolean
+      responses:
+        '400':
+          description: Bad request
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoverageResponse'
+  /calendar-v2/estimated:
+    get:
+      tags:
+      - Calendar v2
+      summary: Estimated Events
+      description: 'Retrieve estimated events filtered by ticker, date range, and other equity identifiers.
+
+
+        **Notes:**
+
+        - Access to this endpoint requires explicit permissions to be enabled on your API key. If you receive a 403 error or empty results, contact your Aiera account team to have estimated events access activated.
+
+        - All dates are in Eastern Time (America/New_York timezone) and formatted in ISO 8601.
+
+        - Only **one** of the equity identifiers (`bloomberg_ticker`, `isin`, `ric`, or `permid`) should be used per request. Using multiple equity identifier query parameters will end up resolving only one of them.
+
+        - Each result includes `created` and `modified` timestamps (Eastern Time, ISO 8601) indicating when the estimate was first created and last updated.
+
+        - The equity schema in this endpoint uses `gics_sub_sector` (with underscore). Note that this differs from the `/calendar-v2/coverage` endpoint, which uses `gics_subsector` (no underscore).'
+      operationId: get_get_event_estimates
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: start_date
+        in: query
+        description: Start date (default now)
+        schema:
+          type: string
+          format: date-time
+      - name: end_date
+        in: query
+        description: End date (default 26 weeks from now)
+        schema:
+          type: string
+          format: date-time
+      - name: bloomberg_ticker
+        in: query
+        description: Filter to one or more Bloomberg tickers, comma-separated (e.g. AAPL:US)
+        schema:
+          type: string
+      - name: isin
+        in: query
+        description: Filter to one or more ISINs, comma-separated
+        schema:
+          type: string
+      - name: permid
+        in: query
+        description: Filter to one or more PermIDs, comma-separated
+        schema:
+          type: string
+      - name: ric
+        in: query
+        description: Filter to one or more RICs, comma-separated
+        schema:
+          type: string
+      - name: ticker
+        in: query
+        description: Filter to one or more ticker symbols, comma-separated
+        schema:
+          type: string
+      - name: event_ids
+        in: query
+        description: Filter to one or more event IDs, comma-separated
+        schema:
+          type: array
+          items:
+            type: string
+      - name: page
+        in: query
+        description: Page number
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        description: Results per page
+        schema:
+          type: integer
+          default: 100
+          minimum: 10
+          maximum: 100
+      responses:
+        '400':
+          description: Bad request
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstimatesResponse'
+  /calendar-v2/{event_id}:
+    get:
+      tags:
+      - Calendar v2
+      summary: Get Calendar Event
+      description: Fetch a single calendar event by ID
+      operationId: get_get_calendar_entry
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        description: The event id to fetch the calendar info for
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Event not found
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarEvent'
+components:
+  schemas:
+    CoverageResponse:
+      properties:
+        counts:
+          description: Coverage counts and breakdowns
+          allOf:
+          - $ref: '#/components/schemas/CoverageCounts'
+        results:
+          type: object
+          description: Company details (when identifier filter is provided)
+      type: object
+    CoverageCounts:
+      properties:
+        companies:
+          type: integer
+          description: Number of companies covered
+        equities:
+          type: integer
+          description: Number of equities covered
+        gics_sectors:
+          type: object
+          description: Count by GICS sector
+        gics_subsectors:
+          type: object
+          description: Count by GICS sub-sector
+        countries:
+          type: object
+          description: Count by country
+        regions:
+          type: object
+          description: Count by region
+        subregions:
+          type: object
+          description: Count by subregion
+      type: object
+    CalendarPagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
+      type: object
+    CalendarEquity:
+      properties:
+        equity_id:
+          type: integer
+          description: Equity ID
+        local_ticker:
+          type: string
+          description: Local ticker
+        bloomberg_ticker:
+          type: string
+          description: Bloomberg ticker
+        ric:
+          type: string
+          description: Reuters/Refinitiv RIC
+        permid:
+          type: string
+          description: PermID
+        isin:
+          type: string
+          description: ISIN
+        exchange_mic:
+          type: string
+          description: Exchange MIC
+      type: object
+    CalendarEvent:
+      properties:
+        event_id:
+          type: integer
+          description: Event ID
+        event_title:
+          type: string
+          description: Event title
+        event_type:
+          type: string
+          description: Event type
+          enum:
+          - custom
+          - earnings
+          - earnings_release
+          - investor_meeting
+          - presentation
+          - shareholder_meeting
+          - special_situation
+        event_date:
+          type: string
+          format: date-time
+          description: Event date
+        equity:
+          description: Associated equity
+          allOf:
+          - $ref: '#/components/schemas/CalendarEquity'
+        has_unknown_time:
+          type: boolean
+          description: Whether event time is unknown (with connections permission)
+        connection_expected:
+          type: boolean
+          description: Whether a connection is expected (with connections permission)
+        broadcast_url:
+          type: string
+          description: Webcast URL (with connections permission)
+        replay_url:
+          type: string
+          description: Replay URL (with connections permission)
+        conference_number:
+          type: string
+          description: Conference dial-in number (with connections permission)
+        conference_pin:
+          type: string
+          description: Conference PIN (with connections permission)
+        slides_url:
+          type: string
+          description: Slides URL (with extras permission)
+        press_url:
+          type: string
+          description: Press release URL (with extras permission)
+        transcription_status:
+          type: string
+          description: Transcription status (with extras permission)
+          enum:
+          - agent_connected
+          - archived
+          - connected
+          - finished
+          - missed
+          - started
+          - submitted
+        transcription_audio_url:
+          type: string
+          description: Audio URL (with extras permission)
+        status:
+          type: string
+          description: Event status
+          enum:
+          - active
+          - deleted
+        created:
+          type: string
+          format: date-time
+          description: Created date
+        modified:
+          type: string
+          format: date-time
+          description: Modified date
+      type: object
+    EstimateDetail:
+      properties:
+        call_type:
+          type: string
+          description: Estimated event type
+        call_date:
+          type: string
+          format: date-time
+          description: Estimated date
+        title:
+          type: string
+          description: Estimated event title
+      type: object
+    EstimateItem:
+      properties:
+        estimate_id:
+          type: integer
+          description: Estimate ID
+        created:
+          type: string
+          format: date-time
+          description: Created date
+        modified:
+          type: string
+          format: date-time
+          description: Modified date
+        equity:
+          description: Associated equity
+          allOf:
+          - $ref: '#/components/schemas/EstimateEquity'
+        estimate:
+          description: Estimated event details
+          allOf:
+          - $ref: '#/components/schemas/EstimateDetail'
+        actual:
+          description: Matched actual event, if any
+          allOf:
+          - $ref: '#/components/schemas/EstimateActual'
+      type: object
+    EstimateActual:
+      properties:
+        event_id:
+          type: integer
+          description: Actual event ID
+        call_type:
+          type: string
+          description: Actual event type
+        call_date:
+          type: string
+          format: date-time
+          description: Actual date
+        title:
+          type: string
+          description: Actual event title
+      type: object
+    EstimateEquity:
+      properties:
+        equity_id:
+          type: integer
+          description: Equity ID
+        name:
+          type: string
+          description: Equity name
+        common_name:
+          type: string
+          description: Common name
+        local_ticker:
+          type: string
+          description: Local ticker
+        mic:
+          type: string
+          description: Exchange MIC
+        bloomberg_ticker:
+          type: string
+          description: Bloomberg ticker
+        isin:
+          type: string
+          description: ISIN
+        permid:
+          type: string
+          description: PermID
+        gics_sector:
+          type: string
+          description: GICS sector name
+        gics_sub_sector:
+          type: string
+          description: GICS sub-sector name
+      type: object
+    CalendarResponse:
+      properties:
+        params:
+          type: object
+          description: Echoed request parameters
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/CalendarPagination'
+        data:
+          type: array
+          description: List of events
+          items:
+            $ref: '#/components/schemas/CalendarEvent'
+      type: object
+    EstimatesResponse:
+      properties:
+        params:
+          type: object
+          description: Echoed request parameters
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/CalendarPagination'
+        results:
+          type: array
+          description: List of estimates
+          items:
+            $ref: '#/components/schemas/EstimateItem'
+      type: object
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Issued API key
+    apiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: Issued API key

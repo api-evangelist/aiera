@@ -1,0 +1,1369 @@
+openapi: 3.2.0
+info:
+  title: Aiera Equities V2 API
+  version: '1.0'
+  description: 'Operations tagged Equities V2 across 3 of this provider''s published API definitions: aiera-equity-openapi.yaml, aiera-rest-api-openapi.json, aiera-unified-openapi.yaml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://premium.aiera.com/api
+- url: https://rest-api.aiera.com/api
+tags:
+- name: Equities V2
+paths:
+  /equities-v2/sectors:
+    get:
+      operationId: get sectors and sub-sectors
+      description: Retrieves sectors and subsectors
+      summary: Retrieves a list of sectors along with their subsectors
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: An array of sector objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sector'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Equities V2
+    servers:
+    - url: https://premium.aiera.com/api
+  /equities-v2:
+    get:
+      operationId: getEquities
+      summary: Retrieves a list of equities
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: bloomberg_ticker
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Filter activities to 1+ bloomberg tickers always including country codes with colon (comma-separated).
+      - name: isin
+        in: query
+        schema:
+          type: string
+        description: ISIN (International Securities Identification Number) of the equity.
+      - name: ric
+        in: query
+        schema:
+          type: string
+        description: Reuters Instrument Code of the equity.
+      - name: ticker
+        in: query
+        schema:
+          type: string
+        description: Local ticker of the equity.
+      - name: permid
+        in: query
+        schema:
+          type: string
+        description: PermID of the equity.
+      - name: sector_id
+        in: query
+        schema:
+          type: integer
+        description: ID of the sector.
+      - name: subsector_id
+        in: query
+        schema:
+          type: integer
+        description: ID of the subsector.
+      - name: search
+        in: query
+        schema:
+          type: string
+        description: Search term for equity names or tickers.
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+        description: Page number for pagination.
+      - name: page_size
+        in: query
+        schema:
+          type: integer
+          default: 100
+          maximum: 2500
+          minimum: 10
+        description: Number of records per page.
+      - name: include_inactive
+        in: query
+        schema:
+          type: boolean
+        description: Whether to include inactive equities.
+      - name: include_company_metadata
+        in: query
+        schema:
+          type: boolean
+          default: true
+        description: Whether to include associated company metadata.
+      responses:
+        '200':
+          description: A list of equities.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Equity'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Equities V2
+    servers:
+    - url: https://premium.aiera.com/api
+  /equities-v2/{equity_id}:
+    get:
+      operationId: get equity info by equity id
+      description: Retrieves equities by equity id
+      summary: Retrieves the appropriate equity by equity id
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: equity_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: ID of the equity.
+      - name: include_company_metadata=true
+        in: query
+        schema:
+          type: boolean
+          default: true
+        description: Whether to include associated company metadata.
+      responses:
+        '200':
+          description: An array of equity objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Equity'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Equities V2
+    servers:
+    - url: https://premium.aiera.com/api
+  /equities-v2/{equity_id}/summary:
+    get:
+      operationId: getEquitySummary
+      description: Retrieves a summary of an equity including basic information and events
+      summary: Retrieves detailed information about an equity including past and upcoming…
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: equity_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the equity or Bloomberg ticker with country code (e.g., AAPL:US)
+      responses:
+        '200':
+          description: A detailed summary of the equity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EquitySummary'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Equities V2
+    servers:
+    - url: https://premium.aiera.com/api
+  /equities-v2/:
+    get:
+      tags:
+      - Equities V2
+      summary: Find Equities
+      description: 'Fetch equities, optionally with events, and narrowed down by search term or supported equity identifiers.
+
+
+        **Notes:**
+
+        - Only **one** of the equity identifiers (`bloomberg_ticker`, `isin`, `permid`, or `ric`) should be used per request. Using multiple equity identifiers will end up resolving only one of them.'
+      operationId: get_get_equities
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: bloomberg_ticker
+        in: query
+        description: Filter to one or more Bloomberg tickers, comma-separated (e.g. AAPL:US)
+        schema:
+          type: string
+      - name: isin
+        in: query
+        description: Filter to one or more ISINs, comma-separated
+        schema:
+          type: string
+      - name: ric
+        in: query
+        description: Filter to one or more Reuters/Refinitiv RICs, comma-separated
+        schema:
+          type: string
+      - name: ticker
+        in: query
+        description: Ticker symbol
+        schema:
+          type: string
+      - name: permid
+        in: query
+        description: Filter to one or more PermIDs, comma-separated
+        schema:
+          type: string
+      - name: sector_id
+        in: query
+        description: Filter to a specific GICS sector ID
+        schema:
+          type: string
+      - name: subsector_id
+        in: query
+        description: Filter to a specific GICS sub-sector ID
+        schema:
+          type: string
+      - name: search
+        in: query
+        description: Search equities by name or ticker
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Page number
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        description: Results per page
+        schema:
+          type: integer
+          default: 100
+          minimum: 10
+          maximum: 2500
+      - name: include_inactive
+        in: query
+        description: Whether to include inactive/delisted equities
+        schema:
+          type: boolean
+      - name: include_company_metadata
+        in: query
+        description: Whether to include the associated company's metadata (e.g. names, urls)
+        schema:
+          type: boolean
+      - name: include_sourcing
+        in: query
+        description: Whether to include sourcing information
+        schema:
+          type: boolean
+      - name: X-Fields
+        in: header
+        description: An optional fields mask
+        schema:
+          type: string
+          format: mask
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equities'
+        '400':
+          description: Bad request
+    servers:
+    - url: https://rest-api.aiera.com/api
+  /equities-v2/summaries:
+    get:
+      tags:
+      - Equities V2
+      summary: Get Equity Summaries
+      description: Get summary data for multiple equities
+      operationId: get_get_equity_summaries
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: bloomberg_ticker
+        in: query
+        description: Bloomberg formatted ticker (e.g. AAPL:US)
+        schema:
+          type: string
+      - name: isin
+        in: query
+        description: ISIN identifier
+        schema:
+          type: string
+      - name: permid
+        in: query
+        description: PermID identifier
+        schema:
+          type: string
+      - name: ric
+        in: query
+        description: Reuters/Refinitiv RIC
+        schema:
+          type: string
+      - name: ticker
+        in: query
+        description: Ticker symbol
+        schema:
+          type: string
+      - name: company_rollup
+        in: query
+        description: Roll up to all equities for the same company
+        schema:
+          type: boolean
+      - name: equity_ids
+        in: query
+        description: Comma-separated equity IDs
+        schema:
+          type: string
+      - name: lookback
+        in: query
+        description: Number of days to look back for summaries
+        schema:
+          type: integer
+      responses:
+        '400':
+          description: Bad request
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EquitySummary_2'
+    servers:
+    - url: https://rest-api.aiera.com/api
+  /equities-v2/{equity_id}/:
+    get:
+      tags:
+      - Equities V2
+      summary: Get Equity
+      description: Fetch a specific equity, optionally with events, linguistics, and statistics
+      operationId: get_get_equity
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: equity_id
+        in: path
+        required: true
+        description: Equity ID or Bloomberg ticker
+        schema:
+          type: string
+      - name: bloomberg_ticker
+        in: query
+        description: Filter to one or more Bloomberg tickers, comma-separated (e.g. AAPL:US)
+        schema:
+          type: string
+      - name: isin
+        in: query
+        description: Filter to one or more ISINs, comma-separated
+        schema:
+          type: string
+      - name: ric
+        in: query
+        description: Filter to one or more Reuters/Refinitiv RICs, comma-separated
+        schema:
+          type: string
+      - name: ticker
+        in: query
+        description: Ticker symbol
+        schema:
+          type: string
+      - name: permid
+        in: query
+        description: Filter to one or more PermIDs, comma-separated
+        schema:
+          type: string
+      - name: sector_id
+        in: query
+        description: Filter to a specific GICS sector ID
+        schema:
+          type: string
+      - name: subsector_id
+        in: query
+        description: Filter to a specific GICS sub-sector ID
+        schema:
+          type: string
+      - name: search
+        in: query
+        description: Search equities by name or ticker
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Page number
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        description: Results per page
+        schema:
+          type: integer
+          default: 100
+          minimum: 10
+          maximum: 2500
+      - name: include_inactive
+        in: query
+        description: Whether to include inactive/delisted equities
+        schema:
+          type: boolean
+      - name: include_company_metadata
+        in: query
+        description: Whether to include the associated company's metadata (e.g. names, urls)
+        schema:
+          type: boolean
+      - name: include_sourcing
+        in: query
+        description: Whether to include sourcing information
+        schema:
+          type: boolean
+      responses:
+        '404':
+          description: Equity not found
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equity_2'
+    servers:
+    - url: https://rest-api.aiera.com/api
+components:
+  schemas:
+    Sector:
+      type: object
+      properties:
+        sector_id:
+          type: integer
+        gics_code:
+          type: string
+        name:
+          type: string
+        subsectors:
+          type: array
+          items:
+            type: object
+            properties:
+              subsector_id:
+                type: integer
+              gics_code:
+                type: string
+              gics_industry_code:
+                type: string
+              name:
+                type: string
+    UpcomingEvent:
+      type: object
+      properties:
+        event_id:
+          type: integer
+          description: Unique identifier for the event
+        title:
+          type: string
+          description: Title of the event
+        event_type:
+          type: string
+          description: Type of event (e.g., earnings, conference)
+        event_date:
+          type: string
+          format: date-time
+          description: Date and time of the event
+        fiscal_quarter:
+          type: string
+          nullable: true
+          description: Fiscal quarter related to the event
+        fiscal_year:
+          type: integer
+          nullable: true
+          description: Fiscal year related to the event
+        conference_number:
+          type: string
+          nullable: true
+          description: Conference call number
+        conference_number_alt:
+          type: string
+          nullable: true
+          description: Alternative conference call number
+        conference_pin:
+          type: string
+          nullable: true
+          description: Conference call PIN
+        broadcast_url:
+          type: string
+          nullable: true
+          description: URL for the broadcast
+        duplicate_of:
+          type: integer
+          nullable: true
+          description: ID of the event this is a duplicate of
+        created:
+          type: string
+          format: date-time
+          description: When the event record was created
+        modified:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the event record was last modified
+    Pagination:
+      type: object
+      properties:
+        total_count:
+          type: integer
+        current_page:
+          type: integer
+        total_pages:
+          type: integer
+        page_size:
+          type: integer
+    PastEvent:
+      type: object
+      properties:
+        event_id:
+          type: integer
+          description: Unique identifier for the event
+        title:
+          type: string
+          description: Title of the event
+        event_type:
+          type: string
+          description: Type of event (e.g., earnings, conference)
+        event_date:
+          type: string
+          format: date-time
+          description: Date and time of the event
+        fiscal_quarter:
+          type: string
+          nullable: true
+          description: Fiscal quarter related to the event
+        fiscal_year:
+          type: integer
+          nullable: true
+          description: Fiscal year related to the event
+        conference_number:
+          type: string
+          nullable: true
+          description: Conference call number
+        conference_number_alt:
+          type: string
+          nullable: true
+          description: Alternative conference call number
+        conference_pin:
+          type: string
+          nullable: true
+          description: Conference call PIN
+        broadcast_url:
+          type: string
+          nullable: true
+          description: URL for the broadcast
+        replay_url:
+          type: string
+          nullable: true
+          description: URL for the replay
+        transcription_status:
+          type: string
+          description: Status of the transcription
+        transcription_connected:
+          type: string
+          format: date-time
+          nullable: true
+          description: When transcription was connected
+        transcription_disconnected:
+          type: string
+          format: date-time
+          nullable: true
+          description: When transcription was disconnected
+        has_human_verified:
+          type: boolean
+          description: Whether the transcript has been human verified
+        has_live_transcript:
+          type: boolean
+          description: Whether a live transcript is available
+        has_audio:
+          type: boolean
+          description: Whether audio is available
+        has_press_release:
+          type: boolean
+          description: Whether a press release is available
+        has_slides:
+          type: boolean
+          description: Whether slides are available
+        duplicate_of:
+          type: integer
+          nullable: true
+          description: ID of the event this is a duplicate of
+        created:
+          type: string
+          format: date-time
+          description: When the event record was created
+        modified:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the event record was last modified
+        price_data:
+          type: object
+          description: Price data related to the event
+          properties:
+            previous_day_close_price:
+              type: number
+              nullable: true
+              description: Closing price on the previous day
+            current_day_open_price:
+              type: number
+              nullable: true
+              description: Opening price on the day of the event
+            current_day_close_price:
+              type: number
+              nullable: true
+              description: Closing price on the day of the event
+            price_at_start:
+              type: number
+              nullable: true
+              description: Price at the start of the event
+            price_at_end:
+              type: number
+              nullable: true
+              description: Price at the end of the event
+            volume_at_start:
+              type: number
+              nullable: true
+              description: Volume at the start of the event
+            olume_at_end:
+              type: number
+              nullable: true
+              description: Volume at the end of the event
+        summary:
+          type: object
+          description: Summary of the event
+          properties:
+            title:
+              type: string
+              nullable: true
+              description: Title of the summary
+            content:
+              type: object
+              nullable: true
+              description: Content of the summary
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    Equity:
+      type: object
+      properties:
+        equity_id:
+          type: integer
+        bloomberg_ticker:
+          type: string
+        name:
+          type: string
+        common_name:
+          type: string
+        ticker:
+          type: string
+        local_ticker:
+          type: string
+        mic:
+          type: string
+        isin:
+          type: string
+        permid:
+          type: string
+        sectoy_id:
+          type: integer
+        gics_sector:
+          type: string
+        subsector_id:
+          type: integer
+        gics_sub_sector:
+          type: string
+        primary_equity:
+          type: boolean
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
+        status:
+          type: string
+        company_metadata:
+          type: object
+          properties:
+            company_id:
+              type: integer
+            company_name:
+              type: string
+            legal_name:
+              type: string
+            incorporated_country_code:
+              type: string
+            domiciled_country_code:
+              type: string
+            urls:
+              type: array
+              items:
+                type: object
+                properties:
+                  url:
+                    type: string
+                  url_type:
+                    type: string
+    EquitySummary:
+      type: object
+      properties:
+        equity_id:
+          type: integer
+          description: The unique identifier for the equity
+        name:
+          type: string
+          description: The full name of the equity
+        common_name:
+          type: string
+          description: The common name of the equity
+        local_ticker:
+          type: string
+          description: The local ticker symbol
+        mic:
+          type: string
+          description: Market Identifier Code
+        bloomberg_ticker:
+          type: string
+          description: The Bloomberg ticker symbol with country code
+        isin:
+          type: string
+          description: International Securities Identification Number
+        permid:
+          type: string
+          description: PermID of the equity
+        gics_sector:
+          type: string
+          description: GICS sector name
+        gics_sub_sector:
+          type: string
+          description: GICS sub-sector name
+        description:
+          type: string
+          description: Company description
+        company_url:
+          type: string
+          description: Company website URL
+        ceo_name:
+          type: string
+          description: Name of the CEO
+        country:
+          type: string
+          description: Country of the company
+        estimated_next_earnings:
+          type: string
+          format: date-time
+          nullable: true
+          description: Estimated date of next earnings release
+        created:
+          type: string
+          format: date-time
+          description: When the equity record was created
+        modified:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the equity record was last modified
+        status:
+          type: string
+          description: Status of the equity
+        events:
+          type: object
+          description: Past and upcoming events for this equity
+          properties:
+            past:
+              type: array
+              description: Events that have already occurred
+              items:
+                $ref: '#/components/schemas/PastEvent'
+            upcoming:
+              type: array
+              description: Events that are scheduled for the future
+              items:
+                $ref: '#/components/schemas/UpcomingEvent'
+    Equities:
+      properties:
+        params:
+          description: Echoed request parameters
+          allOf:
+          - $ref: '#/components/schemas/OutputParams'
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/Pagination_2'
+        data:
+          description: List of equities
+          allOf:
+          - $ref: '#/components/schemas/Equity_2'
+      type: object
+    EquitySummary_2:
+      properties:
+        equity_id:
+          type: integer
+          description: Equity ID
+        company_id:
+          type: integer
+          description: Company ID
+        name:
+          type: string
+          description: Equity name
+        common_name:
+          type: string
+          description: Common name
+        local_ticker:
+          type: string
+          description: Local ticker
+        mic:
+          type: string
+          description: Market identifier code
+        bloomberg_ticker:
+          type: string
+          description: Bloomberg ticker
+        isin:
+          type: string
+          description: ISIN
+        permid:
+          type: string
+          description: PermID
+        ric:
+          type: string
+          description: Reuters/Refinitiv RIC
+        cusip:
+          type: string
+          description: CUSIP
+        gics_sector:
+          type: string
+          description: GICS sector name
+        gics_sub_sector:
+          type: string
+          description: GICS sub-sector name
+        description:
+          type: string
+          description: Company description
+        company_url:
+          type: string
+          description: Company website URL
+        ceo_name:
+          type: string
+          description: CEO name
+        country:
+          type: string
+          description: Country code
+        estimated_next_earnings:
+          type: string
+          format: date-time
+          description: Estimated next earnings date
+        created:
+          type: string
+          format: date-time
+          description: Created date
+        modified:
+          type: string
+          format: date-time
+          description: Modified date
+        status:
+          type: string
+          description: Equity status
+          enum:
+          - active
+          - delisted
+          - inactive
+          - merger
+          - suspended
+        leadership:
+          type: array
+          description: Company leadership
+          items:
+            $ref: '#/components/schemas/SummaryLeader'
+        indices:
+          type: array
+          description: Market indices
+          items:
+            type: string
+        events:
+          description: Past and upcoming events
+          allOf:
+          - $ref: '#/components/schemas/SummaryEvents'
+      type: object
+    Sector_2:
+      properties:
+        sector_id:
+          type: integer
+          description: Sector ID
+        gics_code:
+          type: string
+          description: GICS code
+        name:
+          type: string
+          description: Sector name
+        subsectors:
+          type: array
+          description: Sub-sectors
+          items:
+            $ref: '#/components/schemas/Subsector'
+      type: object
+    Company:
+      properties:
+        company_id:
+          type: integer
+          description: Company ID
+        common_name:
+          type: string
+          description: Common name
+        legal_name:
+          type: string
+          description: Legal name
+        incorporated_country_code:
+          type: string
+          description: Country of incorporation
+        domiciled_country_code:
+          type: string
+          description: Country of domicile
+        urls:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompanyURL'
+      type: object
+    SummaryEvents:
+      properties:
+        past:
+          type: array
+          description: Past events
+          items:
+            $ref: '#/components/schemas/SummaryEvent'
+        upcoming:
+          type: array
+          description: Upcoming events
+          items:
+            $ref: '#/components/schemas/SummaryEvent'
+      type: object
+    SummaryPriceData:
+      properties:
+        previous_day_close_price:
+          type: number
+          description: Previous day closing price
+        current_day_open_price:
+          type: number
+          description: Current day opening price
+        current_day_close_price:
+          type: number
+          description: Current day closing price
+        price_at_start:
+          type: number
+          description: Price at event start
+        price_at_end:
+          type: number
+          description: Price at event end
+        volume_at_start:
+          type: integer
+          description: Volume at event start
+        volume_at_end:
+          type: integer
+          description: Volume at event end
+      type: object
+    Subsector:
+      properties:
+        subsector_id:
+          type: integer
+          description: Sub-sector ID
+        gics_code:
+          type: string
+          description: GICS code
+        gics_industry_code:
+          type: string
+          description: GICS industry code
+        name:
+          type: string
+          description: Sub-sector name
+      type: object
+    Pagination_2:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
+      type: object
+    OutputParams:
+      properties:
+        page:
+          type: integer
+          description: Page number
+        page_size:
+          type: integer
+          description: Page size
+        bloomberg_ticker:
+          type: string
+          description: Bloomberg ticker
+        isin:
+          type: string
+          description: ISIN
+        ric:
+          type: string
+          description: RIC
+        ticker:
+          type: string
+          description: Ticker symbol
+        permid:
+          type: string
+          description: PermID
+        sector_id:
+          type: integer
+          description: GICS sector ID
+        subsector_id:
+          type: integer
+          description: GICS sub-sector ID
+        search:
+          type: string
+          description: Search query
+        include_company_metadata:
+          type: boolean
+          description: Include company metadata
+        include_inactive:
+          type: boolean
+          description: Include inactive equities
+        include_sourcing:
+          type: boolean
+          description: Include sourcing information
+      type: object
+    Equity_2:
+      properties:
+        equity_id:
+          type: integer
+          description: Equity ID
+        company_id:
+          type: integer
+          description: Company ID
+        name:
+          type: string
+          description: Equity name
+        common_name:
+          type: string
+          description: Common name
+        ticker:
+          type: string
+          description: Ticker symbol
+        local_ticker:
+          type: string
+          description: Local ticker
+        mic:
+          type: string
+          description: Market identifier code
+        bloomberg_ticker:
+          type: string
+          description: Bloomberg ticker
+        isin:
+          type: string
+          description: ISIN
+        permid:
+          type: string
+          description: PermID
+        ric:
+          type: string
+          description: Reuters/Refinitiv RIC
+        cusip:
+          type: string
+          description: CUSIP
+        sector_id:
+          type: integer
+          description: GICS sector ID
+        gics_sector:
+          type: string
+          description: GICS sector name
+        subsector_id:
+          type: integer
+          description: GICS sub-sector ID
+        gics_sub_sector:
+          type: string
+          description: GICS sub-sector name
+        primary_equity:
+          type: boolean
+          description: Whether this is the primary equity
+        created:
+          type: string
+          format: date-time
+          description: Created date
+        modified:
+          type: string
+          format: date-time
+          description: Modified date
+        status:
+          type: string
+          description: Equity status
+          enum:
+          - active
+          - delisted
+          - inactive
+          - merger
+          - suspended
+        company_metadata:
+          description: Company metadata
+          allOf:
+          - $ref: '#/components/schemas/Company'
+      type: object
+    SummaryLeader:
+      properties:
+        name:
+          type: string
+          description: Leader name
+        title:
+          type: string
+          description: Leader title
+        event_count:
+          type: integer
+          description: Number of events
+        last_event_date:
+          type: string
+          format: date-time
+          description: Last event date
+      type: object
+    SummaryEvent:
+      properties:
+        event_id:
+          type: integer
+          description: Event ID
+        title:
+          type: string
+          description: Event title
+        event_type:
+          type: string
+          description: Event type
+          enum:
+          - custom
+          - earnings
+          - earnings_release
+          - investor_meeting
+          - presentation
+          - shareholder_meeting
+          - special_situation
+        event_date:
+          type: string
+          format: date-time
+          description: Event date
+        fiscal_quarter:
+          type: integer
+          description: Fiscal quarter
+        fiscal_year:
+          type: integer
+          description: Fiscal year
+        conference_number:
+          type: string
+          description: Conference dial-in number
+        conference_number_alt:
+          type: string
+          description: Alternative conference number
+        conference_pin:
+          type: string
+          description: Conference PIN
+        broadcast_url:
+          type: string
+          description: Webcast URL
+        replay_url:
+          type: string
+          description: Replay URL
+        transcription_status:
+          type: string
+          description: Transcription status
+          enum:
+          - agent_connected
+          - archived
+          - connected
+          - finished
+          - missed
+          - started
+          - submitted
+        transcription_connected:
+          type: string
+          description: Transcription connection time
+        transcription_disconnected:
+          type: string
+          description: Transcription disconnection time
+        has_human_verified:
+          type: boolean
+          description: Whether transcript is human-verified
+        has_live_transcript:
+          type: boolean
+          description: Whether live transcript exists
+        has_audio:
+          type: boolean
+          description: Whether audio is available
+        has_press_release:
+          type: boolean
+          description: Whether press release is available
+        has_slides:
+          type: boolean
+          description: Whether slides are available
+        duplicate_of:
+          type: integer
+          description: Duplicate event ID
+        created:
+          type: string
+          format: date-time
+          description: Created date
+        modified:
+          type: string
+          format: date-time
+          description: Modified date
+        price_data:
+          description: Price data
+          allOf:
+          - $ref: '#/components/schemas/SummaryPriceData'
+        summary:
+          type: object
+          description: Event summary
+      type: object
+    CompanyURL:
+      properties:
+        url:
+          type: string
+          description: URL
+        url_type:
+          type: string
+          description: URL type
+          enum:
+          - facebook
+          - filings
+          - home
+          - instagram
+          - ir_events
+          - ir_home
+          - ir_news
+          - linkedin
+          - logo_icon
+          - twitter
+          - wikipedia
+          - youtube
+      type: object
+    Equity2:
+      type: object
+      properties:
+        equity_id:
+          type: integer
+        bloomberg_ticker:
+          type: string
+        name:
+          type: string
+        common_name:
+          type: string
+        ticker:
+          type: string
+        local_ticker:
+          type: string
+        mic:
+          type: string
+        isin:
+          type: string
+        permid:
+          type: string
+        sectoy_id:
+          type: integer
+        gics_sector:
+          type: string
+        subsector_id:
+          type: integer
+        gics_sub_sector:
+          type: string
+        primary_equity:
+          type: boolean
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
+        status:
+          type: string
+        company_metadata:
+          type: object
+          properties:
+            company_id:
+              type: integer
+            company_name:
+              type: string
+            legal_name:
+              type: string
+            incorporated_country_code:
+              type: string
+            domiciled_country_code:
+              type: string
+            urls:
+              type: array
+              items:
+                type: object
+                properties:
+                  url:
+                    type: string
+                  url_type:
+                    type: string
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Issued API key
+    apiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: Issued API key
+x-refined-from:
+- aiera-equity-openapi.yaml
+- aiera-rest-api-openapi.json
+- aiera-unified-openapi.yaml

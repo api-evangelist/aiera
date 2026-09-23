@@ -1,0 +1,412 @@
+openapi: 3.2.0
+info:
+  title: Aiera REST Filings v1 API
+  version: '1.0'
+  description: Aiera financial data API
+servers:
+- url: https://rest-api.aiera.com/api
+security:
+- apiKeyHeader: []
+tags:
+- name: Filings v1
+  description: SEC regulatory filings
+paths:
+  /filings-v1/:
+    get:
+      tags:
+      - Filings v1
+      summary: Find Filings
+      description: 'Retrieve SEC filings with filtering by ticker, identifier types, filing form number, and date range.
+
+
+        **Notes:**
+
+        - Only **one** equity identifier should be used per request.'
+      operationId: get_get_filings
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: search
+        in: query
+        description: Full-text search query
+        schema:
+          type: string
+      - name: bloomberg_ticker
+        in: query
+        description: Filter to one or more Bloomberg tickers, comma-separated (e.g. AAPL:US)
+        schema:
+          type: string
+      - name: isin
+        in: query
+        description: Filter to one or more ISINs, comma-separated
+        schema:
+          type: string
+      - name: permid
+        in: query
+        description: Filter to one or more PermIDs, comma-separated
+        schema:
+          type: string
+      - name: ric
+        in: query
+        description: Filter to one or more RICs, comma-separated
+        schema:
+          type: string
+      - name: ticker
+        in: query
+        description: Filter to one or more ticker symbols, comma-separated
+        schema:
+          type: string
+      - name: watchlist_id
+        in: query
+        description: Filter by watchlist ID
+        schema:
+          type: integer
+      - name: index_id
+        in: query
+        description: Filter by market index ID
+        schema:
+          type: integer
+      - name: sector_id
+        in: query
+        description: Filter by GICS sector ID
+        schema:
+          type: integer
+      - name: subsector_id
+        in: query
+        description: Filter by GICS sub-sector ID
+        schema:
+          type: integer
+      - name: form_number
+        in: query
+        description: Filter to a specific filing form number (e.g. 10-K, 10-Q, 8-K)
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        description: Start date for filing range (default 12 weeks ago)
+        schema:
+          type: string
+          format: date-time
+      - name: end_date
+        in: query
+        description: End date for filing range (default now)
+        schema:
+          type: string
+          format: date-time
+      - name: include_summaries
+        in: query
+        description: Include AI-generated summaries
+        schema:
+          type: boolean
+          default: false
+      - name: include_delisted
+        in: query
+        description: Whether to include filings from delisted equities
+        schema:
+          type: boolean
+          default: true
+      - name: company_rollup
+        in: query
+        description: Whether to include all equities for matched company
+        schema:
+          type: boolean
+          default: true
+      - name: raw_source
+        in: query
+        description: Whether to return raw S3 URLs instead of API proxy URLs
+        schema:
+          type: boolean
+          default: false
+      - name: page
+        in: query
+        description: Page number
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        description: Results per page
+        schema:
+          type: integer
+          default: 100
+          minimum: 10
+          maximum: 100
+      responses:
+        '400':
+          description: Bad request
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilingsResponse'
+  /filings-v1/{filing_id}:
+    get:
+      tags:
+      - Filings v1
+      summary: Get Filing
+      description: Get SEC filing
+      operationId: get_get_filing
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: filing_id
+        in: path
+        required: true
+        description: Unique identifier for the SEC filing to retrieve
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Filing not found
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Filing'
+  /filings-v1/{filing_id}/datafile/{datafile_name}:
+    get:
+      tags:
+      - Filings v1
+      summary: Get Filing Datafile
+      description: Get XBRL datafile for an SEC filing
+      operationId: get_get_filing_datafile
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: filing_id
+        in: path
+        required: true
+        description: Unique identifier for the SEC filing from which to retrieve the XBRL datafile
+        schema:
+          type: string
+      - name: datafile_name
+        in: path
+        required: true
+        description: Name of the specific XBRL datafile to retrieve
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Filing data file not found
+        '200':
+          description: XBRL datafile
+  /filings-v1/{filing_id}/json:
+    get:
+      tags:
+      - Filings v1
+      summary: Get Filing JSON
+      description: Download the filing JSON
+      operationId: get_get_filing_json
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: filing_id
+        in: path
+        required: true
+        description: The unique identifier for a specific SEC filing document
+        schema:
+          type: string
+      responses:
+        '400':
+          description: JSON not available
+        '200':
+          description: Filing JSON data
+  /filings-v1/{filing_id}/pdf:
+    get:
+      tags:
+      - Filings v1
+      summary: Get Filing PDF
+      description: Download the filing PDF
+      operationId: get_get_filing_pdf
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: filing_id
+        in: path
+        required: true
+        description: The unique identifier for a specific SEC filing document
+        schema:
+          type: string
+      responses:
+        '400':
+          description: PDF not available
+        '200':
+          description: PDF document
+  /filings-v1/{filing_id}/text:
+    get:
+      tags:
+      - Filings v1
+      summary: Get Filing Text
+      description: Download the filing plain text
+      operationId: get_get_filing_text
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: filing_id
+        in: path
+        required: true
+        description: The unique identifier for a specific SEC filing document
+        schema:
+          type: string
+      responses:
+        '400':
+          description: Text not available
+        '200':
+          description: Plain text document
+components:
+  schemas:
+    FilingDatafile:
+      properties:
+        file_type:
+          type: string
+          description: File type (e.g. xml, xsd)
+        description:
+          type: string
+          description: File description
+        origin:
+          type: string
+          description: Original source URL
+        url:
+          type: string
+          description: Proxied download URL
+      type: object
+    FilingPagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
+      type: object
+    FilingEquity:
+      properties:
+        equity_id:
+          type: integer
+          description: Equity ID
+        company_id:
+          type: integer
+          description: Company ID
+        name:
+          type: string
+          description: Equity name
+        common_name:
+          type: string
+          description: Common name
+        local_ticker:
+          type: string
+          description: Local ticker
+        mic:
+          type: string
+          description: Market identifier code
+        bloomberg_ticker:
+          type: string
+          description: Bloomberg ticker
+        isin:
+          type: string
+          description: ISIN
+        permid:
+          type: string
+          description: PermID
+      type: object
+    FilingsResponse:
+      properties:
+        params:
+          type: object
+          description: Echoed request parameters
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/FilingPagination'
+        data:
+          type: array
+          description: List of filings
+          items:
+            $ref: '#/components/schemas/Filing'
+      type: object
+    Filing:
+      properties:
+        filing_id:
+          type: integer
+          description: Filing ID
+        equity:
+          description: Associated equity
+          allOf:
+          - $ref: '#/components/schemas/FilingEquity'
+        title:
+          type: string
+          description: Filing title
+        form_number:
+          type: string
+          description: SEC form number
+        form_name:
+          type: string
+          description: Short form name
+        filing_organization:
+          type: string
+          description: Filing organization (e.g. SEC)
+        filing_system:
+          type: string
+          description: Filing system (e.g. EDGAR)
+        is_amendment:
+          type: boolean
+          description: Whether the filing is an amendment
+        period_end_date:
+          type: string
+          format: date-time
+          description: Period end date
+        release_date:
+          type: string
+          format: date-time
+          description: Release date
+        arrival_date:
+          type: string
+          format: date-time
+          description: Arrival date
+        pulled_date:
+          type: string
+          format: date-time
+          description: Pulled date
+        pdf_url:
+          type: string
+          description: PDF download URL
+        aiera_url:
+          type: string
+          description: Aiera dashboard URL
+        json_synced:
+          type: boolean
+          description: Whether JSON data has been synced
+        json_available:
+          type: boolean
+          description: Whether JSON data is available
+        datafiles_synced:
+          type: boolean
+          description: Whether datafiles have been synced
+        summary:
+          type: object
+          description: AI-generated summary (when include_summaries=true)
+        datafiles:
+          type: array
+          description: Associated datafiles
+          items:
+            $ref: '#/components/schemas/FilingDatafile'
+      type: object
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Issued API key
+    apiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: Issued API key

@@ -1,0 +1,135 @@
+openapi: 3.2.0
+info:
+  title: Aiera REST Calendars v1 API
+  version: '1.0'
+  description: Aiera financial data API
+servers:
+- url: https://rest-api.aiera.com/api
+security:
+- apiKeyHeader: []
+tags:
+- name: Calendars v1
+  description: iCal calendar subscriptions
+paths:
+  /calendars/ical/high_priority:
+    get:
+      tags:
+      - Calendars v1
+      summary: iCal High Priority Calendar
+      description: 'Get an iCal formatted calendar for high-priority events.
+
+
+        **Notes:**
+
+        - This is a public endpoint and does not require authentication.'
+      operationId: get_get_high_priority_calendar
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: types
+        in: query
+        description: 'Event types to include (default: all)'
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - earnings
+            - presentation
+            - shareholder_meeting
+            - investor_meeting
+            - special_situation
+            - earnings_release
+      - name: alarms
+        in: query
+        description: 'Whether to add 1-minute reminder alarms to events (default: false)'
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: iCal calendar (text/calendar)
+  /calendars/ical/user:
+    get:
+      tags:
+      - Calendars v1
+      summary: iCal User Calendar
+      description: 'Get an iCal formatted calendar based on user''s watchlists for calendar subscription.
+
+
+        **Notes:**
+
+        - Uses iCal token for authentication instead of the standard API key header.'
+      operationId: get_calendar_ical_user
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: token
+        in: query
+        description: User's iCal token (required for authentication)
+        schema:
+          type: string
+      - name: watchlist_id
+        in: query
+        description: Specific watchlist ID to filter events (defaults to all user's watchlists)
+        schema:
+          type: integer
+      - name: types
+        in: query
+        description: 'Event types to include (default: all)'
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - earnings
+            - presentation
+            - shareholder_meeting
+            - investor_meeting
+            - special_situation
+            - earnings_release
+      - name: excluded
+        in: query
+        description: Event types to exclude
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - earnings
+            - presentation
+            - shareholder_meeting
+            - investor_meeting
+            - special_situation
+            - earnings_release
+      - name: end_date
+        in: query
+        description: End date for events relative to now
+        schema:
+          type: string
+          enum:
+          - 1W
+          - 2W
+          - 4W
+          - 2M
+          - 3M
+          default: 4W
+      responses:
+        '404':
+          description: User not found
+        '403':
+          description: User does not have iCal permission
+        '200':
+          description: iCal calendar (text/calendar)
+components:
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Issued API key
+    apiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: Issued API key

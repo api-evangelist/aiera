@@ -1,0 +1,274 @@
+openapi: 3.2.0
+info:
+  title: Aiera REST Transcrippets v1 API
+  version: '1.0'
+  description: Aiera financial data API
+servers:
+- url: https://rest-api.aiera.com/api
+security:
+- apiKeyHeader: []
+tags:
+- name: Transcrippets v1
+  description: Shareable transcript snippets
+paths:
+  /transcrippets-v1/:
+    get:
+      tags:
+      - Transcrippets v1
+      summary: Get Transcrippets™
+      description: Get a list of Transcrippets™ filterable by various metadata fields
+      operationId: get_get_transcrippets
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: transcrippet_id
+        in: query
+        description: Comma-separated list of Transcrippet™ IDs
+        schema:
+          type: string
+      - name: event_id
+        in: query
+        description: Comma-separated list of event IDs
+        schema:
+          type: string
+      - name: equity_id
+        in: query
+        description: Comma-separated list of equity IDs
+        schema:
+          type: string
+      - name: speaker_id
+        in: query
+        description: Comma-separated list of speaker IDs
+        schema:
+          type: string
+      - name: transcript_item_id
+        in: query
+        description: Comma-separated list of transcript item IDs
+        schema:
+          type: string
+      - name: created_start_date
+        in: query
+        description: Returns Transcrippets™ created on or after this ISO-formatted date string (e.g. 2023-01-01)
+        schema:
+          type: string
+          format: date-time
+      - name: created_end_date
+        in: query
+        description: Returns Transcrippets™ created on or before this ISO-formatted date string (e.g. 2023-01-01)
+        schema:
+          type: string
+          format: date-time
+      - name: X-Fields
+        in: header
+        description: An optional fields mask
+        schema:
+          type: string
+          format: mask
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TranscrippetCreate'
+  /transcrippets-v1/create:
+    post:
+      tags:
+      - Transcrippets v1
+      summary: Create Transcrippet™
+      description: Save a portion of text and audio, including speaker, event, and company metadata from any Aiera event transcript
+      operationId: post_create_transcrippet
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: event_id
+        in: query
+        required: true
+        description: ID of the event
+        schema:
+          type: integer
+      - name: transcript
+        in: query
+        required: true
+        description: Event transcript text to capture
+        schema:
+          type: string
+      - name: transcript_item_id
+        in: query
+        required: true
+        description: ID of the first transcript item
+        schema:
+          type: integer
+      - name: transcript_item_offset
+        in: query
+        description: Number of characters from the beginning of the starting transcript item text until the start of the captured Transcrippet™ text
+        schema:
+          type: integer
+      - name: transcript_end_item_id
+        in: query
+        description: ID of the last transcript item
+        schema:
+          type: integer
+      - name: transcript_end_item_offset
+        in: query
+        description: Number of characters from the end of the captured Transcrippet™ text until the end of the last transcript item
+        schema:
+          type: integer
+      - name: company_id
+        in: query
+        description: ID of the company to which the event belongs
+        schema:
+          type: integer
+      - name: equity_id
+        in: query
+        description: ID of the equity to which the event belongs
+        schema:
+          type: integer
+      - name: X-Fields
+        in: header
+        description: An optional fields mask
+        schema:
+          type: string
+          format: mask
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranscrippetCreate'
+  /transcrippets-v1/{transcrippet_id}/delete:
+    post:
+      tags:
+      - Transcrippets v1
+      summary: Delete Transcrippet™
+      description: Delete an existing Transcrippet™
+      operationId: post_delete_transcrippet
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: transcrippet_id
+        in: path
+        required: true
+        description: ID of the Transcrippet™ to delete
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Transcrippet not found
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranscrippetDeleteResponse'
+components:
+  schemas:
+    TranscrippetCreate:
+      properties:
+        transcrippet_id:
+          type: integer
+          description: Unique ID of the created Transcrippet™
+        company_id:
+          type: integer
+          description: Company ID
+        equity_id:
+          type: integer
+          description: Equity ID
+        event_id:
+          type: integer
+          description: Event ID
+        speaker_id:
+          type: integer
+          description: Speaker ID
+        transcript_item_id:
+          type: integer
+          description: Transcript item ID
+        user_id:
+          type: integer
+          description: User ID
+        audio_url:
+          type: string
+          description: URL of the event audio
+        company_logo_url:
+          type: string
+          description: URL of the company logo
+        company_name:
+          type: string
+          description: Company name
+        company_ticker:
+          type: string
+          description: Company ticker
+        created:
+          type: string
+          format: date-time
+          description: Date & time of when the Transcrippet™ was created
+        end_ms:
+          type: integer
+          description: Timestamp in milliseconds of Transcrippet™ audio end
+        event_date:
+          type: string
+          format: date-time
+          description: Event date & time
+        event_title:
+          type: string
+          description: Event title
+        event_type:
+          type: string
+          description: Event type
+          enum:
+          - earnings
+          - guidance
+          - investor_meeting
+          - presentation
+          - sales_call
+          - shareholder_meeting
+          - special_call
+        modified:
+          type: string
+          format: date-time
+          description: Date & time of when the Transcrippet™ was updated
+        speaker_name:
+          type: string
+          description: Speaker name
+        speaker_title:
+          type: string
+          description: Speaker title
+        start_ms:
+          type: integer
+          description: Timestamp in milliseconds of Transcrippet™ audio start
+        transcript:
+          type: string
+          description: Transcrippet™ text
+        transcrippet_guid:
+          type: string
+          description: Unique GUID of the created Transcrippet™
+        transcription_audio_offset_seconds:
+          type: integer
+          description: Event audio offset in seconds
+        trimmed_audio_url:
+          type: string
+          description: URL of the truncated event audio
+        word_durations_ms:
+          type: object
+          description: List of word durations in milliseconds of the Transcrippet™ text
+      type: object
+    TranscrippetDeleteResponse:
+      properties:
+        success:
+          type: boolean
+          description: Whether the deletion was successful
+      type: object
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Issued API key
+    apiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: Issued API key

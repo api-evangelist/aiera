@@ -1,0 +1,33 @@
+# Front Door AI Index — aiera — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: aiera
+  lexicon_version: '1.0'
+  probed_at: '2026-09-17'
+  host: aiera.com
+  final_host: aiera.com
+  ownership: own
+  owner: aiera
+  shares_host_with: null
+  inherited_from: null
+  verdict: scored
+  score: 25
+  host_score: 25
+  density: 14.91
+  words: 1677
+  tiers:
+    agentic: 5
+    core: 18
+    model: 2
+  ambiguous: 4
+  top_terms:
+    AI: 16
+    intelligence: 4
+    MCP: 2
+    artificial intelligence: 2
+    Anthropic: 1
+    OpenAI: 1
+    agentic: 1
+    model context protocol: 1
+    prompts: 1

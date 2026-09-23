@@ -1,0 +1,384 @@
+openapi: 3.2.0
+info:
+  title: Aiera REST People v1 API
+  version: '1.0'
+  description: Aiera financial data API
+servers:
+- url: https://rest-api.aiera.com/api
+security:
+- apiKeyHeader: []
+tags:
+- name: People v1
+  description: People and speaker lookup
+paths:
+  /people-v1/:
+    get:
+      tags:
+      - People v1
+      summary: Find People
+      description: Search for people (speakers) by name.
+      operationId: get_get_people
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: search
+        in: query
+        required: true
+        description: Search term for person name
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: 'Page number (default: 1)'
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - name: page_size
+        in: query
+        description: 'Results per page (default: 10, max: 100)'
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 100
+      - name: X-Fields
+        in: header
+        description: An optional fields mask
+        schema:
+          type: string
+          format: mask
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PeopleList'
+        '400':
+          description: Missing search term
+  /people-v1/{person_id}/:
+    parameters:
+    - description: The person id to fetch metadata and events in which the person spoke
+      name: person_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - People v1
+      summary: Get Person
+      description: 'Get a speaker''s name, titles, representations, and events in which they spoke.
+
+
+        **Notes:**
+
+        - The `parent_id` field indicates if a person is a child record merged under a parent person.
+
+        - The `representations` array contains all speaker identities associated with the person across different events.
+
+        - The `firm` field in representations may be `null` if no firm is associated.
+
+        - The `transcripts` array in each event contains all transcript segments where the person spoke.
+
+        - Pass `include_events=false` to skip the events/transcript fetch for a faster, smaller response when only core fields (e.g. `representations`) are needed; the `events` field is then omitted.'
+      operationId: get_get_person
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: include_events
+        in: query
+        description: When false, skip fetching the person's events and transcript text and omit the `events` field from the response — returns only core person fields (including `representations`). Defaults to true (unchanged behavior).
+        schema:
+          type: boolean
+          default: true
+      - name: X-Fields
+        in: header
+        description: An optional fields mask
+        schema:
+          type: string
+          format: mask
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        '404':
+          description: Person not found
+components:
+  schemas:
+    TranscriptSpeaker:
+      properties:
+        speaker_id:
+          type: integer
+          description: Speaker ID
+        name:
+          type: string
+          description: Speaker name
+        title:
+          type: string
+          description: Speaker title
+        firm:
+          description: Firm ID
+          allOf:
+          - $ref: '#/components/schemas/Firm'
+      type: object
+    BasicEvent:
+      properties:
+        event_id:
+          type: integer
+          description: Event ID
+        title:
+          type: string
+          description: Event title
+        event_type:
+          type: string
+          description: Event type
+        event_date:
+          type: string
+          format: date-time
+          description: Event date
+        transcription_audio_url:
+          type: string
+          description: Event audio URL
+        transcription_audio_offset_seconds:
+          type: integer
+          description: Offset seconds from audio file
+        equity:
+          description: Event equity
+          allOf:
+          - $ref: '#/components/schemas/Equity'
+        transcripts:
+          description: Matched transcripts
+          allOf:
+          - $ref: '#/components/schemas/Transcript'
+      type: object
+    PersonListItem:
+      properties:
+        person_id:
+          type: integer
+          description: Person ID
+        name:
+          type: string
+          description: Person name
+        parent_id:
+          type: integer
+          description: Parent person ID (if merged)
+      type: object
+    Company:
+      properties:
+        company_id:
+          type: integer
+          description: Company ID
+        common_name:
+          type: string
+          description: Common name
+        legal_name:
+          type: string
+          description: Legal name
+        incorporated_country_code:
+          type: string
+          description: Country of incorporation
+        domiciled_country_code:
+          type: string
+          description: Country of domicile
+        urls:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompanyURL'
+      type: object
+    Pagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
+      type: object
+    Firm:
+      properties:
+        firm_id:
+          type: integer
+          description: Firm ID
+        firm:
+          type: string
+          description: Firm name
+        domain:
+          type: string
+          description: Relevant domain
+      type: object
+    PeopleList:
+      properties:
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/Pagination'
+        data:
+          type: array
+          description: List of people
+          items:
+            $ref: '#/components/schemas/PersonListItem'
+      type: object
+    Equity:
+      properties:
+        equity_id:
+          type: integer
+          description: Equity ID
+        company_id:
+          type: integer
+          description: Company ID
+        name:
+          type: string
+          description: Equity name
+        common_name:
+          type: string
+          description: Common name
+        ticker:
+          type: string
+          description: Ticker symbol
+        local_ticker:
+          type: string
+          description: Local ticker
+        mic:
+          type: string
+          description: Market identifier code
+        bloomberg_ticker:
+          type: string
+          description: Bloomberg ticker
+        isin:
+          type: string
+          description: ISIN
+        permid:
+          type: string
+          description: PermID
+        ric:
+          type: string
+          description: Reuters/Refinitiv RIC
+        cusip:
+          type: string
+          description: CUSIP
+        sector_id:
+          type: integer
+          description: GICS sector ID
+        gics_sector:
+          type: string
+          description: GICS sector name
+        subsector_id:
+          type: integer
+          description: GICS sub-sector ID
+        gics_sub_sector:
+          type: string
+          description: GICS sub-sector name
+        primary_equity:
+          type: boolean
+          description: Whether this is the primary equity
+        created:
+          type: string
+          format: date-time
+          description: Created date
+        modified:
+          type: string
+          format: date-time
+          description: Modified date
+        status:
+          type: string
+          description: Equity status
+          enum:
+          - active
+          - delisted
+          - inactive
+          - merger
+          - suspended
+        company_metadata:
+          description: Company metadata
+          allOf:
+          - $ref: '#/components/schemas/Company'
+      type: object
+    Person:
+      properties:
+        person_id:
+          type: integer
+          description: Person ID
+        name:
+          type: string
+          description: Person name
+        parent_id:
+          type: integer
+          description: Parent person ID (if merged)
+        representations:
+          description: Representations in transcripts
+          allOf:
+          - $ref: '#/components/schemas/TranscriptSpeaker'
+        events:
+          description: Events speaker found in
+          allOf:
+          - $ref: '#/components/schemas/BasicEvent'
+      type: object
+    Transcript:
+      properties:
+        speaker_id:
+          type: integer
+          description: Speaker ID
+        event_id:
+          type: integer
+          description: Event ID
+        transcript_item_id:
+          type: integer
+          description: Transcript item ID
+        start_ms:
+          type: integer
+          description: Milliseconds until start
+        start_timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of segment start
+        duration_ms:
+          type: integer
+          description: Duration of the segment
+        transcript:
+          type: string
+          description: Transcript
+      type: object
+    CompanyURL:
+      properties:
+        url:
+          type: string
+          description: URL
+        url_type:
+          type: string
+          description: URL type
+          enum:
+          - facebook
+          - filings
+          - home
+          - instagram
+          - ir_events
+          - ir_home
+          - ir_news
+          - linkedin
+          - logo_icon
+          - twitter
+          - wikipedia
+          - youtube
+      type: object
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Issued API key
+    apiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: Issued API key

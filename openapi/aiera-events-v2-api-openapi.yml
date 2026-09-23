@@ -1,0 +1,1846 @@
+openapi: 3.2.0
+info:
+  title: Aiera Events v2 API
+  version: '1.0'
+  description: 'Operations tagged Events v2 across 3 of this provider''s published API definitions: aiera-rest-api-openapi.json, aiera-tonal-sentiments-openapi.yaml, aiera-unified-openapi.yaml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://rest-api.aiera.com/api
+- url: https://premium.aiera.com/api
+tags:
+- name: Events (v2)
+  description: Event data and transcripts
+paths:
+  /events-v2/:
+    get:
+      tags:
+      - Events (v2)
+      summary: Find Events
+      description: 'Retrieve events by ticker, date range, and other filtering criteria.
+
+
+        **Notes:**
+
+        - There is a response cap of 1000 events at a time, broken into 10 pages, with 100 results on each page.
+
+        - `modified_since` can be used to synchronize with an external system.
+
+        - All dates (`event_date`, `created`, `modified`) are in Eastern Time (America/New_York timezone) and formatted in ISO 8601.
+
+        - Only **one** of the equity identifiers (`bloomberg_ticker`, `isin`, `ric`, `permid`, or `ticker`) should be used per request. Using multiple equity identifier query parameters will end up resolving only one of them.
+
+        - Setting the `simplified` flag to true will significantly speed up query performance, but also nullify enriched fields like transcription details, connection information, and linguistics data.'
+      operationId: get_get_events
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: start_date
+        in: query
+        description: Start date (default 2 weeks ago)
+        schema:
+          type: string
+          format: date-time
+      - name: end_date
+        in: query
+        description: End date (default 2 weeks from now)
+        schema:
+          type: string
+          format: date-time
+      - name: event_type
+        in: query
+        description: Event types to include
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - earnings
+            - presentation
+            - shareholder_meeting
+            - investor_meeting
+            - special_situation
+            - earnings_release
+      - name: event_tag
+        in: query
+        description: Filter by event tags, comma-separated
+        schema:
+          type: array
+          items:
+            type: string
+      - name: modified_since
+        in: query
+        description: Return events modified after this date (ISO format)
+        schema:
+          type: string
+          format: date-time
+      - name: fiscal_year
+        in: query
+        description: Filter by fiscal year
+        schema:
+          type: integer
+      - name: fiscal_quarter
+        in: query
+        description: Filter by fiscal quarter (1-4)
+        schema:
+          type: integer
+      - name: equity_id
+        in: query
+        description: Filter by equity ID
+        schema:
+          type: integer
+      - name: company_id
+        in: query
+        description: Filter by company ID
+        schema:
+          type: string
+      - name: bloomberg_ticker
+        in: query
+        description: Filter to one or more Bloomberg tickers, comma-separated (e.g. AAPL:US)
+        schema:
+          type: string
+      - name: isin
+        in: query
+        description: Filter to one or more ISINs, comma-separated
+        schema:
+          type: string
+      - name: permid
+        in: query
+        description: Filter to one or more PermIDs, comma-separated
+        schema:
+          type: string
+      - name: ric
+        in: query
+        description: Filter to one or more RICs, comma-separated
+        schema:
+          type: string
+      - name: ticker
+        in: query
+        description: Filter to one or more ticker symbols, comma-separated
+        schema:
+          type: string
+      - name: sector_id
+        in: query
+        description: Filter to a specific GICS sector ID
+        schema:
+          type: integer
+      - name: subsector_id
+        in: query
+        description: Filter to a specific GICS sub-sector ID
+        schema:
+          type: integer
+      - name: event_ids
+        in: query
+        description: Filter to one or more event IDs, comma-separated
+        schema:
+          type: array
+          items:
+            type: string
+      - name: expected_language
+        in: query
+        description: Filter to a specific expected language code
+        schema:
+          type: string
+      - name: with_transcripts
+        in: query
+        description: Whether to include only events with transcripts
+        schema:
+          type: boolean
+      - name: with_pricing
+        in: query
+        description: Whether to include only events with pricing data
+        schema:
+          type: boolean
+      - name: simplified
+        in: query
+        description: Whether to simplify the payload response and avoid data enrichment
+        schema:
+          type: boolean
+      - name: linguistics
+        in: query
+        description: Whether to include linguistics data (topics, sentiment, summaries)
+        schema:
+          type: boolean
+      - name: pricing
+        in: query
+        description: Whether to include price reaction information
+        schema:
+          type: boolean
+      - name: transcripts
+        in: query
+        description: Whether to include transcript data
+        schema:
+          type: boolean
+      - name: word_offsets
+        in: query
+        description: Whether to include word timing offsets
+        schema:
+          type: boolean
+      - name: page
+        in: query
+        description: Page number
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        description: Results per page
+        schema:
+          type: integer
+          default: 100
+          minimum: 10
+          maximum: 100
+      - name: sort_key
+        in: query
+        description: Sort key for results
+        schema:
+          type: string
+          enum:
+          - event_id_asc
+          - event_id_desc
+          - event_date_asc
+          - event_date_desc
+      - name: live_only
+        in: query
+        description: Only return currently-live events
+        schema:
+          type: boolean
+      - name: improved_only
+        in: query
+        description: Whether or not to only return the post-realtime improved transcripts
+        schema:
+          type: boolean
+      - name: include_deleted
+        in: query
+        description: Whether to include deleted events
+        schema:
+          type: boolean
+      - name: include_everything
+        in: query
+        description: Whether or not to include any transcripts, regardless of offset
+        schema:
+          type: boolean
+      - name: include_connection_detail
+        in: query
+        description: Whether to include connection detail
+        schema:
+          type: boolean
+      - name: include_hierarchy
+        in: query
+        description: Whether to include event hierarchy detail
+        schema:
+          type: boolean
+      - name: include_estimated_docs
+        in: query
+        description: Whether to include model-estimated press/slides URLs
+        schema:
+          type: boolean
+      - name: include_tags
+        in: query
+        description: Whether to include event tags
+        schema:
+          type: boolean
+      - name: include_company_metadata
+        in: query
+        description: Whether to include the associated company's metadata (e.g. names, urls)
+        schema:
+          type: boolean
+      - name: include_people_data
+        in: query
+        description: Whether or not to include people information for equity/event
+        schema:
+          type: boolean
+      - name: exclude_duplicates
+        in: query
+        description: Whether to exclude any duplicated events
+        schema:
+          type: boolean
+      - name: company_rollup
+        in: query
+        description: Whether to roll up matches to the corresponding company entity
+        schema:
+          type: boolean
+      - name: event_category
+        in: query
+        description: Filter by event category
+        schema:
+          type: string
+          enum:
+          - expert_insights
+          - thirdbridge
+      - name: primary_only
+        in: query
+        description: Only return events on primary equities
+        schema:
+          type: boolean
+      - name: X-Fields
+        in: header
+        description: An optional fields mask
+        schema:
+          type: string
+          format: mask
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Events'
+        '400':
+          description: Bad request
+    servers:
+    - url: https://rest-api.aiera.com/api
+  /events-v2/add-connection-detail:
+    post:
+      tags:
+      - Events (v2)
+      summary: Add Connection Detail
+      description: Add connection details to an event
+      operationId: post_add_connection_details
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: event_id
+        in: query
+        schema:
+          type: integer
+      - name: webcast_url
+        in: query
+        schema:
+          type: string
+      - name: dial_in_phone_number
+        in: query
+        schema:
+          type: string
+      - name: dial_in_pin
+        in: query
+        schema:
+          type: string
+      responses:
+        '400':
+          description: Bad request
+        '200':
+          description: Success
+    servers:
+    - url: https://rest-api.aiera.com/api
+  /events-v2/report-issue:
+    post:
+      tags:
+      - Events (v2)
+      summary: Report Issue
+      description: Report an issue with an event
+      operationId: post_report_event_issue
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: event_id
+        in: query
+        schema:
+          type: integer
+      - name: issue
+        in: query
+        schema:
+          type: string
+      responses:
+        '400':
+          description: Bad request
+        '201':
+          description: Success
+    servers:
+    - url: https://rest-api.aiera.com/api
+  /events-v2/request-event:
+    post:
+      tags:
+      - Events (v2)
+      summary: Request Event
+      description: Request a new event to be covered
+      operationId: post_request_new_event
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: ticker
+        in: query
+        schema:
+          type: string
+      - name: event_time
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: event_title
+        in: query
+        schema:
+          type: string
+      - name: webcast_url
+        in: query
+        schema:
+          type: string
+      - name: dial_in_phone_number
+        in: query
+        schema:
+          type: string
+      - name: dial_in_pin
+        in: query
+        schema:
+          type: string
+      responses:
+        '400':
+          description: Bad request
+        '200':
+          description: Success
+    servers:
+    - url: https://rest-api.aiera.com/api
+  /events-v2/{event_id}:
+    get:
+      tags:
+      - Events (v2)
+      summary: Get Event
+      description: Fetch a specific event
+      operationId: get_get_event
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        description: The unique identifier for the specific event to retrieve
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        description: Start date (default 2 weeks ago)
+        schema:
+          type: string
+          format: date-time
+      - name: end_date
+        in: query
+        description: End date (default 2 weeks from now)
+        schema:
+          type: string
+          format: date-time
+      - name: event_type
+        in: query
+        description: Event types to include
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - earnings
+            - presentation
+            - shareholder_meeting
+            - investor_meeting
+            - special_situation
+            - earnings_release
+      - name: event_tag
+        in: query
+        description: Filter by event tags, comma-separated
+        schema:
+          type: array
+          items:
+            type: string
+      - name: modified_since
+        in: query
+        description: Return events modified after this date (ISO format)
+        schema:
+          type: string
+          format: date-time
+      - name: fiscal_year
+        in: query
+        description: Filter by fiscal year
+        schema:
+          type: integer
+      - name: fiscal_quarter
+        in: query
+        description: Filter by fiscal quarter (1-4)
+        schema:
+          type: integer
+      - name: equity_id
+        in: query
+        description: Filter by equity ID
+        schema:
+          type: integer
+      - name: company_id
+        in: query
+        description: Filter by company ID
+        schema:
+          type: string
+      - name: bloomberg_ticker
+        in: query
+        description: Filter to one or more Bloomberg tickers, comma-separated (e.g. AAPL:US)
+        schema:
+          type: string
+      - name: isin
+        in: query
+        description: Filter to one or more ISINs, comma-separated
+        schema:
+          type: string
+      - name: permid
+        in: query
+        description: Filter to one or more PermIDs, comma-separated
+        schema:
+          type: string
+      - name: ric
+        in: query
+        description: Filter to one or more RICs, comma-separated
+        schema:
+          type: string
+      - name: ticker
+        in: query
+        description: Filter to one or more ticker symbols, comma-separated
+        schema:
+          type: string
+      - name: sector_id
+        in: query
+        description: Filter to a specific GICS sector ID
+        schema:
+          type: integer
+      - name: subsector_id
+        in: query
+        description: Filter to a specific GICS sub-sector ID
+        schema:
+          type: integer
+      - name: event_ids
+        in: query
+        description: Filter to one or more event IDs, comma-separated
+        schema:
+          type: array
+          items:
+            type: string
+      - name: expected_language
+        in: query
+        description: Filter to a specific expected language code
+        schema:
+          type: string
+      - name: with_transcripts
+        in: query
+        description: Whether to include only events with transcripts
+        schema:
+          type: boolean
+      - name: with_pricing
+        in: query
+        description: Whether to include only events with pricing data
+        schema:
+          type: boolean
+      - name: simplified
+        in: query
+        description: Whether to simplify the payload response and avoid data enrichment
+        schema:
+          type: boolean
+      - name: linguistics
+        in: query
+        description: Whether to include linguistics data (topics, sentiment, summaries)
+        schema:
+          type: boolean
+      - name: pricing
+        in: query
+        description: Whether to include price reaction information
+        schema:
+          type: boolean
+      - name: transcripts
+        in: query
+        description: Whether to include transcript data
+        schema:
+          type: boolean
+      - name: word_offsets
+        in: query
+        description: Whether to include word timing offsets
+        schema:
+          type: boolean
+      - name: page
+        in: query
+        description: Page number
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        description: Results per page
+        schema:
+          type: integer
+          default: 100
+          minimum: 10
+          maximum: 100
+      - name: sort_key
+        in: query
+        description: Sort key for results
+        schema:
+          type: string
+          enum:
+          - event_id_asc
+          - event_id_desc
+          - event_date_asc
+          - event_date_desc
+      - name: live_only
+        in: query
+        description: Only return currently-live events
+        schema:
+          type: boolean
+      - name: improved_only
+        in: query
+        description: Whether or not to only return the post-realtime improved transcripts
+        schema:
+          type: boolean
+      - name: include_deleted
+        in: query
+        description: Whether to include deleted events
+        schema:
+          type: boolean
+      - name: include_everything
+        in: query
+        description: Whether or not to include any transcripts, regardless of offset
+        schema:
+          type: boolean
+      - name: include_connection_detail
+        in: query
+        description: Whether to include connection detail
+        schema:
+          type: boolean
+      - name: include_hierarchy
+        in: query
+        description: Whether to include event hierarchy detail
+        schema:
+          type: boolean
+      - name: include_estimated_docs
+        in: query
+        description: Whether to include model-estimated press/slides URLs
+        schema:
+          type: boolean
+      - name: include_tags
+        in: query
+        description: Whether to include event tags
+        schema:
+          type: boolean
+      - name: include_company_metadata
+        in: query
+        description: Whether to include the associated company's metadata (e.g. names, urls)
+        schema:
+          type: boolean
+      - name: include_people_data
+        in: query
+        description: Whether or not to include people information for equity/event
+        schema:
+          type: boolean
+      - name: exclude_duplicates
+        in: query
+        description: Whether to exclude any duplicated events
+        schema:
+          type: boolean
+      - name: company_rollup
+        in: query
+        description: Whether to roll up matches to the corresponding company entity
+        schema:
+          type: boolean
+      - name: event_category
+        in: query
+        description: Filter by event category
+        schema:
+          type: string
+          enum:
+          - expert_insights
+          - thirdbridge
+      - name: primary_only
+        in: query
+        description: Only return events on primary equities
+        schema:
+          type: boolean
+      - name: X-Fields
+        in: header
+        description: An optional fields mask
+        schema:
+          type: string
+          format: mask
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '404':
+          description: Event not found
+    servers:
+    - url: https://rest-api.aiera.com/api
+  /events-v2/{event_id}/transcript:
+    get:
+      tags:
+      - Events (v2)
+      summary: Get Transcripts
+      description: 'Returns the available transcripts for an event.
+
+
+        **Notes:**
+
+        - The `modified_since` parameter enables continuous fetching of newer transcripts during live events.'
+      operationId: get_get_event_transcripts
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        description: The event id for which to fetch the transcripts
+        schema:
+          type: string
+      - name: modified_since
+        in: query
+        description: Returns transcripts modified since this date
+        schema:
+          type: string
+          format: date-time
+      - name: linguistics
+        in: query
+        description: Whether to include linguistics metadata in the response
+        schema:
+          type: boolean
+      - name: pricing
+        in: query
+        description: Whether to include price reaction information
+        schema:
+          type: boolean
+      - name: live_only
+        in: query
+        description: Only return live transcript items
+        schema:
+          type: boolean
+      - name: improved_only
+        in: query
+        description: Whether or not to only return the post-realtime improved transcripts
+        schema:
+          type: boolean
+      - name: include_deleted
+        in: query
+        description: Whether or not to include deleted transcripts
+        schema:
+          type: boolean
+      - name: include_everything
+        in: query
+        description: Whether or not to include any transcripts, regardless of offset
+        schema:
+          type: boolean
+      - name: include_tags
+        in: query
+        description: Whether or not to include transcript tagging (presentation, Q&A, etc)
+        schema:
+          type: boolean
+      - name: word_offsets
+        in: query
+        description: Whether to include word-by-word durations and offsets
+        schema:
+          type: boolean
+      - name: X-Fields
+        in: header
+        description: An optional fields mask
+        schema:
+          type: string
+          format: mask
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transcript'
+        '404':
+          description: Event not found
+    servers:
+    - url: https://rest-api.aiera.com/api
+  /events-v2/{event_id}/transcript/html:
+    get:
+      tags:
+      - Events (v2)
+      summary: Download Transcript HTML
+      description: Download the event transcript as HTML
+      operationId: get_get_event_transcripts_html
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        description: The event id for which to fetch the transcripts
+        schema:
+          type: string
+      - name: live_only
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '404':
+          description: Transcript not available
+        '200':
+          description: HTML document
+    servers:
+    - url: https://rest-api.aiera.com/api
+  /events-v2/{event_id}/transcript/pdf:
+    get:
+      tags:
+      - Events (v2)
+      summary: Download Transcript PDF
+      description: Download the event transcript as PDF
+      operationId: get_get_event_transcripts_pdf
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        description: The event id for which to fetch the transcripts
+        schema:
+          type: string
+      - name: live_only
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '404':
+          description: Transcript not available
+        '200':
+          description: PDF document
+    servers:
+    - url: https://rest-api.aiera.com/api
+  /events-v2/{event_id}/transcript/text:
+    get:
+      tags:
+      - Events (v2)
+      summary: Download Transcript Text
+      description: Download the event transcript as plain text
+      operationId: get_get_event_transcripts_text
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        description: The event id for which to fetch the transcripts
+        schema:
+          type: string
+      - name: include_headers
+        in: query
+        schema:
+          type: boolean
+      - name: live_only
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '404':
+          description: Transcript not available
+        '200':
+          description: Plain text document
+    servers:
+    - url: https://rest-api.aiera.com/api
+  /events-v2/{event_id}/transcript/{transcript_item_id}/:
+    get:
+      tags:
+      - Events (v2)
+      summary: Get Transcript Item
+      description: Returns a specific transcript item for an event
+      operationId: get_get_event_transcript
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        description: The event id for which to fetch the transcripts
+        schema:
+          type: string
+      - name: transcript_item_id
+        in: path
+        required: true
+        description: The transcript item id to fetch
+        schema:
+          type: string
+      - name: modified_since
+        in: query
+        description: Returns transcripts modified since this date
+        schema:
+          type: string
+          format: date-time
+      - name: linguistics
+        in: query
+        description: Whether to include linguistics metadata in the response
+        schema:
+          type: boolean
+      - name: pricing
+        in: query
+        description: Whether to include price reaction information
+        schema:
+          type: boolean
+      - name: live_only
+        in: query
+        description: Only return live transcript items
+        schema:
+          type: boolean
+      - name: improved_only
+        in: query
+        description: Whether or not to only return the post-realtime improved transcripts
+        schema:
+          type: boolean
+      - name: include_deleted
+        in: query
+        description: Whether or not to include deleted transcripts
+        schema:
+          type: boolean
+      - name: include_everything
+        in: query
+        description: Whether or not to include any transcripts, regardless of offset
+        schema:
+          type: boolean
+      - name: include_tags
+        in: query
+        description: Whether or not to include transcript tagging (presentation, Q&A, etc)
+        schema:
+          type: boolean
+      - name: word_offsets
+        in: query
+        description: Whether to include word-by-word durations and offsets
+        schema:
+          type: boolean
+      - name: X-Fields
+        in: header
+        description: An optional fields mask
+        schema:
+          type: string
+          format: mask
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transcript'
+        '404':
+          description: Transcript item not found
+    servers:
+    - url: https://rest-api.aiera.com/api
+  /events-v2/tonal/export/csv:
+    get:
+      security:
+      - ApiKeyAuth: []
+      operationId: getTonalSentiments``
+      description: Export tonal sentiment to csv. .
+      summary: Retrieves a csv file of a tonal sentiment
+      parameters:
+      - name: bloomberg_ticker
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Filter events to 1+ bloomberg tickers always including country codes with colon (comma-separated).
+      responses:
+        '200':
+          description: Successfully uploaded the csv file.
+          content:
+            application/csv:
+              schema:
+                type: string
+                format: binary
+          headers:
+            content-disposition:
+              schema:
+                type: string
+                description: Used only with `application/pdf` responses
+                example: attachment; filename="name.pdf"
+            content-encoding:
+              schema:
+                type: string
+                description: Encoding of the file.
+      tags:
+      - Events (v2)
+    servers:
+    - url: https://premium.aiera.com/api
+  /events-v2/person/{person_id}:
+    get:
+      operationId: getPerson
+      description: Retrieves a person using a person id.
+      summary: Retrieves a single person
+      parameters:
+      - name: person_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: person id to get the speaker details
+      responses:
+        '200':
+          description: Successfully retrieved the person details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person_2'
+        '404':
+          description: Person not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Events (v2)
+      security:
+      - ApiKeyAuth: []
+    servers:
+    - url: https://premium.aiera.com/api
+components:
+  schemas:
+    Grouping:
+      properties:
+        grouping_id:
+          type: integer
+          description: Grouping ID
+        grouping_name:
+          type: string
+          description: Grouping name
+      type: object
+    Events:
+      properties:
+        params:
+          description: Echoed request parameters
+          allOf:
+          - $ref: '#/components/schemas/OutputParams'
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/Pagination'
+        data:
+          description: List of events
+          allOf:
+          - $ref: '#/components/schemas/Event'
+      type: object
+    Summary:
+      properties:
+        title:
+          type: string
+          description: Title for the summary text (if applicable)
+        summary:
+          type: array
+          description: Summary text
+          items:
+            type: string
+        model:
+          type: string
+          description: Source of the summary
+        type:
+          type: string
+          description: Type of summary (presentation, Q&A, or whole-document)
+        version:
+          type: string
+          description: Version of the summary (live or published)
+        audio_clip:
+          type: string
+          description: Generated audio reading of the summary
+        video_clip:
+          type: string
+          description: Generated video reading of the summary
+        priority:
+          type: integer
+          description: Priority level of the summary
+        created:
+          type: string
+          format: date-time
+          description: Summary creation date
+        modified:
+          type: string
+          format: date-time
+          description: Summary modified date
+      type: object
+    Company:
+      properties:
+        company_id:
+          type: integer
+          description: Company ID
+        common_name:
+          type: string
+          description: Common name
+        legal_name:
+          type: string
+          description: Legal name
+        incorporated_country_code:
+          type: string
+          description: Country of incorporation
+        domiciled_country_code:
+          type: string
+          description: Country of domicile
+        urls:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompanyURL'
+      type: object
+    Equity:
+      properties:
+        equity_id:
+          type: integer
+          description: Equity ID
+        company_id:
+          type: integer
+          description: Company ID
+        name:
+          type: string
+          description: Equity name
+        common_name:
+          type: string
+          description: Common name
+        ticker:
+          type: string
+          description: Ticker symbol
+        local_ticker:
+          type: string
+          description: Local ticker
+        mic:
+          type: string
+          description: Market identifier code
+        bloomberg_ticker:
+          type: string
+          description: Bloomberg ticker
+        isin:
+          type: string
+          description: ISIN
+        permid:
+          type: string
+          description: PermID
+        ric:
+          type: string
+          description: Reuters/Refinitiv RIC
+        cusip:
+          type: string
+          description: CUSIP
+        sector_id:
+          type: integer
+          description: GICS sector ID
+        gics_sector:
+          type: string
+          description: GICS sector name
+        subsector_id:
+          type: integer
+          description: GICS sub-sector ID
+        gics_sub_sector:
+          type: string
+          description: GICS sub-sector name
+        primary_equity:
+          type: boolean
+          description: Whether this is the primary equity
+        created:
+          type: string
+          format: date-time
+          description: Created date
+        modified:
+          type: string
+          format: date-time
+          description: Modified date
+        status:
+          type: string
+          description: Equity status
+          enum:
+          - active
+          - delisted
+          - inactive
+          - merger
+          - suspended
+        company_metadata:
+          description: Company metadata
+          allOf:
+          - $ref: '#/components/schemas/Company'
+      type: object
+    CompanyURL:
+      properties:
+        url:
+          type: string
+          description: URL
+        url_type:
+          type: string
+          description: URL type
+          enum:
+          - facebook
+          - filings
+          - home
+          - instagram
+          - ir_events
+          - ir_home
+          - ir_news
+          - linkedin
+          - logo_icon
+          - twitter
+          - wikipedia
+          - youtube
+      type: object
+    TranscriptSpeaker:
+      properties:
+        speaker_id:
+          type: integer
+          description: Speaker ID
+        name:
+          type: string
+          description: Speaker name
+        title:
+          type: string
+          description: Speaker title
+        firm:
+          description: Firm ID
+          allOf:
+          - $ref: '#/components/schemas/Firm'
+      type: object
+    Hierarchy:
+      properties:
+        parent_event:
+          type: integer
+          description: Parent event ID
+        child_event:
+          type: integer
+          description: Child event ID
+      type: object
+    SentimentBreakout:
+      properties:
+        start_offset:
+          type: integer
+          description: Start of the breakout offset
+        end_offset:
+          type: integer
+          description: Median sentiment score
+        sentiment:
+          type: number
+          description: Sentiment score
+      type: object
+    BasicEvent:
+      properties:
+        event_id:
+          type: integer
+          description: Event ID
+        title:
+          type: string
+          description: Event title
+        event_type:
+          type: string
+          description: Event type
+        event_date:
+          type: string
+          format: date-time
+          description: Event date
+        transcription_audio_url:
+          type: string
+          description: Event audio URL
+        transcription_audio_offset_seconds:
+          type: integer
+          description: Offset seconds from audio file
+        equity:
+          description: Event equity
+          allOf:
+          - $ref: '#/components/schemas/Equity'
+        transcripts:
+          description: Matched transcripts
+          allOf:
+          - $ref: '#/components/schemas/Transcript'
+      type: object
+    EventTag:
+      properties:
+        tag_id:
+          type: integer
+          description: Tag ID
+        tag:
+          type: string
+          description: Tag name
+      type: object
+    Pagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
+      type: object
+    Topic:
+      properties:
+        topic_id:
+          type: string
+          description: Topic ID
+        topic:
+          type: string
+          description: Topic
+      type: object
+    Person:
+      properties:
+        person_id:
+          type: integer
+          description: Person ID
+        name:
+          type: string
+          description: Person name
+        parent_id:
+          type: integer
+          description: Parent person ID (if merged)
+        representations:
+          description: Representations in transcripts
+          allOf:
+          - $ref: '#/components/schemas/TranscriptSpeaker'
+        events:
+          description: Events speaker found in
+          allOf:
+          - $ref: '#/components/schemas/BasicEvent'
+      type: object
+    SegmentPrice:
+      properties:
+        trade_time:
+          type: string
+          format: date-time
+          description: Trade timestamp
+        price:
+          type: number
+          description: Trade price
+        volume:
+          type: integer
+          description: Trade volume
+      type: object
+    OutputParams:
+      properties:
+        page:
+          type: integer
+          description: Page number
+        page_size:
+          type: integer
+          description: Page size
+        bloomberg_ticker:
+          type: string
+          description: Bloomberg ticker
+        isin:
+          type: string
+          description: ISIN
+        ric:
+          type: string
+          description: RIC
+        ticker:
+          type: string
+          description: Ticker symbol
+        permid:
+          type: string
+          description: PermID
+        sector_id:
+          type: integer
+          description: GICS sector ID
+        subsector_id:
+          type: integer
+          description: GICS sub-sector ID
+        search:
+          type: string
+          description: Search query
+        include_company_metadata:
+          type: boolean
+          description: Include company metadata
+        include_inactive:
+          type: boolean
+          description: Include inactive equities
+        include_sourcing:
+          type: boolean
+          description: Include sourcing information
+      type: object
+    Event:
+      properties:
+        event_id:
+          type: integer
+          description: Event ID
+        company_id:
+          type: integer
+          description: Company ID
+        equity_id:
+          type: integer
+          description: Equity ID
+        ticker:
+          type: string
+          description: Ticker symbol
+        local_ticker:
+          type: string
+          description: Local ticker
+        bloomberg_ticker:
+          type: string
+          description: Bloomberg ticker
+        ric:
+          type: string
+          description: Reuters/Refinitiv RIC
+        permid:
+          type: string
+          description: PermID
+        isin:
+          type: string
+          description: ISIN
+        exchange_mic:
+          type: string
+          description: Exchange MIC
+        sector_id:
+          type: integer
+          description: GICS sector ID
+        subsector_id:
+          type: integer
+          description: GICS sub-sector ID
+        primary_equity:
+          type: boolean
+          description: Whether this is the primary equity
+        title:
+          type: string
+          description: Event title
+        event_type:
+          type: string
+          description: Event type
+          enum:
+          - custom
+          - earnings
+          - earnings_release
+          - investor_meeting
+          - presentation
+          - shareholder_meeting
+          - special_situation
+        event_tags:
+          description: Event tags
+          allOf:
+          - $ref: '#/components/schemas/EventTag'
+        event_date:
+          type: string
+          format: date-time
+          description: Event date and time
+        event_category:
+          type: string
+          description: Event category
+        expected_language:
+          type: string
+          description: Expected language
+        accuracy_review:
+          type: string
+          description: Accuracy review status
+        has_unknown_time:
+          type: boolean
+          description: Whether event time is unknown
+        connection_expected:
+          type: boolean
+          description: Whether a connection is expected
+        is_live:
+          type: boolean
+          description: Whether the event is currently live
+        estimate_id:
+          type: integer
+          description: Linked estimate ID
+        machine_published:
+          type: boolean
+          description: Whether transcript is machine-published
+        machine_published_completed:
+          type: string
+          format: date-time
+          description: Machine publish completion date
+        human_verified:
+          type: boolean
+          description: Whether transcript is human-verified
+        human_verified_api:
+          type: boolean
+          description: Whether human-verified for API
+        human_verified_version:
+          type: integer
+          description: Human-verified version number
+        human_verified_source:
+          type: string
+          description: Human verification source
+        human_verified_source_id:
+          type: string
+          description: Human verification source ID
+        connection_detail:
+          description: Connection detail data
+          allOf:
+          - $ref: '#/components/schemas/ConnectionDetail'
+        fiscal_year:
+          type: integer
+          description: Fiscal year
+        fiscal_quarter:
+          type: integer
+          description: Fiscal quarter
+        conference_number:
+          type: string
+          description: Conference dial-in number
+        conference_pin:
+          type: string
+          description: Conference PIN
+        broadcast_url:
+          type: string
+          description: Webcast URL
+        replay_url:
+          type: string
+          description: Replay URL
+        slides_url:
+          type: string
+          description: Slides URL
+        slides_url_type:
+          type: string
+          description: Slides URL type
+          enum:
+          - confirmed
+          - estimated
+        press_url:
+          type: string
+          description: Press release URL
+        press_url_type:
+          type: string
+          description: Press URL type
+          enum:
+          - confirmed
+          - estimated
+        public_url:
+          type: string
+          description: Public URL
+        public_share_url:
+          type: string
+          description: Public share URL
+        live_asr_provider:
+          type: string
+          description: Live ASR provider
+        transcription_status:
+          type: string
+          description: Transcription status
+          enum:
+          - agent_connected
+          - archived
+          - connected
+          - finished
+          - missed
+          - started
+          - submitted
+        transcription_audio_url:
+          type: string
+          description: Audio URL
+        transcription_audio_offset_seconds:
+          type: integer
+          description: Audio offset in seconds
+        audio_offset_start:
+          type: integer
+          description: Audio offset start in milliseconds
+        audio_offset_end:
+          type: integer
+          description: Audio offset end in milliseconds
+        audio_stream_url:
+          type: string
+          description: Audio stream URL
+        has_transcripts:
+          type: boolean
+          description: Whether transcripts are available
+        has_api_transcript:
+          type: boolean
+          description: Whether API transcript is available
+        has_pricing:
+          type: boolean
+          description: Whether pricing data is available
+        duplicate_of:
+          type: integer
+          description: ID of the event this is a duplicate of
+        hierarchy:
+          description: Event hierarchy data
+          allOf:
+          - $ref: '#/components/schemas/Hierarchy'
+        grouping:
+          description: Event grouping data
+          allOf:
+          - $ref: '#/components/schemas/Grouping'
+        status:
+          type: string
+          description: Event status
+          enum:
+          - active
+          - deleted
+        created:
+          type: string
+          format: date-time
+          description: Created date
+        modified:
+          type: string
+          format: date-time
+          description: Modified date
+        linguistics:
+          description: Linguistics metadata
+          allOf:
+          - $ref: '#/components/schemas/Linguistics'
+        price_data:
+          description: Price data
+          allOf:
+          - $ref: '#/components/schemas/PriceData'
+        transcripts:
+          description: Transcript items
+          allOf:
+          - $ref: '#/components/schemas/Transcript'
+        company_metadata:
+          description: Company metadata
+          allOf:
+          - $ref: '#/components/schemas/Company'
+        people:
+          description: People/speakers data
+          allOf:
+          - $ref: '#/components/schemas/Person'
+      type: object
+    Transcript:
+      properties:
+        speaker_id:
+          type: integer
+          description: Speaker ID
+        event_id:
+          type: integer
+          description: Event ID
+        transcript_item_id:
+          type: integer
+          description: Transcript item ID
+        start_ms:
+          type: integer
+          description: Milliseconds until start
+        start_timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of segment start
+        duration_ms:
+          type: integer
+          description: Duration of the segment
+        transcript:
+          type: string
+          description: Transcript
+      type: object
+    Linguistics:
+      properties:
+        summaries:
+          type: array
+          description: Summaries
+          items:
+            $ref: '#/components/schemas/Summary'
+        topics:
+          type: array
+          description: Topics
+          items:
+            $ref: '#/components/schemas/Topic'
+        auto_tags:
+          type: array
+          description: Auto-tags
+          items:
+            type: string
+        sentiment:
+          description: Sentiment
+          allOf:
+          - $ref: '#/components/schemas/Sentiment'
+        sentiment_breakouts:
+          type: array
+          description: Sentiment breakouts
+          items:
+            $ref: '#/components/schemas/SentimentBreakout'
+      type: object
+    Sentiment:
+      properties:
+        average:
+          type: number
+          description: Average sentiment score
+        median:
+          type: number
+          description: Median sentiment score
+        minimum:
+          type: number
+          description: Minimum sentiment score
+        maximum:
+          type: number
+          description: Maximum sentiment score
+      type: object
+    ConnectionDetail:
+      properties:
+        transcription_status:
+          type: string
+          description: Transcription status
+          enum:
+          - agent_connected
+          - archived
+          - connected
+          - finished
+          - missed
+          - started
+          - submitted
+        webcast_status:
+          type: string
+          description: Webcast connection status
+        connected:
+          type: string
+          format: date-time
+          description: Connection timestamp
+        disconnected:
+          type: string
+          format: date-time
+          description: Disconnection timestamp
+        failure_code:
+          type: string
+          description: Failure code if connection failed
+        published_source:
+          type: string
+          description: Published transcript source
+      type: object
+    Firm:
+      properties:
+        firm_id:
+          type: integer
+          description: Firm ID
+        firm:
+          type: string
+          description: Firm name
+        domain:
+          type: string
+          description: Relevant domain
+      type: object
+    PriceData:
+      properties:
+        previous_day_close_price:
+          type: number
+          description: Previous day closing price
+        current_day_open_price:
+          type: number
+          description: Current day opening price
+        current_day_close_price:
+          type: number
+          description: Current day closing price
+        price_at_event_start:
+          type: number
+          description: Price at event start
+        volume_at_event_start:
+          type: number
+          description: Volume at event start
+        price_at_event_end:
+          type: number
+          description: Price at event end
+        volume_at_event_end:
+          type: number
+          description: Volume at event end
+        before_transcript:
+          description: Price data before transcript
+          allOf:
+          - $ref: '#/components/schemas/SegmentPrice'
+        after_transcript:
+          description: Price data after transcript
+          allOf:
+          - $ref: '#/components/schemas/SegmentPrice'
+      type: object
+    Person_2:
+      type: object
+      properties:
+        event_id:
+          type: integer
+        question:
+          type: object
+          properties:
+            summary:
+              type: object
+              properties:
+                extract:
+                  type: string
+                abridged:
+                  type: string
+            speakers:
+              type: array
+              items:
+                type: object
+                properties:
+                  person_id:
+                    type: integer
+                  speaker_name:
+                    type: string
+            linguistics:
+              type: object
+              properties:
+                tonal:
+                  type: number
+                topics:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      topic:
+                        type: string
+                      position:
+                        type: integer
+                      topic_id:
+                        type: integer
+                sentiments:
+                  type: object
+                  properties:
+                    median:
+                      type: number
+                    average:
+                      type: number
+                    maximum:
+                      type: number
+                    minimum:
+                      type: number
+        answer:
+          type: object
+          properties:
+            summary:
+              type: object
+              properties:
+                extract:
+                  type: string
+                abridged:
+                  type: string
+            speakers:
+              type: array
+              items:
+                type: object
+                properties:
+                  person_id:
+                    type: integer
+                  speaker_name:
+                    type: string
+            linguistics:
+              type: object
+              properties:
+                tonal:
+                  type: number
+                topics:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      topic:
+                        type: string
+                      position:
+                        type: integer
+                      topic_id:
+                        type: integer
+                sentiments:
+                  type: object
+                  properties:
+                    median:
+                      type: number
+                    average:
+                      type: number
+                    maximum:
+                      type: number
+                    minimum:
+                      type: number
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Issued API key
+    apiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: Issued API key
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+x-refined-from:
+- aiera-rest-api-openapi.json
+- aiera-tonal-sentiments-openapi.yaml
+- aiera-unified-openapi.yaml

@@ -1,0 +1,215 @@
+openapi: 3.2.0
+info:
+  title: Aiera REST Companies v1 API
+  version: '1.0'
+  description: Aiera financial data API
+servers:
+- url: https://rest-api.aiera.com/api
+security:
+- apiKeyHeader: []
+tags:
+- name: Companies v1
+  description: Company information and lookup
+paths:
+  /companies-v1/:
+    get:
+      tags:
+      - Companies v1
+      summary: Find Companies
+      description: 'Fetch companies matching filter criteria.
+
+
+        **Notes:**
+
+        - Only **one** of the equity identifiers (`bloomberg_ticker`, `isin`, `permid`, `ric`, or `cusip`) should be used per request.'
+      operationId: get_get_companies
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: bloomberg_ticker
+        in: query
+        description: Filter to one or more Bloomberg tickers, comma-separated (e.g. AAPL:US)
+        schema:
+          type: string
+      - name: isin
+        in: query
+        description: Filter to one or more ISINs, comma-separated
+        schema:
+          type: string
+      - name: permid
+        in: query
+        description: Filter to one or more PermIDs, comma-separated
+        schema:
+          type: string
+      - name: ric
+        in: query
+        description: Filter to one or more Reuters/Refinitiv RICs, comma-separated
+        schema:
+          type: string
+      - name: ticker
+        in: query
+        description: Filter to one or more ticker symbols, comma-separated
+        schema:
+          type: string
+      - name: cusip
+        in: query
+        description: Filter to one or more CUSIPs, comma-separated
+        schema:
+          type: string
+      - name: company_type
+        in: query
+        description: Company type filter
+        schema:
+          type: string
+      - name: ownership
+        in: query
+        description: Filter by ownership type
+        schema:
+          type: string
+      - name: incorporated_country_code
+        in: query
+        description: Filter by incorporated country code
+        schema:
+          type: string
+      - name: domiciled_country_code
+        in: query
+        description: Filter by domiciled country code
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Page number
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        description: Results per page
+        schema:
+          type: integer
+          default: 100
+          minimum: 10
+          maximum: 100
+      responses:
+        '400':
+          description: Bad request
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompaniesResponse'
+  /companies-v1/{company_id}/:
+    get:
+      tags:
+      - Companies v1
+      summary: Get Company
+      description: Fetch details for a specific company by ID
+      operationId: get_get_company
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: company_id
+        in: path
+        required: true
+        description: The company ID to fetch
+        schema:
+          type: string
+      responses:
+        '404':
+          description: Company not found
+        '400':
+          description: Bad request
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+components:
+  schemas:
+    CompanyPagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
+      type: object
+    CompaniesResponse:
+      properties:
+        params:
+          type: object
+          description: Echoed request parameters
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/CompanyPagination'
+        data:
+          type: array
+          description: List of companies
+          items:
+            $ref: '#/components/schemas/Company'
+      type: object
+    Company:
+      properties:
+        company_id:
+          type: integer
+          description: Company ID
+        common_name:
+          type: string
+          description: Common name
+        legal_name:
+          type: string
+          description: Legal name
+        incorporated_country_code:
+          type: string
+          description: Country of incorporation
+        domiciled_country_code:
+          type: string
+          description: Country of domicile
+        urls:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompanyURL'
+      type: object
+    CompanyURL:
+      properties:
+        url:
+          type: string
+          description: URL
+        url_type:
+          type: string
+          description: URL type
+          enum:
+          - facebook
+          - filings
+          - home
+          - instagram
+          - ir_events
+          - ir_home
+          - ir_news
+          - linkedin
+          - logo_icon
+          - twitter
+          - wikipedia
+          - youtube
+      type: object
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Issued API key
+    apiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: Issued API key

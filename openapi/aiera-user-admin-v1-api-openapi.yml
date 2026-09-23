@@ -1,0 +1,128 @@
+openapi: 3.2.0
+info:
+  title: Aiera REST User Admin v1 API
+  version: '1.0'
+  description: Aiera financial data API
+servers:
+- url: https://rest-api.aiera.com/api
+security:
+- apiKeyHeader: []
+tags:
+- name: User Admin v1
+  description: Organization user management
+paths:
+  /user-admin-v1/:
+    get:
+      tags:
+      - User Admin v1
+      summary: List Users
+      description: 'List active users in the authenticated admin''s organization.
+
+
+        **Notes:**
+
+        - Only users with `status = active` are returned.
+
+        - Results are scoped to the authenticated user''s `organization_id`.
+
+        - Results are ordered by `user_id` ascending.'
+      operationId: get_list_users
+      security:
+      - apiKeyHeader: []
+      parameters:
+      - name: page
+        in: query
+        description: Page number
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        description: Results per page
+        schema:
+          type: integer
+          default: 50
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersResponse'
+components:
+  schemas:
+    UsersResponse:
+      properties:
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/UserPagination'
+        data:
+          type: array
+          description: List of users
+          items:
+            $ref: '#/components/schemas/UserItem'
+      type: object
+    UserPagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of users
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
+      type: object
+    UserItem:
+      properties:
+        user_id:
+          type: integer
+          description: User ID
+        username:
+          type: string
+          description: Username
+        first_name:
+          type: string
+          description: First name
+        last_name:
+          type: string
+          description: Last name
+        primary_email:
+          type: string
+          description: Primary email address
+        api_key:
+          type: string
+          description: API key
+        is_active:
+          type: boolean
+          description: Whether the user is active
+        status:
+          type: string
+          description: User status
+        create_date:
+          type: string
+          format: date-time
+          description: Account creation date
+        last_active:
+          type: string
+          format: date-time
+          description: Last active date
+      type: object
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Issued API key
+    apiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: Issued API key
