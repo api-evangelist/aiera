@@ -79,12 +79,6 @@ paths:
       - Transcrippets
 components:
   schemas:
-    Transcrippet:
-      type: object
-      properties:
-        trimmed_audio_url:
-          type: string
-          format: url
     Error:
       type: object
       required:
@@ -96,6 +90,12 @@ components:
           format: int32
         message:
           type: string
+    Transcrippet:
+      type: object
+      properties:
+        trimmed_audio_url:
+          type: string
+          format: url
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

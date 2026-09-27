@@ -286,15 +286,173 @@ paths:
       - Corporate Activity
 components:
   schemas:
-    ContactDetails:
+    CorporateActivityDetails:
       type: object
       properties:
-        name:
+        id:
           type: string
-        email:
+        title:
           type: string
-        telephone:
+        type:
           type: string
+        subtype:
+          type: string
+        when:
+          type: string
+          format: date-time
+        date_is_exact:
+          type: boolean
+        is_tentative:
+          type: boolean
+        is_estimated:
+          type: boolean
+        is_postponed:
+          type: boolean
+        is_cancelled:
+          type: boolean
+        raw_identifiers:
+          type: object
+          properties:
+            isin:
+              type: string
+            cusip:
+              type: string
+            comapny_name:
+              type: string
+            delisted:
+              type: boolean
+        event:
+          $ref: '#/components/schemas/EventCorporateActivity'
+        equity:
+          $ref: '#/components/schemas/Equity'
+        related_ids:
+          type: array
+          items:
+            type: string
+        metadata:
+          type: object
+          properties:
+            contact:
+              $ref: '#/components/schemas/ContactDetails'
+            speakers:
+              type: string
+            webcasts:
+              type: array
+              items:
+                type: object
+                properties:
+                  url:
+                    type: string
+                  'description:':
+                    type: string
+            regarding:
+              type: string
+            callDetails:
+              type: object
+              properties:
+                dialInNumber:
+                  type: string
+            localLanguage:
+              type: boolean
+            replayDetails:
+              type: object
+              properties:
+                date:
+                  type: string
+                  format: date-time
+                timeZone:
+                  type: string
+                dialInEnds:
+                  type: string
+                  format: date-time
+                webcastUrl:
+                  type: string
+            preRegistration:
+              type: boolean
+            preRegistrationUrl:
+              type: string
+        explaination:
+          type: string
+        audit:
+          type: array
+          items:
+            type: object
+            properties:
+              change_date:
+                type: string
+                format: date-time
+              change_type:
+                type: string
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
+    EventCorporateActivity:
+      type: object
+      properties:
+        event_id:
+          type: integer
+        event_title:
+          type: string
+        event_type:
+          type: string
+        event_date:
+          type: string
+          format: date-time
+        has_unknown_time:
+          type: boolean
+        broadcase_url:
+          type: string
+        replay_url:
+          type: string
+        conference_number:
+          type: string
+        conference_pin:
+          type: string
+        slides_url:
+          type: string
+        slides_url_type:
+          type: string
+        press_url:
+          type: string
+        press_url_type:
+          type: string
+        transcription_status:
+          type: string
+        transcription_audio_url:
+          type: string
+        status:
+          type: string
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    CorporateActivities:
+      type: object
+      properties:
+        params:
+          type: object
+        count:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CorporateActivityAuditItem'
     CorporateActivityAuditItem:
       type: object
       properties:
@@ -415,162 +573,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CorporateActivityAuditItem'
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    EventCorporateActivity:
-      type: object
-      properties:
-        event_id:
-          type: integer
-        event_title:
-          type: string
-        event_type:
-          type: string
-        event_date:
-          type: string
-          format: date-time
-        has_unknown_time:
-          type: boolean
-        broadcase_url:
-          type: string
-        replay_url:
-          type: string
-        conference_number:
-          type: string
-        conference_pin:
-          type: string
-        slides_url:
-          type: string
-        slides_url_type:
-          type: string
-        press_url:
-          type: string
-        press_url_type:
-          type: string
-        transcription_status:
-          type: string
-        transcription_audio_url:
-          type: string
-        status:
-          type: string
-        created:
-          type: string
-          format: date-time
-        modified:
-          type: string
-          format: date-time
-    CorporateActivityDetails:
-      type: object
-      properties:
-        id:
-          type: string
-        title:
-          type: string
-        type:
-          type: string
-        subtype:
-          type: string
-        when:
-          type: string
-          format: date-time
-        date_is_exact:
-          type: boolean
-        is_tentative:
-          type: boolean
-        is_estimated:
-          type: boolean
-        is_postponed:
-          type: boolean
-        is_cancelled:
-          type: boolean
-        raw_identifiers:
-          type: object
-          properties:
-            isin:
-              type: string
-            cusip:
-              type: string
-            comapny_name:
-              type: string
-            delisted:
-              type: boolean
-        event:
-          $ref: '#/components/schemas/EventCorporateActivity'
-        equity:
-          $ref: '#/components/schemas/Equity'
-        related_ids:
-          type: array
-          items:
-            type: string
-        metadata:
-          type: object
-          properties:
-            contact:
-              $ref: '#/components/schemas/ContactDetails'
-            speakers:
-              type: string
-            webcasts:
-              type: array
-              items:
-                type: object
-                properties:
-                  url:
-                    type: string
-                  'description:':
-                    type: string
-            regarding:
-              type: string
-            callDetails:
-              type: object
-              properties:
-                dialInNumber:
-                  type: string
-            localLanguage:
-              type: boolean
-            replayDetails:
-              type: object
-              properties:
-                date:
-                  type: string
-                  format: date-time
-                timeZone:
-                  type: string
-                dialInEnds:
-                  type: string
-                  format: date-time
-                webcastUrl:
-                  type: string
-            preRegistration:
-              type: boolean
-            preRegistrationUrl:
-              type: string
-        explaination:
-          type: string
-        audit:
-          type: array
-          items:
-            type: object
-            properties:
-              change_date:
-                type: string
-                format: date-time
-              change_type:
-                type: string
-        created:
-          type: string
-          format: date-time
-        modified:
-          type: string
-          format: date-time
     Equity:
       type: object
       properties:
@@ -594,17 +596,15 @@ components:
           type: string
         exchange_mic:
           type: string
-    CorporateActivities:
+    ContactDetails:
       type: object
       properties:
-        params:
-          type: object
-        count:
-          type: integer
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/CorporateActivityAuditItem'
+        name:
+          type: string
+        email:
+          type: string
+        telephone:
+          type: string
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

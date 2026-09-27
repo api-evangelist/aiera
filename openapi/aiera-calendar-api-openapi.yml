@@ -225,6 +225,59 @@ paths:
       - Calendar
 components:
   schemas:
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    Calendar:
+      type: object
+      properties:
+        params:
+          type: object
+        count:
+          type: integer
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/Event'
+    Event:
+      type: object
+      properties:
+        event_id:
+          type: integer
+        event_title:
+          type: string
+        event_type:
+          type: string
+        event_date:
+          type: string
+          format: date-time
+          example: '2024-10-31T23:59:59.999999'
+          pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}$
+        equity:
+          type: object
+          properties:
+            equity_id:
+              type: integer
+            local_ticker:
+              type: string
+            bloomberg_ticker:
+              type: string
+            ric:
+              type: string
+            permid:
+              type: string
+            isin:
+              type: string
+            exchange_mic:
+              type: string
     EventDetails:
       type: object
       properties:
@@ -259,59 +312,6 @@ components:
           type: string
         transcription_audio_url:
           type: string
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    Event:
-      type: object
-      properties:
-        event_id:
-          type: integer
-        event_title:
-          type: string
-        event_type:
-          type: string
-        event_date:
-          type: string
-          format: date-time
-          example: '2024-10-31T23:59:59.999999'
-          pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}$
-        equity:
-          type: object
-          properties:
-            equity_id:
-              type: integer
-            local_ticker:
-              type: string
-            bloomberg_ticker:
-              type: string
-            ric:
-              type: string
-            permid:
-              type: string
-            isin:
-              type: string
-            exchange_mic:
-              type: string
-    Calendar:
-      type: object
-      properties:
-        params:
-          type: object
-        count:
-          type: integer
-        events:
-          type: array
-          items:
-            $ref: '#/components/schemas/Event'
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

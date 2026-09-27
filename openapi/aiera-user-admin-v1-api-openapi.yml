@@ -53,33 +53,6 @@ paths:
                 $ref: '#/components/schemas/UsersResponse'
 components:
   schemas:
-    UsersResponse:
-      properties:
-        pagination:
-          description: Pagination metadata
-          allOf:
-          - $ref: '#/components/schemas/UserPagination'
-        data:
-          type: array
-          description: List of users
-          items:
-            $ref: '#/components/schemas/UserItem'
-      type: object
-    UserPagination:
-      properties:
-        total_count:
-          type: integer
-          description: Total number of users
-        current_page:
-          type: integer
-          description: Current page number
-        total_pages:
-          type: integer
-          description: Total number of pages
-        page_size:
-          type: integer
-          description: Number of results on this page
-      type: object
     UserItem:
       properties:
         user_id:
@@ -114,6 +87,33 @@ components:
           type: string
           format: date-time
           description: Last active date
+      type: object
+    UsersResponse:
+      properties:
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/UserPagination'
+        data:
+          type: array
+          description: List of users
+          items:
+            $ref: '#/components/schemas/UserItem'
+      type: object
+    UserPagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of users
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
       type: object
   securitySchemes:
     apiKeyHeader:

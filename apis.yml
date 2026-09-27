@@ -8,6 +8,23 @@ description: >-
   expert-insight content (including Third Bridge) and financial news. Aiera exposes that corpus to buy-side and
   sell-side institutions through an entitlement-aware REST API, a hosted remote MCP server for LLM and agentic
   workflows, embeddable web components (AieraChat, Aieracast, EventList), and an open-source Python MCP package.
+deliveryModel:
+  model: saas
+  license_evidence:
+    not_product:
+    - aiera-inc/aiera-mcp
+    - aiera-inc/aiera-rest-openapi
+  open_source: unknown
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: low
+  source:
+  - openapi
+  - pricing
+  - repository-not-product
+  generated: '2026-09-25'
+  method: derived
 image: https://aiera.com/wp-content/uploads/2025/09/aiera-default-feature.jpg
 url: https://raw.githubusercontent.com/api-evangelist/aiera/refs/heads/main/apis.yml
 x-type: company
@@ -25,9 +42,9 @@ tags:
 - Broker Research
 - Expert Networks
 - Speech-to-Text
-- Financial-Services
+- Financial Services
 - MCP
-- agent-native
+- Agent-Native
 tags_raw:
 - financial-research
 - earnings-calls
@@ -41,6 +58,7 @@ tags_raw:
 - financial-services
 - mcp
 - agent-native
+- Financial-Services
 apis:
 - name: Aiera MCP Server
   description: >-
@@ -56,6 +74,11 @@ apis:
   image: https://aiera.com/wp-content/uploads/2025/09/aiera-default-feature.jpg
   position: Producing
   tags:
+  - MCP
+  - Agent-Native
+  - Financial Research
+  - Financial Data
+  tags_raw:
   - MCP
   - agent-native
   - Financial Research

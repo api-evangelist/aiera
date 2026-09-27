@@ -204,6 +204,33 @@ paths:
       - Content
 components:
   schemas:
+    News:
+      type: object
+      properties:
+        content_id:
+          type: integer
+        title:
+          type: string
+        news_source_id:
+          type: integer
+        news_source:
+          type: string
+        published_date:
+          type: string
+          format: date-time
+        url:
+          type: string
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
     Filings:
       type: object
       properties:
@@ -235,33 +262,6 @@ components:
         pdf_url:
           type: string
         url:
-          type: string
-    News:
-      type: object
-      properties:
-        content_id:
-          type: integer
-        title:
-          type: string
-        news_source_id:
-          type: integer
-        news_source:
-          type: string
-        published_date:
-          type: string
-          format: date-time
-        url:
-          type: string
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
           type: string
   securitySchemes:
     ApiKeyAuth:

@@ -11,7 +11,7 @@ tags:
 paths:
   /equities-v2/sectors:
     get:
-      operationId: get sectors and sub-sectors
+      operationId: getSectorsAndSub-sectors
       description: Retrieves sectors and subsectors
       summary: Retrieves a list of sectors along with their subsectors
       security:
@@ -33,6 +33,8 @@ paths:
                 $ref: '#/components/schemas/Error'
       tags:
       - Equities V2
+      x-operation-id-source: normalized
+      x-operation-id-original: get sectors and sub-sectors
     servers:
     - url: https://premium.aiera.com/api
   /equities-v2:
@@ -134,7 +136,7 @@ paths:
     - url: https://premium.aiera.com/api
   /equities-v2/{equity_id}:
     get:
-      operationId: get equity info by equity id
+      operationId: getEquityInfoByEquityId
       description: Retrieves equities by equity id
       summary: Retrieves the appropriate equity by equity id
       security:
@@ -169,6 +171,8 @@ paths:
                 $ref: '#/components/schemas/Error'
       tags:
       - Equities V2
+      x-operation-id-source: normalized
+      x-operation-id-original: get equity info by equity id
     servers:
     - url: https://premium.aiera.com/api
   /equities-v2/{equity_id}/summary:
@@ -464,28 +468,17 @@ paths:
     - url: https://rest-api.aiera.com/api
 components:
   schemas:
-    Sector:
+    Error:
       type: object
+      required:
+      - code
+      - message
       properties:
-        sector_id:
+        code:
           type: integer
-        gics_code:
+          format: int32
+        message:
           type: string
-        name:
-          type: string
-        subsectors:
-          type: array
-          items:
-            type: object
-            properties:
-              subsector_id:
-                type: integer
-              gics_code:
-                type: string
-              gics_industry_code:
-                type: string
-              name:
-                type: string
     UpcomingEvent:
       type: object
       properties:
@@ -539,17 +532,104 @@ components:
           format: date-time
           nullable: true
           description: When the event record was last modified
-    Pagination:
+    EquitySummary:
       type: object
       properties:
-        total_count:
+        equity_id:
           type: integer
-        current_page:
+          description: The unique identifier for the equity
+        name:
+          type: string
+          description: The full name of the equity
+        common_name:
+          type: string
+          description: The common name of the equity
+        local_ticker:
+          type: string
+          description: The local ticker symbol
+        mic:
+          type: string
+          description: Market Identifier Code
+        bloomberg_ticker:
+          type: string
+          description: The Bloomberg ticker symbol with country code
+        isin:
+          type: string
+          description: International Securities Identification Number
+        permid:
+          type: string
+          description: PermID of the equity
+        gics_sector:
+          type: string
+          description: GICS sector name
+        gics_sub_sector:
+          type: string
+          description: GICS sub-sector name
+        description:
+          type: string
+          description: Company description
+        company_url:
+          type: string
+          description: Company website URL
+        ceo_name:
+          type: string
+          description: Name of the CEO
+        country:
+          type: string
+          description: Country of the company
+        estimated_next_earnings:
+          type: string
+          format: date-time
+          nullable: true
+          description: Estimated date of next earnings release
+        created:
+          type: string
+          format: date-time
+          description: When the equity record was created
+        modified:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the equity record was last modified
+        status:
+          type: string
+          description: Status of the equity
+        events:
+          type: object
+          description: Past and upcoming events for this equity
+          properties:
+            past:
+              type: array
+              description: Events that have already occurred
+              items:
+                $ref: '#/components/schemas/PastEvent'
+            upcoming:
+              type: array
+              description: Events that are scheduled for the future
+              items:
+                $ref: '#/components/schemas/UpcomingEvent'
+    Sector:
+      type: object
+      properties:
+        sector_id:
           type: integer
-        total_pages:
-          type: integer
-        page_size:
-          type: integer
+        gics_code:
+          type: string
+        name:
+          type: string
+        subsectors:
+          type: array
+          items:
+            type: object
+            properties:
+              subsector_id:
+                type: integer
+              gics_code:
+                type: string
+              gics_industry_code:
+                type: string
+              name:
+                type: string
     PastEvent:
       type: object
       properties:
@@ -679,17 +759,6 @@ components:
               type: object
               nullable: true
               description: Content of the summary
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
     Equity:
       type: object
       properties:
@@ -751,82 +820,17 @@ components:
                     type: string
                   url_type:
                     type: string
-    EquitySummary:
+    Pagination:
       type: object
       properties:
-        equity_id:
+        total_count:
           type: integer
-          description: The unique identifier for the equity
-        name:
-          type: string
-          description: The full name of the equity
-        common_name:
-          type: string
-          description: The common name of the equity
-        local_ticker:
-          type: string
-          description: The local ticker symbol
-        mic:
-          type: string
-          description: Market Identifier Code
-        bloomberg_ticker:
-          type: string
-          description: The Bloomberg ticker symbol with country code
-        isin:
-          type: string
-          description: International Securities Identification Number
-        permid:
-          type: string
-          description: PermID of the equity
-        gics_sector:
-          type: string
-          description: GICS sector name
-        gics_sub_sector:
-          type: string
-          description: GICS sub-sector name
-        description:
-          type: string
-          description: Company description
-        company_url:
-          type: string
-          description: Company website URL
-        ceo_name:
-          type: string
-          description: Name of the CEO
-        country:
-          type: string
-          description: Country of the company
-        estimated_next_earnings:
-          type: string
-          format: date-time
-          nullable: true
-          description: Estimated date of next earnings release
-        created:
-          type: string
-          format: date-time
-          description: When the equity record was created
-        modified:
-          type: string
-          format: date-time
-          nullable: true
-          description: When the equity record was last modified
-        status:
-          type: string
-          description: Status of the equity
-        events:
-          type: object
-          description: Past and upcoming events for this equity
-          properties:
-            past:
-              type: array
-              description: Events that have already occurred
-              items:
-                $ref: '#/components/schemas/PastEvent'
-            upcoming:
-              type: array
-              description: Events that are scheduled for the future
-              items:
-                $ref: '#/components/schemas/UpcomingEvent'
+        current_page:
+          type: integer
+        total_pages:
+          type: integer
+        page_size:
+          type: integer
     Equities:
       properties:
         params:
@@ -841,6 +845,19 @@ components:
           description: List of equities
           allOf:
           - $ref: '#/components/schemas/Equity_2'
+      type: object
+    SummaryEvents:
+      properties:
+        past:
+          type: array
+          description: Past events
+          items:
+            $ref: '#/components/schemas/SummaryEvent'
+        upcoming:
+          type: array
+          description: Upcoming events
+          items:
+            $ref: '#/components/schemas/SummaryEvent'
       type: object
     EquitySummary_2:
       properties:
@@ -931,112 +948,6 @@ components:
           allOf:
           - $ref: '#/components/schemas/SummaryEvents'
       type: object
-    Sector_2:
-      properties:
-        sector_id:
-          type: integer
-          description: Sector ID
-        gics_code:
-          type: string
-          description: GICS code
-        name:
-          type: string
-          description: Sector name
-        subsectors:
-          type: array
-          description: Sub-sectors
-          items:
-            $ref: '#/components/schemas/Subsector'
-      type: object
-    Company:
-      properties:
-        company_id:
-          type: integer
-          description: Company ID
-        common_name:
-          type: string
-          description: Common name
-        legal_name:
-          type: string
-          description: Legal name
-        incorporated_country_code:
-          type: string
-          description: Country of incorporation
-        domiciled_country_code:
-          type: string
-          description: Country of domicile
-        urls:
-          type: array
-          items:
-            $ref: '#/components/schemas/CompanyURL'
-      type: object
-    SummaryEvents:
-      properties:
-        past:
-          type: array
-          description: Past events
-          items:
-            $ref: '#/components/schemas/SummaryEvent'
-        upcoming:
-          type: array
-          description: Upcoming events
-          items:
-            $ref: '#/components/schemas/SummaryEvent'
-      type: object
-    SummaryPriceData:
-      properties:
-        previous_day_close_price:
-          type: number
-          description: Previous day closing price
-        current_day_open_price:
-          type: number
-          description: Current day opening price
-        current_day_close_price:
-          type: number
-          description: Current day closing price
-        price_at_start:
-          type: number
-          description: Price at event start
-        price_at_end:
-          type: number
-          description: Price at event end
-        volume_at_start:
-          type: integer
-          description: Volume at event start
-        volume_at_end:
-          type: integer
-          description: Volume at event end
-      type: object
-    Subsector:
-      properties:
-        subsector_id:
-          type: integer
-          description: Sub-sector ID
-        gics_code:
-          type: string
-          description: GICS code
-        gics_industry_code:
-          type: string
-          description: GICS industry code
-        name:
-          type: string
-          description: Sub-sector name
-      type: object
-    Pagination_2:
-      properties:
-        total_count:
-          type: integer
-          description: Total number of results
-        current_page:
-          type: integer
-          description: Current page number
-        total_pages:
-          type: integer
-          description: Total number of pages
-        page_size:
-          type: integer
-          description: Number of results on this page
-      type: object
     OutputParams:
       properties:
         page:
@@ -1079,80 +990,22 @@ components:
           type: boolean
           description: Include sourcing information
       type: object
-    Equity_2:
+    Sector_2:
       properties:
-        equity_id:
-          type: integer
-          description: Equity ID
-        company_id:
-          type: integer
-          description: Company ID
-        name:
-          type: string
-          description: Equity name
-        common_name:
-          type: string
-          description: Common name
-        ticker:
-          type: string
-          description: Ticker symbol
-        local_ticker:
-          type: string
-          description: Local ticker
-        mic:
-          type: string
-          description: Market identifier code
-        bloomberg_ticker:
-          type: string
-          description: Bloomberg ticker
-        isin:
-          type: string
-          description: ISIN
-        permid:
-          type: string
-          description: PermID
-        ric:
-          type: string
-          description: Reuters/Refinitiv RIC
-        cusip:
-          type: string
-          description: CUSIP
         sector_id:
           type: integer
-          description: GICS sector ID
-        gics_sector:
+          description: Sector ID
+        gics_code:
           type: string
-          description: GICS sector name
-        subsector_id:
-          type: integer
-          description: GICS sub-sector ID
-        gics_sub_sector:
+          description: GICS code
+        name:
           type: string
-          description: GICS sub-sector name
-        primary_equity:
-          type: boolean
-          description: Whether this is the primary equity
-        created:
-          type: string
-          format: date-time
-          description: Created date
-        modified:
-          type: string
-          format: date-time
-          description: Modified date
-        status:
-          type: string
-          description: Equity status
-          enum:
-          - active
-          - delisted
-          - inactive
-          - merger
-          - suspended
-        company_metadata:
-          description: Company metadata
-          allOf:
-          - $ref: '#/components/schemas/Company'
+          description: Sector name
+        subsectors:
+          type: array
+          description: Sub-sectors
+          items:
+            $ref: '#/components/schemas/Subsector'
       type: object
     SummaryLeader:
       properties:
@@ -1169,6 +1022,43 @@ components:
           type: string
           format: date-time
           description: Last event date
+      type: object
+    CompanyURL:
+      properties:
+        url:
+          type: string
+          description: URL
+        url_type:
+          type: string
+          description: URL type
+          enum:
+          - facebook
+          - filings
+          - home
+          - instagram
+          - ir_events
+          - ir_home
+          - ir_news
+          - linkedin
+          - logo_icon
+          - twitter
+          - wikipedia
+          - youtube
+      type: object
+    Subsector:
+      properties:
+        subsector_id:
+          type: integer
+          description: Sub-sector ID
+        gics_code:
+          type: string
+          description: GICS code
+        gics_industry_code:
+          type: string
+          description: GICS industry code
+        name:
+          type: string
+          description: Sub-sector name
       type: object
     SummaryEvent:
       properties:
@@ -1265,27 +1155,141 @@ components:
           type: object
           description: Event summary
       type: object
-    CompanyURL:
+    SummaryPriceData:
       properties:
-        url:
+        previous_day_close_price:
+          type: number
+          description: Previous day closing price
+        current_day_open_price:
+          type: number
+          description: Current day opening price
+        current_day_close_price:
+          type: number
+          description: Current day closing price
+        price_at_start:
+          type: number
+          description: Price at event start
+        price_at_end:
+          type: number
+          description: Price at event end
+        volume_at_start:
+          type: integer
+          description: Volume at event start
+        volume_at_end:
+          type: integer
+          description: Volume at event end
+      type: object
+    Company:
+      properties:
+        company_id:
+          type: integer
+          description: Company ID
+        common_name:
           type: string
-          description: URL
-        url_type:
+          description: Common name
+        legal_name:
           type: string
-          description: URL type
+          description: Legal name
+        incorporated_country_code:
+          type: string
+          description: Country of incorporation
+        domiciled_country_code:
+          type: string
+          description: Country of domicile
+        urls:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompanyURL'
+      type: object
+    Equity_2:
+      properties:
+        equity_id:
+          type: integer
+          description: Equity ID
+        company_id:
+          type: integer
+          description: Company ID
+        name:
+          type: string
+          description: Equity name
+        common_name:
+          type: string
+          description: Common name
+        ticker:
+          type: string
+          description: Ticker symbol
+        local_ticker:
+          type: string
+          description: Local ticker
+        mic:
+          type: string
+          description: Market identifier code
+        bloomberg_ticker:
+          type: string
+          description: Bloomberg ticker
+        isin:
+          type: string
+          description: ISIN
+        permid:
+          type: string
+          description: PermID
+        ric:
+          type: string
+          description: Reuters/Refinitiv RIC
+        cusip:
+          type: string
+          description: CUSIP
+        sector_id:
+          type: integer
+          description: GICS sector ID
+        gics_sector:
+          type: string
+          description: GICS sector name
+        subsector_id:
+          type: integer
+          description: GICS sub-sector ID
+        gics_sub_sector:
+          type: string
+          description: GICS sub-sector name
+        primary_equity:
+          type: boolean
+          description: Whether this is the primary equity
+        created:
+          type: string
+          format: date-time
+          description: Created date
+        modified:
+          type: string
+          format: date-time
+          description: Modified date
+        status:
+          type: string
+          description: Equity status
           enum:
-          - facebook
-          - filings
-          - home
-          - instagram
-          - ir_events
-          - ir_home
-          - ir_news
-          - linkedin
-          - logo_icon
-          - twitter
-          - wikipedia
-          - youtube
+          - active
+          - delisted
+          - inactive
+          - merger
+          - suspended
+        company_metadata:
+          description: Company metadata
+          allOf:
+          - $ref: '#/components/schemas/Company'
+      type: object
+    Pagination_2:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
       type: object
     Equity2:
       type: object

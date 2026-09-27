@@ -437,6 +437,21 @@ paths:
           description: Plain text document
 components:
   schemas:
+    DocsResponse:
+      properties:
+        params:
+          type: object
+          description: Echoed request parameters
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/DocPagination'
+        data:
+          type: array
+          description: List of documents
+          items:
+            $ref: '#/components/schemas/DocItem'
+      type: object
     CoverageResponse:
       properties:
         counts:
@@ -446,6 +461,24 @@ components:
         results:
           type: object
           description: Company details (when identifier filter is provided)
+      type: object
+    DocCompany:
+      properties:
+        company_id:
+          type: integer
+          description: Company ID
+        common_name:
+          type: string
+          description: Common name
+        legal_name:
+          type: string
+          description: Legal name
+        incorporated_country_code:
+          type: string
+          description: Country of incorporation
+        domiciled_country_code:
+          type: string
+          description: Country of domicile
       type: object
     DocPagination:
       properties:
@@ -485,6 +518,16 @@ components:
         subregions:
           type: object
           description: Count by subregion
+      type: object
+    KeywordsResponse:
+      properties:
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/DocPagination'
+        data:
+          type: object
+          description: Map of keyword to document count
       type: object
     DocItem:
       properties:
@@ -547,34 +590,6 @@ components:
           format: date-time
           description: Modified date
       type: object
-    KeywordsResponse:
-      properties:
-        pagination:
-          description: Pagination metadata
-          allOf:
-          - $ref: '#/components/schemas/DocPagination'
-        data:
-          type: object
-          description: Map of keyword to document count
-      type: object
-    DocCompany:
-      properties:
-        company_id:
-          type: integer
-          description: Company ID
-        common_name:
-          type: string
-          description: Common name
-        legal_name:
-          type: string
-          description: Legal name
-        incorporated_country_code:
-          type: string
-          description: Country of incorporation
-        domiciled_country_code:
-          type: string
-          description: Country of domicile
-      type: object
     CategoriesResponse:
       properties:
         pagination:
@@ -584,21 +599,6 @@ components:
         data:
           type: object
           description: Map of category name to document count
-      type: object
-    DocsResponse:
-      properties:
-        params:
-          type: object
-          description: Echoed request parameters
-        pagination:
-          description: Pagination metadata
-          allOf:
-          - $ref: '#/components/schemas/DocPagination'
-        data:
-          type: array
-          description: List of documents
-          items:
-            $ref: '#/components/schemas/DocItem'
       type: object
   securitySchemes:
     apiKeyHeader:

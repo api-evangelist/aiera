@@ -128,21 +128,6 @@ paths:
                 $ref: '#/components/schemas/Company'
 components:
   schemas:
-    CompanyPagination:
-      properties:
-        total_count:
-          type: integer
-          description: Total number of results
-        current_page:
-          type: integer
-          description: Current page number
-        total_pages:
-          type: integer
-          description: Total number of pages
-        page_size:
-          type: integer
-          description: Number of results on this page
-      type: object
     CompaniesResponse:
       properties:
         params:
@@ -201,6 +186,21 @@ components:
           - twitter
           - wikipedia
           - youtube
+      type: object
+    CompanyPagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
       type: object
   securitySchemes:
     apiKeyHeader:

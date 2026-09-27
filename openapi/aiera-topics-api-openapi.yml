@@ -247,6 +247,50 @@ paths:
       - Topics
 components:
   schemas:
+    EquityByTopicId:
+      type: object
+      properties:
+        equity_id:
+          type: integer
+        local_ticker:
+          type: string
+        mic:
+          type: string
+        bloomberg_ticker:
+          type: string
+        isin:
+          type: string
+        gics_sector:
+          type: string
+        gics_sub_sector:
+          type: string
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    Topics:
+      type: object
+      properties:
+        topic_id:
+          type: string
+        topic_name:
+          type: string
+    EquityTopics:
+      type: object
+      properties:
+        topic_id:
+          type: string
+        topic_name:
+          type: string
+        equity_count:
+          type: integer
     EventsByTopicId:
       type: object
       properties:
@@ -278,13 +322,6 @@ components:
               type: string
             gics_sub_sector:
               type: string
-    Topics:
-      type: object
-      properties:
-        topic_id:
-          type: string
-        topic_name:
-          type: string
     EventTopics:
       type: object
       properties:
@@ -293,43 +330,6 @@ components:
         topic_name:
           type: string
         event_count:
-          type: integer
-    EquityByTopicId:
-      type: object
-      properties:
-        equity_id:
-          type: integer
-        local_ticker:
-          type: string
-        mic:
-          type: string
-        bloomberg_ticker:
-          type: string
-        isin:
-          type: string
-        gics_sector:
-          type: string
-        gics_sub_sector:
-          type: string
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    EquityTopics:
-      type: object
-      properties:
-        topic_id:
-          type: string
-        topic_name:
-          type: string
-        equity_count:
           type: integer
   securitySchemes:
     ApiKeyAuth:

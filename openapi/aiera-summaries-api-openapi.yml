@@ -160,6 +160,21 @@ paths:
       - Summaries
 components:
   schemas:
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    GetEventSummary:
+      type: array
+      items:
+        $ref: '#/components/schemas/Summaries'
     Summary:
       type: object
       properties:
@@ -187,17 +202,6 @@ components:
         modified:
           type: string
           format: date-time
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
     Event3:
       type: object
       required:
@@ -279,10 +283,6 @@ components:
           type: string
         modified:
           type: string
-    GetEventSummary:
-      type: array
-      items:
-        $ref: '#/components/schemas/Summaries'
     Summaries:
       type: object
       properties:

@@ -143,6 +143,17 @@ paths:
       - Events
 components:
   schemas:
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
     Events:
       type: object
       required:
@@ -255,17 +266,6 @@ components:
                     type: string
                   priority:
                     type: integer
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
