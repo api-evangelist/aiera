@@ -272,6 +272,21 @@ components:
           items:
             $ref: '#/components/schemas/Filing'
       type: object
+    FilingPagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
+      type: object
     Filing:
       properties:
         filing_id:
@@ -339,6 +354,21 @@ components:
           items:
             $ref: '#/components/schemas/FilingDatafile'
       type: object
+    FilingDatafile:
+      properties:
+        file_type:
+          type: string
+          description: File type (e.g. xml, xsd)
+        description:
+          type: string
+          description: File description
+        origin:
+          type: string
+          description: Original source URL
+        url:
+          type: string
+          description: Proxied download URL
+      type: object
     FilingEquity:
       properties:
         equity_id:
@@ -368,36 +398,6 @@ components:
         permid:
           type: string
           description: PermID
-      type: object
-    FilingDatafile:
-      properties:
-        file_type:
-          type: string
-          description: File type (e.g. xml, xsd)
-        description:
-          type: string
-          description: File description
-        origin:
-          type: string
-          description: Original source URL
-        url:
-          type: string
-          description: Proxied download URL
-      type: object
-    FilingPagination:
-      properties:
-        total_count:
-          type: integer
-          description: Total number of results
-        current_page:
-          type: integer
-          description: Current page number
-        total_pages:
-          type: integer
-          description: Total number of pages
-        page_size:
-          type: integer
-          description: Number of results on this page
       type: object
   securitySchemes:
     apiKeyHeader:

@@ -264,6 +264,82 @@ paths:
                 $ref: '#/components/schemas/ChatSession'
 components:
   schemas:
+    ChatPromptResponse:
+      properties:
+        id:
+          type: integer
+          description: Prompt message ID
+        content:
+          type: string
+          description: Prompt content
+        session_id:
+          type: integer
+          description: Session ID
+        message_type:
+          type: string
+          description: Message type (prompt)
+        created_at:
+          type: string
+          format: date-time
+          description: Created timestamp
+      type: object
+    ChatSessionPagination:
+      properties:
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Items per page
+        total_pages:
+          type: integer
+          description: Total number of pages
+        total_count:
+          type: integer
+          description: Total number of sessions
+        has_next:
+          type: boolean
+          description: Whether there is a next page
+        has_previous:
+          type: boolean
+          description: Whether there is a previous page
+      type: object
+    ChatContentBlock:
+      properties:
+        type:
+          type: string
+          description: Block type (text)
+        content:
+          type: string
+          description: Text content
+        citations:
+          type: array
+          description: Citations in this block
+          items:
+            $ref: '#/components/schemas/ChatCitation'
+      type: object
+    ChatCitation:
+      properties:
+        marker:
+          type: string
+          description: Citation marker (e.g. [1])
+        quote:
+          type: string
+          description: Quoted text from the source
+        date:
+          type: string
+          format: date
+          description: Source date
+        author:
+          type: string
+          description: Source author
+        url:
+          type: string
+          description: Source URL
+        source:
+          type: object
+          description: Source reference object
+      type: object
     ChatMessage:
       properties:
         id:
@@ -308,71 +384,6 @@ components:
           format: date-time
           description: Updated timestamp
       type: object
-    ChatContentBlock:
-      properties:
-        type:
-          type: string
-          description: Block type (text)
-        content:
-          type: string
-          description: Text content
-        citations:
-          type: array
-          description: Citations in this block
-          items:
-            $ref: '#/components/schemas/ChatCitation'
-      type: object
-    ChatSessionsList:
-      properties:
-        data:
-          type: array
-          description: List of chat sessions
-          items:
-            $ref: '#/components/schemas/ChatSession'
-        pagination:
-          description: Pagination metadata
-          allOf:
-          - $ref: '#/components/schemas/ChatSessionPagination'
-      type: object
-    ChatPromptResponse:
-      properties:
-        id:
-          type: integer
-          description: Prompt message ID
-        content:
-          type: string
-          description: Prompt content
-        session_id:
-          type: integer
-          description: Session ID
-        message_type:
-          type: string
-          description: Message type (prompt)
-        created_at:
-          type: string
-          format: date-time
-          description: Created timestamp
-      type: object
-    UpdateChatSession:
-      properties:
-        title:
-          type: string
-          description: New session title
-        sources:
-          type: object
-          description: Updated sources array
-      type: object
-    ChatPrompt:
-      required:
-      - content
-      properties:
-        content:
-          type: string
-          description: The prompt message text
-        tool_settings:
-          type: object
-          description: Optional tool settings (`source_filters`, `web_search_enabled`)
-      type: object
     ChatSource:
       properties:
         id:
@@ -391,48 +402,22 @@ components:
           type: object
           description: Parent source reference
       type: object
-    ChatSessionPagination:
+    DeleteChatSessionResponse:
       properties:
-        page:
-          type: integer
-          description: Current page number
-        page_size:
-          type: integer
-          description: Items per page
-        total_pages:
-          type: integer
-          description: Total number of pages
-        total_count:
-          type: integer
-          description: Total number of sessions
-        has_next:
+        success:
           type: boolean
-          description: Whether there is a next page
-        has_previous:
-          type: boolean
-          description: Whether there is a previous page
+          description: Whether the deletion was successful
       type: object
-    ChatCitation:
+    ChatPrompt:
+      required:
+      - content
       properties:
-        marker:
+        content:
           type: string
-          description: Citation marker (e.g. [1])
-        quote:
-          type: string
-          description: Quoted text from the source
-        date:
-          type: string
-          format: date
-          description: Source date
-        author:
-          type: string
-          description: Source author
-        url:
-          type: string
-          description: Source URL
-        source:
+          description: The prompt message text
+        tool_settings:
           type: object
-          description: Source reference object
+          description: Optional tool settings (`source_filters`, `web_search_enabled`)
       type: object
     ChatSession:
       properties:
@@ -484,6 +469,15 @@ components:
           format: date-time
           description: Updated timestamp
       type: object
+    UpdateChatSession:
+      properties:
+        title:
+          type: string
+          description: New session title
+        sources:
+          type: object
+          description: Updated sources array
+      type: object
     CreateChatSession:
       properties:
         title:
@@ -496,11 +490,17 @@ components:
           type: object
           description: Optional initial sources array to scope the session to specific documents, events, or companies. See [Chat](../../chat) for source shape.
       type: object
-    DeleteChatSessionResponse:
+    ChatSessionsList:
       properties:
-        success:
-          type: boolean
-          description: Whether the deletion was successful
+        data:
+          type: array
+          description: List of chat sessions
+          items:
+            $ref: '#/components/schemas/ChatSession'
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/ChatSessionPagination'
       type: object
   securitySchemes:
     apiKeyHeader:

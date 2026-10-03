@@ -160,48 +160,6 @@ paths:
       - Summaries
 components:
   schemas:
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    GetEventSummary:
-      type: array
-      items:
-        $ref: '#/components/schemas/Summaries'
-    Summary:
-      type: object
-      properties:
-        title:
-          type: string
-        summary:
-          type: array
-          items:
-            type: string
-        model:
-          type: string
-        type:
-          type: string
-        version:
-          type: string
-        audio_clip:
-          type: string
-        video_clip:
-          type: string
-        priority:
-          type: integer
-        created:
-          type: string
-          format: date-time
-        modified:
-          type: string
-          format: date-time
     Event3:
       type: object
       required:
@@ -283,6 +241,33 @@ components:
           type: string
         modified:
           type: string
+    Summary:
+      type: object
+      properties:
+        title:
+          type: string
+        summary:
+          type: array
+          items:
+            type: string
+        model:
+          type: string
+        type:
+          type: string
+        version:
+          type: string
+        audio_clip:
+          type: string
+        video_clip:
+          type: string
+        priority:
+          type: integer
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
     Summaries:
       type: object
       properties:
@@ -290,6 +275,21 @@ components:
           $ref: '#/components/schemas/Event3'
         summary:
           $ref: '#/components/schemas/Summary'
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    GetEventSummary:
+      type: array
+      items:
+        $ref: '#/components/schemas/Summaries'
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

@@ -128,6 +128,21 @@ paths:
                 $ref: '#/components/schemas/Company'
 components:
   schemas:
+    CompanyPagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
+      type: object
     CompaniesResponse:
       properties:
         params:
@@ -142,28 +157,6 @@ components:
           description: List of companies
           items:
             $ref: '#/components/schemas/Company'
-      type: object
-    Company:
-      properties:
-        company_id:
-          type: integer
-          description: Company ID
-        common_name:
-          type: string
-          description: Common name
-        legal_name:
-          type: string
-          description: Legal name
-        incorporated_country_code:
-          type: string
-          description: Country of incorporation
-        domiciled_country_code:
-          type: string
-          description: Country of domicile
-        urls:
-          type: array
-          items:
-            $ref: '#/components/schemas/CompanyURL'
       type: object
     CompanyURL:
       properties:
@@ -187,20 +180,27 @@ components:
           - wikipedia
           - youtube
       type: object
-    CompanyPagination:
+    Company:
       properties:
-        total_count:
+        company_id:
           type: integer
-          description: Total number of results
-        current_page:
-          type: integer
-          description: Current page number
-        total_pages:
-          type: integer
-          description: Total number of pages
-        page_size:
-          type: integer
-          description: Number of results on this page
+          description: Company ID
+        common_name:
+          type: string
+          description: Common name
+        legal_name:
+          type: string
+          description: Legal name
+        incorporated_country_code:
+          type: string
+          description: Country of incorporation
+        domiciled_country_code:
+          type: string
+          description: Country of domicile
+        urls:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompanyURL'
       type: object
   securitySchemes:
     apiKeyHeader:

@@ -264,6 +264,22 @@ components:
           type: string
         gics_sub_sector:
           type: string
+    EventTopics:
+      type: object
+      properties:
+        topic_id:
+          type: string
+        topic_name:
+          type: string
+        event_count:
+          type: integer
+    Topics:
+      type: object
+      properties:
+        topic_id:
+          type: string
+        topic_name:
+          type: string
     Error:
       type: object
       required:
@@ -275,22 +291,6 @@ components:
           format: int32
         message:
           type: string
-    Topics:
-      type: object
-      properties:
-        topic_id:
-          type: string
-        topic_name:
-          type: string
-    EquityTopics:
-      type: object
-      properties:
-        topic_id:
-          type: string
-        topic_name:
-          type: string
-        equity_count:
-          type: integer
     EventsByTopicId:
       type: object
       properties:
@@ -322,14 +322,14 @@ components:
               type: string
             gics_sub_sector:
               type: string
-    EventTopics:
+    EquityTopics:
       type: object
       properties:
         topic_id:
           type: string
         topic_name:
           type: string
-        event_count:
+        equity_count:
           type: integer
   securitySchemes:
     ApiKeyAuth:

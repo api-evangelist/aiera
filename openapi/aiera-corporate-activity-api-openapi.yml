@@ -286,6 +286,148 @@ paths:
       - Corporate Activity
 components:
   schemas:
+    CorporateCoverage:
+      type: object
+      properties:
+        counts:
+          type: object
+          properties:
+            mapped:
+              type: object
+              properties:
+                companies:
+                  type: integer
+                equities:
+                  type: integer
+                gics_sectors:
+                  type: object
+                  additionalProperties:
+                    type: integer
+                  example:
+                    Consumer Discretionary: 1
+                gics_subsectors:
+                  type: object
+                  additionalProperties:
+                    type: integer
+                  example:
+                    Broadline Retail: 1
+                countries:
+                  type: object
+                  additionalProperties:
+                    type: integer
+                  example:
+                    US: 1
+                regions:
+                  type: object
+                  additionalProperties:
+                    type: integer
+                  example:
+                    Americas: 1
+                subregions:
+                  type: object
+                  additionalProperties:
+                    type: integer
+                  example:
+                    North America: 1
+            unmapped:
+              type: object
+              properties:
+                listed:
+                  type: integer
+                delisted:
+                  type: integer
+        results:
+          type: object
+          properties:
+            mapped:
+              type: array
+              items:
+                type: object
+                properties:
+                  company_id:
+                    type: integer
+                  name:
+                    type: string
+                  country:
+                    type: string
+                  region:
+                    type: string
+                  subregion:
+                    type: string
+                  equities:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        equity_id:
+                          type: integer
+                        bloomberg_ticker:
+                          type: string
+                        local_ticker:
+                          type: string
+                        ric:
+                          type: string
+                        isin:
+                          type: string
+                        cusip:
+                          type: string
+                        permid:
+                          type: string
+                        mic:
+                          type: string
+                        gics_sector:
+                          type: string
+                        gics_subsector:
+                          type: string
+            unmapped:
+              type: array
+              items:
+                type: object
+    CorporateActivityAuditItem:
+      type: object
+      properties:
+        corporate_activity_id:
+          type: string
+        change_date:
+          type: string
+          format: date-time
+        change_type:
+          type: string
+        corporate_activity:
+          $ref: '#/components/schemas/CorporateActivityDetails'
+    CorporateActivityAudits:
+      type: object
+      properties:
+        params:
+          type: object
+        count:
+          type: integer
+        audits:
+          type: array
+          items:
+            $ref: '#/components/schemas/CorporateActivityAuditItem'
+    CorporateActivities:
+      type: object
+      properties:
+        params:
+          type: object
+        count:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CorporateActivityAuditItem'
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
     CorporateActivityDetails:
       type: object
       properties:
@@ -431,148 +573,6 @@ components:
         modified:
           type: string
           format: date-time
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    CorporateActivities:
-      type: object
-      properties:
-        params:
-          type: object
-        count:
-          type: integer
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/CorporateActivityAuditItem'
-    CorporateActivityAuditItem:
-      type: object
-      properties:
-        corporate_activity_id:
-          type: string
-        change_date:
-          type: string
-          format: date-time
-        change_type:
-          type: string
-        corporate_activity:
-          $ref: '#/components/schemas/CorporateActivityDetails'
-    CorporateCoverage:
-      type: object
-      properties:
-        counts:
-          type: object
-          properties:
-            mapped:
-              type: object
-              properties:
-                companies:
-                  type: integer
-                equities:
-                  type: integer
-                gics_sectors:
-                  type: object
-                  additionalProperties:
-                    type: integer
-                  example:
-                    Consumer Discretionary: 1
-                gics_subsectors:
-                  type: object
-                  additionalProperties:
-                    type: integer
-                  example:
-                    Broadline Retail: 1
-                countries:
-                  type: object
-                  additionalProperties:
-                    type: integer
-                  example:
-                    US: 1
-                regions:
-                  type: object
-                  additionalProperties:
-                    type: integer
-                  example:
-                    Americas: 1
-                subregions:
-                  type: object
-                  additionalProperties:
-                    type: integer
-                  example:
-                    North America: 1
-            unmapped:
-              type: object
-              properties:
-                listed:
-                  type: integer
-                delisted:
-                  type: integer
-        results:
-          type: object
-          properties:
-            mapped:
-              type: array
-              items:
-                type: object
-                properties:
-                  company_id:
-                    type: integer
-                  name:
-                    type: string
-                  country:
-                    type: string
-                  region:
-                    type: string
-                  subregion:
-                    type: string
-                  equities:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        equity_id:
-                          type: integer
-                        bloomberg_ticker:
-                          type: string
-                        local_ticker:
-                          type: string
-                        ric:
-                          type: string
-                        isin:
-                          type: string
-                        cusip:
-                          type: string
-                        permid:
-                          type: string
-                        mic:
-                          type: string
-                        gics_sector:
-                          type: string
-                        gics_subsector:
-                          type: string
-            unmapped:
-              type: array
-              items:
-                type: object
-    CorporateActivityAudits:
-      type: object
-      properties:
-        params:
-          type: object
-        count:
-          type: integer
-        audits:
-          type: array
-          items:
-            $ref: '#/components/schemas/CorporateActivityAuditItem'
     Equity:
       type: object
       properties:

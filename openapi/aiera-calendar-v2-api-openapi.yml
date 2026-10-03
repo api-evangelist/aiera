@@ -344,69 +344,6 @@ components:
           type: object
           description: Company details (when identifier filter is provided)
       type: object
-    EstimatesResponse:
-      properties:
-        params:
-          type: object
-          description: Echoed request parameters
-        pagination:
-          description: Pagination metadata
-          allOf:
-          - $ref: '#/components/schemas/CalendarPagination'
-        results:
-          type: array
-          description: List of estimates
-          items:
-            $ref: '#/components/schemas/EstimateItem'
-      type: object
-    CalendarEquity:
-      properties:
-        equity_id:
-          type: integer
-          description: Equity ID
-        local_ticker:
-          type: string
-          description: Local ticker
-        bloomberg_ticker:
-          type: string
-          description: Bloomberg ticker
-        ric:
-          type: string
-          description: Reuters/Refinitiv RIC
-        permid:
-          type: string
-          description: PermID
-        isin:
-          type: string
-          description: ISIN
-        exchange_mic:
-          type: string
-          description: Exchange MIC
-      type: object
-    CoverageCounts:
-      properties:
-        companies:
-          type: integer
-          description: Number of companies covered
-        equities:
-          type: integer
-          description: Number of equities covered
-        gics_sectors:
-          type: object
-          description: Count by GICS sector
-        gics_subsectors:
-          type: object
-          description: Count by GICS sub-sector
-        countries:
-          type: object
-          description: Count by country
-        regions:
-          type: object
-          description: Count by region
-        subregions:
-          type: object
-          description: Count by subregion
-      type: object
     CalendarEvent:
       properties:
         event_id:
@@ -487,6 +424,36 @@ components:
           format: date-time
           description: Modified date
       type: object
+    CalendarPagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
+      type: object
+    EstimatesResponse:
+      properties:
+        params:
+          type: object
+          description: Echoed request parameters
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/CalendarPagination'
+        results:
+          type: array
+          description: List of estimates
+          items:
+            $ref: '#/components/schemas/EstimateItem'
+      type: object
     EstimateItem:
       properties:
         estimate_id:
@@ -513,49 +480,29 @@ components:
           allOf:
           - $ref: '#/components/schemas/EstimateActual'
       type: object
-    EstimateDetail:
+    CalendarEquity:
       properties:
-        call_type:
-          type: string
-          description: Estimated event type
-        call_date:
-          type: string
-          format: date-time
-          description: Estimated date
-        title:
-          type: string
-          description: Estimated event title
-      type: object
-    EstimateActual:
-      properties:
-        event_id:
+        equity_id:
           type: integer
-          description: Actual event ID
-        call_type:
+          description: Equity ID
+        local_ticker:
           type: string
-          description: Actual event type
-        call_date:
+          description: Local ticker
+        bloomberg_ticker:
           type: string
-          format: date-time
-          description: Actual date
-        title:
+          description: Bloomberg ticker
+        ric:
           type: string
-          description: Actual event title
-      type: object
-    CalendarPagination:
-      properties:
-        total_count:
-          type: integer
-          description: Total number of results
-        current_page:
-          type: integer
-          description: Current page number
-        total_pages:
-          type: integer
-          description: Total number of pages
-        page_size:
-          type: integer
-          description: Number of results on this page
+          description: Reuters/Refinitiv RIC
+        permid:
+          type: string
+          description: PermID
+        isin:
+          type: string
+          description: ISIN
+        exchange_mic:
+          type: string
+          description: Exchange MIC
       type: object
     CalendarResponse:
       properties:
@@ -604,6 +551,59 @@ components:
         gics_sub_sector:
           type: string
           description: GICS sub-sector name
+      type: object
+    EstimateActual:
+      properties:
+        event_id:
+          type: integer
+          description: Actual event ID
+        call_type:
+          type: string
+          description: Actual event type
+        call_date:
+          type: string
+          format: date-time
+          description: Actual date
+        title:
+          type: string
+          description: Actual event title
+      type: object
+    EstimateDetail:
+      properties:
+        call_type:
+          type: string
+          description: Estimated event type
+        call_date:
+          type: string
+          format: date-time
+          description: Estimated date
+        title:
+          type: string
+          description: Estimated event title
+      type: object
+    CoverageCounts:
+      properties:
+        companies:
+          type: integer
+          description: Number of companies covered
+        equities:
+          type: integer
+          description: Number of equities covered
+        gics_sectors:
+          type: object
+          description: Count by GICS sector
+        gics_subsectors:
+          type: object
+          description: Count by GICS sub-sector
+        countries:
+          type: object
+          description: Count by country
+        regions:
+          type: object
+          description: Count by region
+        subregions:
+          type: object
+          description: Count by subregion
       type: object
   securitySchemes:
     apiKeyHeader:

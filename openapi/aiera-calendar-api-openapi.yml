@@ -225,28 +225,6 @@ paths:
       - Calendar
 components:
   schemas:
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    Calendar:
-      type: object
-      properties:
-        params:
-          type: object
-        count:
-          type: integer
-        events:
-          type: array
-          items:
-            $ref: '#/components/schemas/Event'
     Event:
       type: object
       properties:
@@ -311,6 +289,28 @@ components:
         press_url:
           type: string
         transcription_audio_url:
+          type: string
+    Calendar:
+      type: object
+      properties:
+        params:
+          type: object
+        count:
+          type: integer
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/Event'
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
           type: string
   securitySchemes:
     ApiKeyAuth:

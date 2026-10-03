@@ -142,17 +142,35 @@ paths:
                 $ref: '#/components/schemas/ExpertEventDetail'
 components:
   schemas:
-    ExpertCompany:
+    ExpertEventsResponse:
+      properties:
+        params:
+          type: object
+          description: Echoed request parameters
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/ExpertPagination'
+        data:
+          type: array
+          description: List of events
+          items:
+            $ref: '#/components/schemas/ExpertEvent'
+      type: object
+    ExpertBiography:
       properties:
         name:
           type: string
-          description: Company name
-        ticker:
+          description: Expert name
+        biography:
           type: string
-          description: Company ticker
-        exchange:
+          description: Expert biography text
+      type: object
+    ExpertStatus:
+      properties:
+        status:
           type: string
-          description: Exchange name
+          description: Service status
       type: object
     ExpertEventDetail:
       properties:
@@ -200,11 +218,17 @@ components:
           type: string
           description: Full transcript text
       type: object
-    ExpertStatus:
+    ExpertCompany:
       properties:
-        status:
+        name:
           type: string
-          description: Service status
+          description: Company name
+        ticker:
+          type: string
+          description: Company ticker
+        exchange:
+          type: string
+          description: Exchange name
       type: object
     ExpertEvent:
       properties:
@@ -253,30 +277,6 @@ components:
         page_size:
           type: integer
           description: Number of results on this page
-      type: object
-    ExpertBiography:
-      properties:
-        name:
-          type: string
-          description: Expert name
-        biography:
-          type: string
-          description: Expert biography text
-      type: object
-    ExpertEventsResponse:
-      properties:
-        params:
-          type: object
-          description: Echoed request parameters
-        pagination:
-          description: Pagination metadata
-          allOf:
-          - $ref: '#/components/schemas/ExpertPagination'
-        data:
-          type: array
-          description: List of events
-          items:
-            $ref: '#/components/schemas/ExpertEvent'
       type: object
   securitySchemes:
     apiKeyHeader:

@@ -110,6 +110,79 @@ paths:
           description: Person not found
 components:
   schemas:
+    TranscriptSpeaker:
+      properties:
+        speaker_id:
+          type: integer
+          description: Speaker ID
+        name:
+          type: string
+          description: Speaker name
+        title:
+          type: string
+          description: Speaker title
+        firm:
+          description: Firm ID
+          allOf:
+          - $ref: '#/components/schemas/Firm'
+      type: object
+    CompanyURL:
+      properties:
+        url:
+          type: string
+          description: URL
+        url_type:
+          type: string
+          description: URL type
+          enum:
+          - facebook
+          - filings
+          - home
+          - instagram
+          - ir_events
+          - ir_home
+          - ir_news
+          - linkedin
+          - logo_icon
+          - twitter
+          - wikipedia
+          - youtube
+      type: object
+    Person:
+      properties:
+        person_id:
+          type: integer
+          description: Person ID
+        name:
+          type: string
+          description: Person name
+        parent_id:
+          type: integer
+          description: Parent person ID (if merged)
+        representations:
+          description: Representations in transcripts
+          allOf:
+          - $ref: '#/components/schemas/TranscriptSpeaker'
+        events:
+          description: Events speaker found in
+          allOf:
+          - $ref: '#/components/schemas/BasicEvent'
+      type: object
+    Pagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
+      type: object
     PeopleList:
       properties:
         pagination:
@@ -121,31 +194,6 @@ components:
           description: List of people
           items:
             $ref: '#/components/schemas/PersonListItem'
-      type: object
-    Transcript:
-      properties:
-        speaker_id:
-          type: integer
-          description: Speaker ID
-        event_id:
-          type: integer
-          description: Event ID
-        transcript_item_id:
-          type: integer
-          description: Transcript item ID
-        start_ms:
-          type: integer
-          description: Milliseconds until start
-        start_timestamp:
-          type: string
-          format: date-time
-          description: Timestamp of segment start
-        duration_ms:
-          type: integer
-          description: Duration of the segment
-        transcript:
-          type: string
-          description: Transcript
       type: object
     BasicEvent:
       properties:
@@ -177,28 +225,6 @@ components:
           allOf:
           - $ref: '#/components/schemas/Transcript'
       type: object
-    CompanyURL:
-      properties:
-        url:
-          type: string
-          description: URL
-        url_type:
-          type: string
-          description: URL type
-          enum:
-          - facebook
-          - filings
-          - home
-          - instagram
-          - ir_events
-          - ir_home
-          - ir_news
-          - linkedin
-          - logo_icon
-          - twitter
-          - wikipedia
-          - youtube
-      type: object
     Company:
       properties:
         company_id:
@@ -221,41 +247,42 @@ components:
           items:
             $ref: '#/components/schemas/CompanyURL'
       type: object
-    TranscriptSpeaker:
+    Firm:
+      properties:
+        firm_id:
+          type: integer
+          description: Firm ID
+        firm:
+          type: string
+          description: Firm name
+        domain:
+          type: string
+          description: Relevant domain
+      type: object
+    Transcript:
       properties:
         speaker_id:
           type: integer
           description: Speaker ID
-        name:
-          type: string
-          description: Speaker name
-        title:
-          type: string
-          description: Speaker title
-        firm:
-          description: Firm ID
-          allOf:
-          - $ref: '#/components/schemas/Firm'
-      type: object
-    Person:
-      properties:
-        person_id:
+        event_id:
           type: integer
-          description: Person ID
-        name:
-          type: string
-          description: Person name
-        parent_id:
+          description: Event ID
+        transcript_item_id:
           type: integer
-          description: Parent person ID (if merged)
-        representations:
-          description: Representations in transcripts
-          allOf:
-          - $ref: '#/components/schemas/TranscriptSpeaker'
-        events:
-          description: Events speaker found in
-          allOf:
-          - $ref: '#/components/schemas/BasicEvent'
+          description: Transcript item ID
+        start_ms:
+          type: integer
+          description: Milliseconds until start
+        start_timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of segment start
+        duration_ms:
+          type: integer
+          description: Duration of the segment
+        transcript:
+          type: string
+          description: Transcript
       type: object
     Equity:
       properties:
@@ -332,18 +359,6 @@ components:
           allOf:
           - $ref: '#/components/schemas/Company'
       type: object
-    Firm:
-      properties:
-        firm_id:
-          type: integer
-          description: Firm ID
-        firm:
-          type: string
-          description: Firm name
-        domain:
-          type: string
-          description: Relevant domain
-      type: object
     PersonListItem:
       properties:
         person_id:
@@ -355,21 +370,6 @@ components:
         parent_id:
           type: integer
           description: Parent person ID (if merged)
-      type: object
-    Pagination:
-      properties:
-        total_count:
-          type: integer
-          description: Total number of results
-        current_page:
-          type: integer
-          description: Current page number
-        total_pages:
-          type: integer
-          description: Total number of pages
-        page_size:
-          type: integer
-          description: Number of results on this page
       type: object
   securitySchemes:
     apiKeyHeader:
