@@ -110,45 +110,7 @@ paths:
           description: Person not found
 components:
   schemas:
-    TranscriptSpeaker:
-      properties:
-        speaker_id:
-          type: integer
-          description: Speaker ID
-        name:
-          type: string
-          description: Speaker name
-        title:
-          type: string
-          description: Speaker title
-        firm:
-          description: Firm ID
-          allOf:
-          - $ref: '#/components/schemas/Firm'
-      type: object
-    CompanyURL:
-      properties:
-        url:
-          type: string
-          description: URL
-        url_type:
-          type: string
-          description: URL type
-          enum:
-          - facebook
-          - filings
-          - home
-          - instagram
-          - ir_events
-          - ir_home
-          - ir_news
-          - linkedin
-          - logo_icon
-          - twitter
-          - wikipedia
-          - youtube
-      type: object
-    Person:
+    PersonListItem:
       properties:
         person_id:
           type: integer
@@ -159,14 +121,6 @@ components:
         parent_id:
           type: integer
           description: Parent person ID (if merged)
-        representations:
-          description: Representations in transcripts
-          allOf:
-          - $ref: '#/components/schemas/TranscriptSpeaker'
-        events:
-          description: Events speaker found in
-          allOf:
-          - $ref: '#/components/schemas/BasicEvent'
       type: object
     Pagination:
       properties:
@@ -182,107 +136,6 @@ components:
         page_size:
           type: integer
           description: Number of results on this page
-      type: object
-    PeopleList:
-      properties:
-        pagination:
-          description: Pagination metadata
-          allOf:
-          - $ref: '#/components/schemas/Pagination'
-        data:
-          type: array
-          description: List of people
-          items:
-            $ref: '#/components/schemas/PersonListItem'
-      type: object
-    BasicEvent:
-      properties:
-        event_id:
-          type: integer
-          description: Event ID
-        title:
-          type: string
-          description: Event title
-        event_type:
-          type: string
-          description: Event type
-        event_date:
-          type: string
-          format: date-time
-          description: Event date
-        transcription_audio_url:
-          type: string
-          description: Event audio URL
-        transcription_audio_offset_seconds:
-          type: integer
-          description: Offset seconds from audio file
-        equity:
-          description: Event equity
-          allOf:
-          - $ref: '#/components/schemas/Equity'
-        transcripts:
-          description: Matched transcripts
-          allOf:
-          - $ref: '#/components/schemas/Transcript'
-      type: object
-    Company:
-      properties:
-        company_id:
-          type: integer
-          description: Company ID
-        common_name:
-          type: string
-          description: Common name
-        legal_name:
-          type: string
-          description: Legal name
-        incorporated_country_code:
-          type: string
-          description: Country of incorporation
-        domiciled_country_code:
-          type: string
-          description: Country of domicile
-        urls:
-          type: array
-          items:
-            $ref: '#/components/schemas/CompanyURL'
-      type: object
-    Firm:
-      properties:
-        firm_id:
-          type: integer
-          description: Firm ID
-        firm:
-          type: string
-          description: Firm name
-        domain:
-          type: string
-          description: Relevant domain
-      type: object
-    Transcript:
-      properties:
-        speaker_id:
-          type: integer
-          description: Speaker ID
-        event_id:
-          type: integer
-          description: Event ID
-        transcript_item_id:
-          type: integer
-          description: Transcript item ID
-        start_ms:
-          type: integer
-          description: Milliseconds until start
-        start_timestamp:
-          type: string
-          format: date-time
-          description: Timestamp of segment start
-        duration_ms:
-          type: integer
-          description: Duration of the segment
-        transcript:
-          type: string
-          description: Transcript
       type: object
     Equity:
       properties:
@@ -359,7 +212,7 @@ components:
           allOf:
           - $ref: '#/components/schemas/Company'
       type: object
-    PersonListItem:
+    Person:
       properties:
         person_id:
           type: integer
@@ -370,6 +223,153 @@ components:
         parent_id:
           type: integer
           description: Parent person ID (if merged)
+        representations:
+          description: Representations in transcripts
+          allOf:
+          - $ref: '#/components/schemas/TranscriptSpeaker'
+        events:
+          description: Events speaker found in
+          allOf:
+          - $ref: '#/components/schemas/BasicEvent'
+      type: object
+    Firm:
+      properties:
+        firm_id:
+          type: integer
+          description: Firm ID
+        firm:
+          type: string
+          description: Firm name
+        domain:
+          type: string
+          description: Relevant domain
+      type: object
+    BasicEvent:
+      properties:
+        event_id:
+          type: integer
+          description: Event ID
+        title:
+          type: string
+          description: Event title
+        event_type:
+          type: string
+          description: Event type
+        event_date:
+          type: string
+          format: date-time
+          description: Event date
+        transcription_audio_url:
+          type: string
+          description: Event audio URL
+        transcription_audio_offset_seconds:
+          type: integer
+          description: Offset seconds from audio file
+        equity:
+          description: Event equity
+          allOf:
+          - $ref: '#/components/schemas/Equity'
+        transcripts:
+          description: Matched transcripts
+          allOf:
+          - $ref: '#/components/schemas/Transcript'
+      type: object
+    PeopleList:
+      properties:
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/Pagination'
+        data:
+          type: array
+          description: List of people
+          items:
+            $ref: '#/components/schemas/PersonListItem'
+      type: object
+    Transcript:
+      properties:
+        speaker_id:
+          type: integer
+          description: Speaker ID
+        event_id:
+          type: integer
+          description: Event ID
+        transcript_item_id:
+          type: integer
+          description: Transcript item ID
+        start_ms:
+          type: integer
+          description: Milliseconds until start
+        start_timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of segment start
+        duration_ms:
+          type: integer
+          description: Duration of the segment
+        transcript:
+          type: string
+          description: Transcript
+      type: object
+    TranscriptSpeaker:
+      properties:
+        speaker_id:
+          type: integer
+          description: Speaker ID
+        name:
+          type: string
+          description: Speaker name
+        title:
+          type: string
+          description: Speaker title
+        firm:
+          description: Firm ID
+          allOf:
+          - $ref: '#/components/schemas/Firm'
+      type: object
+    CompanyURL:
+      properties:
+        url:
+          type: string
+          description: URL
+        url_type:
+          type: string
+          description: URL type
+          enum:
+          - facebook
+          - filings
+          - home
+          - instagram
+          - ir_events
+          - ir_home
+          - ir_news
+          - linkedin
+          - logo_icon
+          - twitter
+          - wikipedia
+          - youtube
+      type: object
+    Company:
+      properties:
+        company_id:
+          type: integer
+          description: Company ID
+        common_name:
+          type: string
+          description: Common name
+        legal_name:
+          type: string
+          description: Legal name
+        incorporated_country_code:
+          type: string
+          description: Country of incorporation
+        domiciled_country_code:
+          type: string
+          description: Country of domicile
+        urls:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompanyURL'
       type: object
   securitySchemes:
     apiKeyHeader:

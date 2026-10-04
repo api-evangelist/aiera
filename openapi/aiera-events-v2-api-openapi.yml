@@ -984,18 +984,114 @@ paths:
     - url: https://premium.aiera.com/api
 components:
   schemas:
-    SegmentPrice:
+    Summary:
       properties:
-        trade_time:
+        title:
+          type: string
+          description: Title for the summary text (if applicable)
+        summary:
+          type: array
+          description: Summary text
+          items:
+            type: string
+        model:
+          type: string
+          description: Source of the summary
+        type:
+          type: string
+          description: Type of summary (presentation, Q&A, or whole-document)
+        version:
+          type: string
+          description: Version of the summary (live or published)
+        audio_clip:
+          type: string
+          description: Generated audio reading of the summary
+        video_clip:
+          type: string
+          description: Generated video reading of the summary
+        priority:
+          type: integer
+          description: Priority level of the summary
+        created:
           type: string
           format: date-time
-          description: Trade timestamp
-        price:
-          type: number
-          description: Trade price
-        volume:
+          description: Summary creation date
+        modified:
+          type: string
+          format: date-time
+          description: Summary modified date
+      type: object
+    Person:
+      properties:
+        person_id:
           type: integer
-          description: Trade volume
+          description: Person ID
+        name:
+          type: string
+          description: Person name
+        parent_id:
+          type: integer
+          description: Parent person ID (if merged)
+        representations:
+          description: Representations in transcripts
+          allOf:
+          - $ref: '#/components/schemas/TranscriptSpeaker'
+        events:
+          description: Events speaker found in
+          allOf:
+          - $ref: '#/components/schemas/BasicEvent'
+      type: object
+    Firm:
+      properties:
+        firm_id:
+          type: integer
+          description: Firm ID
+        firm:
+          type: string
+          description: Firm name
+        domain:
+          type: string
+          description: Relevant domain
+      type: object
+    Transcript:
+      properties:
+        speaker_id:
+          type: integer
+          description: Speaker ID
+        event_id:
+          type: integer
+          description: Event ID
+        transcript_item_id:
+          type: integer
+          description: Transcript item ID
+        start_ms:
+          type: integer
+          description: Milliseconds until start
+        start_timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of segment start
+        duration_ms:
+          type: integer
+          description: Duration of the segment
+        transcript:
+          type: string
+          description: Transcript
+      type: object
+    Sentiment:
+      properties:
+        average:
+          type: number
+          description: Average sentiment score
+        median:
+          type: number
+          description: Median sentiment score
+        minimum:
+          type: number
+          description: Minimum sentiment score
+        maximum:
+          type: number
+          description: Maximum sentiment score
       type: object
     SentimentBreakout:
       properties:
@@ -1009,36 +1105,38 @@ components:
           type: number
           description: Sentiment score
       type: object
-    Company:
+    Events:
       properties:
-        company_id:
-          type: integer
-          description: Company ID
-        common_name:
-          type: string
-          description: Common name
-        legal_name:
-          type: string
-          description: Legal name
-        incorporated_country_code:
-          type: string
-          description: Country of incorporation
-        domiciled_country_code:
-          type: string
-          description: Country of domicile
-        urls:
-          type: array
-          items:
-            $ref: '#/components/schemas/CompanyURL'
+        params:
+          description: Echoed request parameters
+          allOf:
+          - $ref: '#/components/schemas/OutputParams'
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/Pagination'
+        data:
+          description: List of events
+          allOf:
+          - $ref: '#/components/schemas/Event'
       type: object
-    EventTag:
+    Hierarchy:
       properties:
-        tag_id:
+        parent_event:
           type: integer
-          description: Tag ID
-        tag:
+          description: Parent event ID
+        child_event:
+          type: integer
+          description: Child event ID
+      type: object
+    Topic:
+      properties:
+        topic_id:
           type: string
-          description: Tag name
+          description: Topic ID
+        topic:
+          type: string
+          description: Topic
       type: object
     PriceData:
       properties:
@@ -1072,112 +1170,20 @@ components:
           allOf:
           - $ref: '#/components/schemas/SegmentPrice'
       type: object
-    Hierarchy:
+    Pagination:
       properties:
-        parent_event:
+        total_count:
           type: integer
-          description: Parent event ID
-        child_event:
+          description: Total number of results
+        current_page:
           type: integer
-          description: Child event ID
-      type: object
-    OutputParams:
-      properties:
-        page:
+          description: Current page number
+        total_pages:
           type: integer
-          description: Page number
+          description: Total number of pages
         page_size:
           type: integer
-          description: Page size
-        bloomberg_ticker:
-          type: string
-          description: Bloomberg ticker
-        isin:
-          type: string
-          description: ISIN
-        ric:
-          type: string
-          description: RIC
-        ticker:
-          type: string
-          description: Ticker symbol
-        permid:
-          type: string
-          description: PermID
-        sector_id:
-          type: integer
-          description: GICS sector ID
-        subsector_id:
-          type: integer
-          description: GICS sub-sector ID
-        search:
-          type: string
-          description: Search query
-        include_company_metadata:
-          type: boolean
-          description: Include company metadata
-        include_inactive:
-          type: boolean
-          description: Include inactive equities
-        include_sourcing:
-          type: boolean
-          description: Include sourcing information
-      type: object
-    Transcript:
-      properties:
-        speaker_id:
-          type: integer
-          description: Speaker ID
-        event_id:
-          type: integer
-          description: Event ID
-        transcript_item_id:
-          type: integer
-          description: Transcript item ID
-        start_ms:
-          type: integer
-          description: Milliseconds until start
-        start_timestamp:
-          type: string
-          format: date-time
-          description: Timestamp of segment start
-        duration_ms:
-          type: integer
-          description: Duration of the segment
-        transcript:
-          type: string
-          description: Transcript
-      type: object
-    ConnectionDetail:
-      properties:
-        transcription_status:
-          type: string
-          description: Transcription status
-          enum:
-          - agent_connected
-          - archived
-          - connected
-          - finished
-          - missed
-          - started
-          - submitted
-        webcast_status:
-          type: string
-          description: Webcast connection status
-        connected:
-          type: string
-          format: date-time
-          description: Connection timestamp
-        disconnected:
-          type: string
-          format: date-time
-          description: Disconnection timestamp
-        failure_code:
-          type: string
-          description: Failure code if connection failed
-        published_source:
-          type: string
-          description: Published transcript source
+          description: Number of results on this page
       type: object
     Equity:
       properties:
@@ -1254,232 +1260,69 @@ components:
           allOf:
           - $ref: '#/components/schemas/Company'
       type: object
-    TranscriptSpeaker:
+    OutputParams:
       properties:
-        speaker_id:
+        page:
           type: integer
-          description: Speaker ID
-        name:
-          type: string
-          description: Speaker name
-        title:
-          type: string
-          description: Speaker title
-        firm:
-          description: Firm ID
-          allOf:
-          - $ref: '#/components/schemas/Firm'
-      type: object
-    Summary:
-      properties:
-        title:
-          type: string
-          description: Title for the summary text (if applicable)
-        summary:
-          type: array
-          description: Summary text
-          items:
-            type: string
-        model:
-          type: string
-          description: Source of the summary
-        type:
-          type: string
-          description: Type of summary (presentation, Q&A, or whole-document)
-        version:
-          type: string
-          description: Version of the summary (live or published)
-        audio_clip:
-          type: string
-          description: Generated audio reading of the summary
-        video_clip:
-          type: string
-          description: Generated video reading of the summary
-        priority:
-          type: integer
-          description: Priority level of the summary
-        created:
-          type: string
-          format: date-time
-          description: Summary creation date
-        modified:
-          type: string
-          format: date-time
-          description: Summary modified date
-      type: object
-    Events:
-      properties:
-        params:
-          description: Echoed request parameters
-          allOf:
-          - $ref: '#/components/schemas/OutputParams'
-        pagination:
-          description: Pagination metadata
-          allOf:
-          - $ref: '#/components/schemas/Pagination'
-        data:
-          description: List of events
-          allOf:
-          - $ref: '#/components/schemas/Event'
-      type: object
-    Grouping:
-      properties:
-        grouping_id:
-          type: integer
-          description: Grouping ID
-        grouping_name:
-          type: string
-          description: Grouping name
-      type: object
-    Topic:
-      properties:
-        topic_id:
-          type: string
-          description: Topic ID
-        topic:
-          type: string
-          description: Topic
-      type: object
-    BasicEvent:
-      properties:
-        event_id:
-          type: integer
-          description: Event ID
-        title:
-          type: string
-          description: Event title
-        event_type:
-          type: string
-          description: Event type
-        event_date:
-          type: string
-          format: date-time
-          description: Event date
-        transcription_audio_url:
-          type: string
-          description: Event audio URL
-        transcription_audio_offset_seconds:
-          type: integer
-          description: Offset seconds from audio file
-        equity:
-          description: Event equity
-          allOf:
-          - $ref: '#/components/schemas/Equity'
-        transcripts:
-          description: Matched transcripts
-          allOf:
-          - $ref: '#/components/schemas/Transcript'
-      type: object
-    Linguistics:
-      properties:
-        summaries:
-          type: array
-          description: Summaries
-          items:
-            $ref: '#/components/schemas/Summary'
-        topics:
-          type: array
-          description: Topics
-          items:
-            $ref: '#/components/schemas/Topic'
-        auto_tags:
-          type: array
-          description: Auto-tags
-          items:
-            type: string
-        sentiment:
-          description: Sentiment
-          allOf:
-          - $ref: '#/components/schemas/Sentiment'
-        sentiment_breakouts:
-          type: array
-          description: Sentiment breakouts
-          items:
-            $ref: '#/components/schemas/SentimentBreakout'
-      type: object
-    CompanyURL:
-      properties:
-        url:
-          type: string
-          description: URL
-        url_type:
-          type: string
-          description: URL type
-          enum:
-          - facebook
-          - filings
-          - home
-          - instagram
-          - ir_events
-          - ir_home
-          - ir_news
-          - linkedin
-          - logo_icon
-          - twitter
-          - wikipedia
-          - youtube
-      type: object
-    Pagination:
-      properties:
-        total_count:
-          type: integer
-          description: Total number of results
-        current_page:
-          type: integer
-          description: Current page number
-        total_pages:
-          type: integer
-          description: Total number of pages
+          description: Page number
         page_size:
           type: integer
-          description: Number of results on this page
-      type: object
-    Sentiment:
-      properties:
-        average:
-          type: number
-          description: Average sentiment score
-        median:
-          type: number
-          description: Median sentiment score
-        minimum:
-          type: number
-          description: Minimum sentiment score
-        maximum:
-          type: number
-          description: Maximum sentiment score
-      type: object
-    Person:
-      properties:
-        person_id:
-          type: integer
-          description: Person ID
-        name:
+          description: Page size
+        bloomberg_ticker:
           type: string
-          description: Person name
-        parent_id:
+          description: Bloomberg ticker
+        isin:
+          type: string
+          description: ISIN
+        ric:
+          type: string
+          description: RIC
+        ticker:
+          type: string
+          description: Ticker symbol
+        permid:
+          type: string
+          description: PermID
+        sector_id:
           type: integer
-          description: Parent person ID (if merged)
-        representations:
-          description: Representations in transcripts
-          allOf:
-          - $ref: '#/components/schemas/TranscriptSpeaker'
-        events:
-          description: Events speaker found in
-          allOf:
-          - $ref: '#/components/schemas/BasicEvent'
+          description: GICS sector ID
+        subsector_id:
+          type: integer
+          description: GICS sub-sector ID
+        search:
+          type: string
+          description: Search query
+        include_company_metadata:
+          type: boolean
+          description: Include company metadata
+        include_inactive:
+          type: boolean
+          description: Include inactive equities
+        include_sourcing:
+          type: boolean
+          description: Include sourcing information
       type: object
-    Firm:
+    SegmentPrice:
       properties:
-        firm_id:
+        trade_time:
+          type: string
+          format: date-time
+          description: Trade timestamp
+        price:
+          type: number
+          description: Trade price
+        volume:
           type: integer
-          description: Firm ID
-        firm:
+          description: Trade volume
+      type: object
+    EventTag:
+      properties:
+        tag_id:
+          type: integer
+          description: Tag ID
+        tag:
           type: string
-          description: Firm name
-        domain:
-          type: string
-          description: Relevant domain
+          description: Tag name
       type: object
     Event:
       properties:
@@ -1716,6 +1559,163 @@ components:
           description: People/speakers data
           allOf:
           - $ref: '#/components/schemas/Person'
+      type: object
+    BasicEvent:
+      properties:
+        event_id:
+          type: integer
+          description: Event ID
+        title:
+          type: string
+          description: Event title
+        event_type:
+          type: string
+          description: Event type
+        event_date:
+          type: string
+          format: date-time
+          description: Event date
+        transcription_audio_url:
+          type: string
+          description: Event audio URL
+        transcription_audio_offset_seconds:
+          type: integer
+          description: Offset seconds from audio file
+        equity:
+          description: Event equity
+          allOf:
+          - $ref: '#/components/schemas/Equity'
+        transcripts:
+          description: Matched transcripts
+          allOf:
+          - $ref: '#/components/schemas/Transcript'
+      type: object
+    TranscriptSpeaker:
+      properties:
+        speaker_id:
+          type: integer
+          description: Speaker ID
+        name:
+          type: string
+          description: Speaker name
+        title:
+          type: string
+          description: Speaker title
+        firm:
+          description: Firm ID
+          allOf:
+          - $ref: '#/components/schemas/Firm'
+      type: object
+    Company:
+      properties:
+        company_id:
+          type: integer
+          description: Company ID
+        common_name:
+          type: string
+          description: Common name
+        legal_name:
+          type: string
+          description: Legal name
+        incorporated_country_code:
+          type: string
+          description: Country of incorporation
+        domiciled_country_code:
+          type: string
+          description: Country of domicile
+        urls:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompanyURL'
+      type: object
+    Linguistics:
+      properties:
+        summaries:
+          type: array
+          description: Summaries
+          items:
+            $ref: '#/components/schemas/Summary'
+        topics:
+          type: array
+          description: Topics
+          items:
+            $ref: '#/components/schemas/Topic'
+        auto_tags:
+          type: array
+          description: Auto-tags
+          items:
+            type: string
+        sentiment:
+          description: Sentiment
+          allOf:
+          - $ref: '#/components/schemas/Sentiment'
+        sentiment_breakouts:
+          type: array
+          description: Sentiment breakouts
+          items:
+            $ref: '#/components/schemas/SentimentBreakout'
+      type: object
+    Grouping:
+      properties:
+        grouping_id:
+          type: integer
+          description: Grouping ID
+        grouping_name:
+          type: string
+          description: Grouping name
+      type: object
+    ConnectionDetail:
+      properties:
+        transcription_status:
+          type: string
+          description: Transcription status
+          enum:
+          - agent_connected
+          - archived
+          - connected
+          - finished
+          - missed
+          - started
+          - submitted
+        webcast_status:
+          type: string
+          description: Webcast connection status
+        connected:
+          type: string
+          format: date-time
+          description: Connection timestamp
+        disconnected:
+          type: string
+          format: date-time
+          description: Disconnection timestamp
+        failure_code:
+          type: string
+          description: Failure code if connection failed
+        published_source:
+          type: string
+          description: Published transcript source
+      type: object
+    CompanyURL:
+      properties:
+        url:
+          type: string
+          description: URL
+        url_type:
+          type: string
+          description: URL type
+          enum:
+          - facebook
+          - filings
+          - home
+          - instagram
+          - ir_events
+          - ir_home
+          - ir_news
+          - linkedin
+          - logo_icon
+          - twitter
+          - wikipedia
+          - youtube
       type: object
     Error:
       type: object

@@ -160,6 +160,17 @@ paths:
       - Summaries
 components:
   schemas:
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
     Event3:
       type: object
       required:
@@ -275,17 +286,6 @@ components:
           $ref: '#/components/schemas/Event3'
         summary:
           $ref: '#/components/schemas/Summary'
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
     GetEventSummary:
       type: array
       items:

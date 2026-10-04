@@ -96,6 +96,17 @@ paths:
       - Dashboards
 components:
   schemas:
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
     Match:
       type: object
       properties:
@@ -143,17 +154,6 @@ components:
                         type: string
                       gics_sub_sector:
                         type: string
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

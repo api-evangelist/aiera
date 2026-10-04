@@ -334,15 +334,35 @@ paths:
                 $ref: '#/components/schemas/CalendarEvent'
 components:
   schemas:
-    CoverageResponse:
+    EstimatesResponse:
       properties:
-        counts:
-          description: Coverage counts and breakdowns
-          allOf:
-          - $ref: '#/components/schemas/CoverageCounts'
-        results:
+        params:
           type: object
-          description: Company details (when identifier filter is provided)
+          description: Echoed request parameters
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/CalendarPagination'
+        results:
+          type: array
+          description: List of estimates
+          items:
+            $ref: '#/components/schemas/EstimateItem'
+      type: object
+    CalendarPagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
       type: object
     CalendarEvent:
       properties:
@@ -424,62 +444,6 @@ components:
           format: date-time
           description: Modified date
       type: object
-    CalendarPagination:
-      properties:
-        total_count:
-          type: integer
-          description: Total number of results
-        current_page:
-          type: integer
-          description: Current page number
-        total_pages:
-          type: integer
-          description: Total number of pages
-        page_size:
-          type: integer
-          description: Number of results on this page
-      type: object
-    EstimatesResponse:
-      properties:
-        params:
-          type: object
-          description: Echoed request parameters
-        pagination:
-          description: Pagination metadata
-          allOf:
-          - $ref: '#/components/schemas/CalendarPagination'
-        results:
-          type: array
-          description: List of estimates
-          items:
-            $ref: '#/components/schemas/EstimateItem'
-      type: object
-    EstimateItem:
-      properties:
-        estimate_id:
-          type: integer
-          description: Estimate ID
-        created:
-          type: string
-          format: date-time
-          description: Created date
-        modified:
-          type: string
-          format: date-time
-          description: Modified date
-        equity:
-          description: Associated equity
-          allOf:
-          - $ref: '#/components/schemas/EstimateEquity'
-        estimate:
-          description: Estimated event details
-          allOf:
-          - $ref: '#/components/schemas/EstimateDetail'
-        actual:
-          description: Matched actual event, if any
-          allOf:
-          - $ref: '#/components/schemas/EstimateActual'
-      type: object
     CalendarEquity:
       properties:
         equity_id:
@@ -503,21 +467,6 @@ components:
         exchange_mic:
           type: string
           description: Exchange MIC
-      type: object
-    CalendarResponse:
-      properties:
-        params:
-          type: object
-          description: Echoed request parameters
-        pagination:
-          description: Pagination metadata
-          allOf:
-          - $ref: '#/components/schemas/CalendarPagination'
-        data:
-          type: array
-          description: List of events
-          items:
-            $ref: '#/components/schemas/CalendarEvent'
       type: object
     EstimateEquity:
       properties:
@@ -552,6 +501,34 @@ components:
           type: string
           description: GICS sub-sector name
       type: object
+    EstimateDetail:
+      properties:
+        call_type:
+          type: string
+          description: Estimated event type
+        call_date:
+          type: string
+          format: date-time
+          description: Estimated date
+        title:
+          type: string
+          description: Estimated event title
+      type: object
+    CalendarResponse:
+      properties:
+        params:
+          type: object
+          description: Echoed request parameters
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/CalendarPagination'
+        data:
+          type: array
+          description: List of events
+          items:
+            $ref: '#/components/schemas/CalendarEvent'
+      type: object
     EstimateActual:
       properties:
         event_id:
@@ -568,18 +545,15 @@ components:
           type: string
           description: Actual event title
       type: object
-    EstimateDetail:
+    CoverageResponse:
       properties:
-        call_type:
-          type: string
-          description: Estimated event type
-        call_date:
-          type: string
-          format: date-time
-          description: Estimated date
-        title:
-          type: string
-          description: Estimated event title
+        counts:
+          description: Coverage counts and breakdowns
+          allOf:
+          - $ref: '#/components/schemas/CoverageCounts'
+        results:
+          type: object
+          description: Company details (when identifier filter is provided)
       type: object
     CoverageCounts:
       properties:
@@ -604,6 +578,32 @@ components:
         subregions:
           type: object
           description: Count by subregion
+      type: object
+    EstimateItem:
+      properties:
+        estimate_id:
+          type: integer
+          description: Estimate ID
+        created:
+          type: string
+          format: date-time
+          description: Created date
+        modified:
+          type: string
+          format: date-time
+          description: Modified date
+        equity:
+          description: Associated equity
+          allOf:
+          - $ref: '#/components/schemas/EstimateEquity'
+        estimate:
+          description: Estimated event details
+          allOf:
+          - $ref: '#/components/schemas/EstimateDetail'
+        actual:
+          description: Matched actual event, if any
+          allOf:
+          - $ref: '#/components/schemas/EstimateActual'
       type: object
   securitySchemes:
     apiKeyHeader:

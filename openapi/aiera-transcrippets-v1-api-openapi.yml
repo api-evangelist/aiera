@@ -166,12 +166,6 @@ paths:
                 $ref: '#/components/schemas/TranscrippetDeleteResponse'
 components:
   schemas:
-    TranscrippetDeleteResponse:
-      properties:
-        success:
-          type: boolean
-          description: Whether the deletion was successful
-      type: object
     TranscrippetCreate:
       properties:
         transcrippet_id:
@@ -260,6 +254,12 @@ components:
         word_durations_ms:
           type: object
           description: List of word durations in milliseconds of the Transcrippet™ text
+      type: object
+    TranscrippetDeleteResponse:
+      properties:
+        success:
+          type: boolean
+          description: Whether the deletion was successful
       type: object
   securitySchemes:
     apiKeyHeader:

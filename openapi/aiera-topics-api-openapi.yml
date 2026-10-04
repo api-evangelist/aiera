@@ -247,6 +247,42 @@ paths:
       - Topics
 components:
   schemas:
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    Topics:
+      type: object
+      properties:
+        topic_id:
+          type: string
+        topic_name:
+          type: string
+    EquityTopics:
+      type: object
+      properties:
+        topic_id:
+          type: string
+        topic_name:
+          type: string
+        equity_count:
+          type: integer
+    EventTopics:
+      type: object
+      properties:
+        topic_id:
+          type: string
+        topic_name:
+          type: string
+        event_count:
+          type: integer
     EquityByTopicId:
       type: object
       properties:
@@ -263,33 +299,6 @@ components:
         gics_sector:
           type: string
         gics_sub_sector:
-          type: string
-    EventTopics:
-      type: object
-      properties:
-        topic_id:
-          type: string
-        topic_name:
-          type: string
-        event_count:
-          type: integer
-    Topics:
-      type: object
-      properties:
-        topic_id:
-          type: string
-        topic_name:
-          type: string
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
           type: string
     EventsByTopicId:
       type: object
@@ -322,15 +331,6 @@ components:
               type: string
             gics_sub_sector:
               type: string
-    EquityTopics:
-      type: object
-      properties:
-        topic_id:
-          type: string
-        topic_name:
-          type: string
-        equity_count:
-          type: integer
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

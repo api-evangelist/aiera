@@ -257,21 +257,6 @@ paths:
           description: Plain text document
 components:
   schemas:
-    FilingsResponse:
-      properties:
-        params:
-          type: object
-          description: Echoed request parameters
-        pagination:
-          description: Pagination metadata
-          allOf:
-          - $ref: '#/components/schemas/FilingPagination'
-        data:
-          type: array
-          description: List of filings
-          items:
-            $ref: '#/components/schemas/Filing'
-      type: object
     FilingPagination:
       properties:
         total_count:
@@ -286,6 +271,66 @@ components:
         page_size:
           type: integer
           description: Number of results on this page
+      type: object
+    FilingEquity:
+      properties:
+        equity_id:
+          type: integer
+          description: Equity ID
+        company_id:
+          type: integer
+          description: Company ID
+        name:
+          type: string
+          description: Equity name
+        common_name:
+          type: string
+          description: Common name
+        local_ticker:
+          type: string
+          description: Local ticker
+        mic:
+          type: string
+          description: Market identifier code
+        bloomberg_ticker:
+          type: string
+          description: Bloomberg ticker
+        isin:
+          type: string
+          description: ISIN
+        permid:
+          type: string
+          description: PermID
+      type: object
+    FilingDatafile:
+      properties:
+        file_type:
+          type: string
+          description: File type (e.g. xml, xsd)
+        description:
+          type: string
+          description: File description
+        origin:
+          type: string
+          description: Original source URL
+        url:
+          type: string
+          description: Proxied download URL
+      type: object
+    FilingsResponse:
+      properties:
+        params:
+          type: object
+          description: Echoed request parameters
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/FilingPagination'
+        data:
+          type: array
+          description: List of filings
+          items:
+            $ref: '#/components/schemas/Filing'
       type: object
     Filing:
       properties:
@@ -353,51 +398,6 @@ components:
           description: Associated datafiles
           items:
             $ref: '#/components/schemas/FilingDatafile'
-      type: object
-    FilingDatafile:
-      properties:
-        file_type:
-          type: string
-          description: File type (e.g. xml, xsd)
-        description:
-          type: string
-          description: File description
-        origin:
-          type: string
-          description: Original source URL
-        url:
-          type: string
-          description: Proxied download URL
-      type: object
-    FilingEquity:
-      properties:
-        equity_id:
-          type: integer
-          description: Equity ID
-        company_id:
-          type: integer
-          description: Company ID
-        name:
-          type: string
-          description: Equity name
-        common_name:
-          type: string
-          description: Common name
-        local_ticker:
-          type: string
-          description: Local ticker
-        mic:
-          type: string
-          description: Market identifier code
-        bloomberg_ticker:
-          type: string
-          description: Bloomberg ticker
-        isin:
-          type: string
-          description: ISIN
-        permid:
-          type: string
-          description: PermID
       type: object
   securitySchemes:
     apiKeyHeader:
