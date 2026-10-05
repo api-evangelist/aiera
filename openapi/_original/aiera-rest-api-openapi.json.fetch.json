@@ -1,0 +1,12 @@
+{
+ "url": "https://premium.aiera.com/api/swagger.json",
+ "requested_url": "https://premium.aiera.com/api/swagger.json",
+ "status": 200,
+ "content_type": "application/json",
+ "bytes": 140333,
+ "sha256": "9efd8aa7534cb02097eadee87f66ebb0ffaa16d1c22dacd23603ecd93f5cbc4e",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "equivalent",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the provider's current document describes the same operations (Jaccard 1.0), but the bytes differ, so the archive is an earlier or reformatted copy."
+}
