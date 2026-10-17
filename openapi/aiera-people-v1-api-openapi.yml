@@ -110,7 +110,7 @@ paths:
           description: Person not found
 components:
   schemas:
-    PersonListItem:
+    Person:
       properties:
         person_id:
           type: integer
@@ -121,21 +121,111 @@ components:
         parent_id:
           type: integer
           description: Parent person ID (if merged)
+        representations:
+          description: Representations in transcripts
+          allOf:
+          - $ref: '#/components/schemas/TranscriptSpeaker'
+        events:
+          description: Events speaker found in
+          allOf:
+          - $ref: '#/components/schemas/BasicEvent'
       type: object
-    Pagination:
+    Company:
       properties:
-        total_count:
+        company_id:
           type: integer
-          description: Total number of results
-        current_page:
+          description: Company ID
+        common_name:
+          type: string
+          description: Common name
+        legal_name:
+          type: string
+          description: Legal name
+        incorporated_country_code:
+          type: string
+          description: Country of incorporation
+        domiciled_country_code:
+          type: string
+          description: Country of domicile
+        urls:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompanyURL'
+      type: object
+    TranscriptSpeaker:
+      properties:
+        speaker_id:
           type: integer
-          description: Current page number
-        total_pages:
+          description: Speaker ID
+        name:
+          type: string
+          description: Speaker name
+        title:
+          type: string
+          description: Speaker title
+        firm:
+          description: Firm ID
+          allOf:
+          - $ref: '#/components/schemas/Firm'
+      type: object
+    Transcript:
+      properties:
+        speaker_id:
           type: integer
-          description: Total number of pages
-        page_size:
+          description: Speaker ID
+        event_id:
           type: integer
-          description: Number of results on this page
+          description: Event ID
+        transcript_item_id:
+          type: integer
+          description: Transcript item ID
+        start_ms:
+          type: integer
+          description: Milliseconds until start
+        start_timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of segment start
+        duration_ms:
+          type: integer
+          description: Duration of the segment
+        transcript:
+          type: string
+          description: Transcript
+      type: object
+    Firm:
+      properties:
+        firm_id:
+          type: integer
+          description: Firm ID
+        firm:
+          type: string
+          description: Firm name
+        domain:
+          type: string
+          description: Relevant domain
+      type: object
+    CompanyURL:
+      properties:
+        url:
+          type: string
+          description: URL
+        url_type:
+          type: string
+          description: URL type
+          enum:
+          - facebook
+          - filings
+          - home
+          - instagram
+          - ir_events
+          - ir_home
+          - ir_news
+          - linkedin
+          - logo_icon
+          - twitter
+          - wikipedia
+          - youtube
       type: object
     Equity:
       properties:
@@ -212,37 +302,20 @@ components:
           allOf:
           - $ref: '#/components/schemas/Company'
       type: object
-    Person:
+    Pagination:
       properties:
-        person_id:
+        total_count:
           type: integer
-          description: Person ID
-        name:
-          type: string
-          description: Person name
-        parent_id:
+          description: Total number of results
+        current_page:
           type: integer
-          description: Parent person ID (if merged)
-        representations:
-          description: Representations in transcripts
-          allOf:
-          - $ref: '#/components/schemas/TranscriptSpeaker'
-        events:
-          description: Events speaker found in
-          allOf:
-          - $ref: '#/components/schemas/BasicEvent'
-      type: object
-    Firm:
-      properties:
-        firm_id:
+          description: Current page number
+        total_pages:
           type: integer
-          description: Firm ID
-        firm:
-          type: string
-          description: Firm name
-        domain:
-          type: string
-          description: Relevant domain
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
       type: object
     BasicEvent:
       properties:
@@ -286,90 +359,17 @@ components:
           items:
             $ref: '#/components/schemas/PersonListItem'
       type: object
-    Transcript:
+    PersonListItem:
       properties:
-        speaker_id:
+        person_id:
           type: integer
-          description: Speaker ID
-        event_id:
-          type: integer
-          description: Event ID
-        transcript_item_id:
-          type: integer
-          description: Transcript item ID
-        start_ms:
-          type: integer
-          description: Milliseconds until start
-        start_timestamp:
-          type: string
-          format: date-time
-          description: Timestamp of segment start
-        duration_ms:
-          type: integer
-          description: Duration of the segment
-        transcript:
-          type: string
-          description: Transcript
-      type: object
-    TranscriptSpeaker:
-      properties:
-        speaker_id:
-          type: integer
-          description: Speaker ID
+          description: Person ID
         name:
           type: string
-          description: Speaker name
-        title:
-          type: string
-          description: Speaker title
-        firm:
-          description: Firm ID
-          allOf:
-          - $ref: '#/components/schemas/Firm'
-      type: object
-    CompanyURL:
-      properties:
-        url:
-          type: string
-          description: URL
-        url_type:
-          type: string
-          description: URL type
-          enum:
-          - facebook
-          - filings
-          - home
-          - instagram
-          - ir_events
-          - ir_home
-          - ir_news
-          - linkedin
-          - logo_icon
-          - twitter
-          - wikipedia
-          - youtube
-      type: object
-    Company:
-      properties:
-        company_id:
+          description: Person name
+        parent_id:
           type: integer
-          description: Company ID
-        common_name:
-          type: string
-          description: Common name
-        legal_name:
-          type: string
-          description: Legal name
-        incorporated_country_code:
-          type: string
-          description: Country of incorporation
-        domiciled_country_code:
-          type: string
-          description: Country of domicile
-        urls:
-          type: array
-          items:
-            $ref: '#/components/schemas/CompanyURL'
+          description: Parent person ID (if merged)
       type: object
   securitySchemes:
     apiKeyHeader:

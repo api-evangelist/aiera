@@ -171,6 +171,10 @@ components:
           format: int32
         message:
           type: string
+    GetEventSummary:
+      type: array
+      items:
+        $ref: '#/components/schemas/Summaries'
     Event3:
       type: object
       required:
@@ -252,6 +256,13 @@ components:
           type: string
         modified:
           type: string
+    Summaries:
+      type: object
+      properties:
+        events:
+          $ref: '#/components/schemas/Event3'
+        summary:
+          $ref: '#/components/schemas/Summary'
     Summary:
       type: object
       properties:
@@ -279,17 +290,6 @@ components:
         modified:
           type: string
           format: date-time
-    Summaries:
-      type: object
-      properties:
-        events:
-          $ref: '#/components/schemas/Event3'
-        summary:
-          $ref: '#/components/schemas/Summary'
-    GetEventSummary:
-      type: array
-      items:
-        $ref: '#/components/schemas/Summaries'
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

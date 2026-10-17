@@ -142,20 +142,38 @@ paths:
                 $ref: '#/components/schemas/ExpertEventDetail'
 components:
   schemas:
-    ExpertPagination:
+    ExpertEvent:
       properties:
-        total_count:
-          type: integer
-          description: Total number of results
-        current_page:
-          type: integer
-          description: Current page number
-        total_pages:
-          type: integer
-          description: Total number of pages
-        page_size:
-          type: integer
-          description: Number of results on this page
+        event_id:
+          type: string
+          description: Provider event ID
+        content_type:
+          type: string
+          description: Content type
+          enum:
+          - COMMUNITY
+          - FORUM
+          - PRIMER
+        call_date:
+          type: string
+          format: date-time
+          description: Call date
+        title:
+          type: string
+          description: Event title
+        language:
+          type: string
+          description: Content language
+        agenda:
+          type: array
+          description: Agenda items
+          items:
+            type: string
+        insights:
+          type: array
+          description: Key insights
+          items:
+            type: string
       type: object
     ExpertEventDetail:
       properties:
@@ -203,50 +221,11 @@ components:
           type: string
           description: Full transcript text
       type: object
-    ExpertCompany:
+    ExpertStatus:
       properties:
-        name:
+        status:
           type: string
-          description: Company name
-        ticker:
-          type: string
-          description: Company ticker
-        exchange:
-          type: string
-          description: Exchange name
-      type: object
-    ExpertEvent:
-      properties:
-        event_id:
-          type: string
-          description: Provider event ID
-        content_type:
-          type: string
-          description: Content type
-          enum:
-          - COMMUNITY
-          - FORUM
-          - PRIMER
-        call_date:
-          type: string
-          format: date-time
-          description: Call date
-        title:
-          type: string
-          description: Event title
-        language:
-          type: string
-          description: Content language
-        agenda:
-          type: array
-          description: Agenda items
-          items:
-            type: string
-        insights:
-          type: array
-          description: Key insights
-          items:
-            type: string
+          description: Service status
       type: object
     ExpertEventsResponse:
       properties:
@@ -263,12 +242,6 @@ components:
           items:
             $ref: '#/components/schemas/ExpertEvent'
       type: object
-    ExpertStatus:
-      properties:
-        status:
-          type: string
-          description: Service status
-      type: object
     ExpertBiography:
       properties:
         name:
@@ -277,6 +250,33 @@ components:
         biography:
           type: string
           description: Expert biography text
+      type: object
+    ExpertPagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
+      type: object
+    ExpertCompany:
+      properties:
+        name:
+          type: string
+          description: Company name
+        ticker:
+          type: string
+          description: Company ticker
+        exchange:
+          type: string
+          description: Exchange name
       type: object
   securitySchemes:
     apiKeyHeader:

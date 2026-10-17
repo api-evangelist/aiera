@@ -204,17 +204,6 @@ paths:
       - Content
 components:
   schemas:
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
     News:
       type: object
       properties:
@@ -230,6 +219,17 @@ components:
           type: string
           format: date-time
         url:
+          type: string
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
           type: string
     Filings:
       type: object

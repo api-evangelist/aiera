@@ -258,48 +258,6 @@ components:
           format: int32
         message:
           type: string
-    Topics:
-      type: object
-      properties:
-        topic_id:
-          type: string
-        topic_name:
-          type: string
-    EquityTopics:
-      type: object
-      properties:
-        topic_id:
-          type: string
-        topic_name:
-          type: string
-        equity_count:
-          type: integer
-    EventTopics:
-      type: object
-      properties:
-        topic_id:
-          type: string
-        topic_name:
-          type: string
-        event_count:
-          type: integer
-    EquityByTopicId:
-      type: object
-      properties:
-        equity_id:
-          type: integer
-        local_ticker:
-          type: string
-        mic:
-          type: string
-        bloomberg_ticker:
-          type: string
-        isin:
-          type: string
-        gics_sector:
-          type: string
-        gics_sub_sector:
-          type: string
     EventsByTopicId:
       type: object
       properties:
@@ -331,6 +289,48 @@ components:
               type: string
             gics_sub_sector:
               type: string
+    EventTopics:
+      type: object
+      properties:
+        topic_id:
+          type: string
+        topic_name:
+          type: string
+        event_count:
+          type: integer
+    EquityTopics:
+      type: object
+      properties:
+        topic_id:
+          type: string
+        topic_name:
+          type: string
+        equity_count:
+          type: integer
+    Topics:
+      type: object
+      properties:
+        topic_id:
+          type: string
+        topic_name:
+          type: string
+    EquityByTopicId:
+      type: object
+      properties:
+        equity_id:
+          type: integer
+        local_ticker:
+          type: string
+        mic:
+          type: string
+        bloomberg_ticker:
+          type: string
+        isin:
+          type: string
+        gics_sector:
+          type: string
+        gics_sub_sector:
+          type: string
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

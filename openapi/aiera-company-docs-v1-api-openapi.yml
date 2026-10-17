@@ -437,6 +437,83 @@ paths:
           description: Plain text document
 components:
   schemas:
+    CoverageCounts:
+      properties:
+        companies:
+          type: integer
+          description: Number of companies covered
+        equities:
+          type: integer
+          description: Number of equities covered
+        gics_sectors:
+          type: object
+          description: Count by GICS sector
+        gics_subsectors:
+          type: object
+          description: Count by GICS sub-sector
+        countries:
+          type: object
+          description: Count by country
+        regions:
+          type: object
+          description: Count by region
+        subregions:
+          type: object
+          description: Count by subregion
+      type: object
+    DocPagination:
+      properties:
+        total_count:
+          type: integer
+          description: Total number of results
+        current_page:
+          type: integer
+          description: Current page number
+        total_pages:
+          type: integer
+          description: Total number of pages
+        page_size:
+          type: integer
+          description: Number of results on this page
+      type: object
+    KeywordsResponse:
+      properties:
+        pagination:
+          description: Pagination metadata
+          allOf:
+          - $ref: '#/components/schemas/DocPagination'
+        data:
+          type: object
+          description: Map of keyword to document count
+      type: object
+    DocCompany:
+      properties:
+        company_id:
+          type: integer
+          description: Company ID
+        common_name:
+          type: string
+          description: Common name
+        legal_name:
+          type: string
+          description: Legal name
+        incorporated_country_code:
+          type: string
+          description: Country of incorporation
+        domiciled_country_code:
+          type: string
+          description: Country of domicile
+      type: object
+    CoverageResponse:
+      properties:
+        counts:
+          description: Coverage counts and breakdowns
+          allOf:
+          - $ref: '#/components/schemas/CoverageCounts'
+        results:
+          type: object
+          description: Company details (when identifier filter is provided)
+      type: object
     DocsResponse:
       properties:
         params:
@@ -461,16 +538,6 @@ components:
         data:
           type: object
           description: Map of category name to document count
-      type: object
-    CoverageResponse:
-      properties:
-        counts:
-          description: Coverage counts and breakdowns
-          allOf:
-          - $ref: '#/components/schemas/CoverageCounts'
-        results:
-          type: object
-          description: Company details (when identifier filter is provided)
       type: object
     DocItem:
       properties:
@@ -532,73 +599,6 @@ components:
           type: string
           format: date-time
           description: Modified date
-      type: object
-    DocCompany:
-      properties:
-        company_id:
-          type: integer
-          description: Company ID
-        common_name:
-          type: string
-          description: Common name
-        legal_name:
-          type: string
-          description: Legal name
-        incorporated_country_code:
-          type: string
-          description: Country of incorporation
-        domiciled_country_code:
-          type: string
-          description: Country of domicile
-      type: object
-    DocPagination:
-      properties:
-        total_count:
-          type: integer
-          description: Total number of results
-        current_page:
-          type: integer
-          description: Current page number
-        total_pages:
-          type: integer
-          description: Total number of pages
-        page_size:
-          type: integer
-          description: Number of results on this page
-      type: object
-    CoverageCounts:
-      properties:
-        companies:
-          type: integer
-          description: Number of companies covered
-        equities:
-          type: integer
-          description: Number of equities covered
-        gics_sectors:
-          type: object
-          description: Count by GICS sector
-        gics_subsectors:
-          type: object
-          description: Count by GICS sub-sector
-        countries:
-          type: object
-          description: Count by country
-        regions:
-          type: object
-          description: Count by region
-        subregions:
-          type: object
-          description: Count by subregion
-      type: object
-    KeywordsResponse:
-      properties:
-        pagination:
-          description: Pagination metadata
-          allOf:
-          - $ref: '#/components/schemas/DocPagination'
-        data:
-          type: object
-          description: Map of keyword to document count
       type: object
   securitySchemes:
     apiKeyHeader:
