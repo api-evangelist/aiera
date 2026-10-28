@@ -64,45 +64,147 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Aiera is a financial research technology company providing real-time and historical intelligence on
-public-company events. Its platform covers earnings calls, investor days, conferences and shareholder
-meetings with live AI transcription plus human-edited transcripts, layered with AI-generated summaries,
-topic and tonal-sentiment analysis, SEC filings, company-published documents, broker research,
-expert-insight content (including Third Bridge) and financial news.
+Aiera is a New York-based financial research technology company that provides real-time and historical intelligence on public-company events. Its platform covers earnings calls, investor days, conferences and shareholder meetings with live AI transcription plus human-edited transcripts, and layers on AI-generated summaries, topic and tonal-sentiment analysis, SEC filings, company-published documents, broker research, expert-insight content (including Third Bridge) and financial news. Aiera exposes that corpus to buy-side and sell-side institutions through an entitlement-aware REST API, a hosted remote MCP server for LLM and agentic workflows, embeddable web components (AieraChat, Aieracast, EventList), and an open-source Python MCP package.
 
-## API surface
+**Areas:** Financial Research · Earnings Calls · Transcripts · SEC Filings · Market Data · Financial Data · Broker Research · Expert Networks · Speech-to-Text · Financial Services · MCP · Agent-Native
 
-| Surface | Where | Auth |
-|---|---|---|
-| Aiera REST API | `https://premium.aiera.com/api` — docs at https://rest.aiera.com/ | `X-API-Key` header (or `api_key` query) |
-| Aiera MCP Server | `https://mcp-pub.aiera.com/` | OAuth 2.1 (Cognito, PKCE, dynamic client registration) or `api_key` query |
-| Embedded components | `https://public.aiera.com/aiera-sdk/0.0.81/` | public, domain-white-listed API key |
+## Aiera on APIs.io
 
-## Contracts captured
+Everything profiled for Aiera is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/aiera/](https://apis.io/providers/aiera/)** — or go straight to one of the APIs or properties below.
 
-- `openapi/aiera-rest-api-openapi.json` — OpenAPI 3.0.3, 50 paths / 53 operations, served live at
-  `https://premium.aiera.com/api/swagger.json`.
-- `openapi/aiera-unified-openapi.yaml` and three companions — OpenAPI 3.1.0, published by Aiera at
-  https://github.com/aiera-inc/aiera-rest-openapi.
+### APIs (22)
 
-The two spec families share exactly one path. Together they describe 78 distinct paths.
+- [Aiera MCP Server](https://apis.io/apis/aiera/aiera-mcp-server/) — Aiera's hosted remote Model Context Protocol server, exposing the financial research corpus to LLMs and agentic workflows as roughly three dozen specialized…
+- [Aiera Calendar API](https://apis.io/apis/aiera/aiera-calendar-api/) — The Calendar API from Aiera — 3 operation(s) for calendar.
+- [Aiera Calendar v2 API](https://apis.io/apis/aiera/aiera-calendar-v2-api/) — Event calendar, coverage, and estimates
+- [Aiera Calendars v1 API](https://apis.io/apis/aiera/aiera-calendars-v1-api/) — iCal calendar subscriptions
+- [Aiera Chat v1 API](https://apis.io/apis/aiera/aiera-chat-v1-api/) — AieraChat
+- [Aiera Companies v1 API](https://apis.io/apis/aiera/aiera-companies-v1-api/) — Company information and lookup
+- [Aiera Company Docs v1 API](https://apis.io/apis/aiera/aiera-company-docs-v1-api/) — Company-published documents
+- [Aiera Content API](https://apis.io/apis/aiera/aiera-content-api/) — The Content API from Aiera — 2 operation(s) for content.
+- [Aiera Corporate Activity API](https://apis.io/apis/aiera/aiera-corporate-activity-api/) — The Corporate Activity API from Aiera — 4 operation(s) for corporate activity.
+- [Aiera Dashboards API](https://apis.io/apis/aiera/aiera-dashboards-api/) — The Dashboards API from Aiera — 1 operation(s) for dashboards.
+- [Aiera Equities V2 API](https://apis.io/apis/aiera/aiera-equities-v2-api/) — The Equities V2 API from Aiera — 7 operation(s) for equities v2.
+- [Aiera Events API](https://apis.io/apis/aiera/aiera-events-api/) — The Events API from Aiera — 3 operation(s) for events.
+- [Aiera Events v2 API](https://apis.io/apis/aiera/aiera-events-v2-api/) — Event data and transcripts
+- [Aiera Expert Access v1 API](https://apis.io/apis/aiera/aiera-expert-access-v1-api/) — Third-party expert insights content
+- [Aiera Filings v1 API](https://apis.io/apis/aiera/aiera-filings-v1-api/) — SEC regulatory filings
+- [Aiera People v1 API](https://apis.io/apis/aiera/aiera-people-v1-api/) — People and speaker lookup
+- [Aiera Summaries API](https://apis.io/apis/aiera/aiera-summaries-api/) — The Summaries API from Aiera — 3 operation(s) for summaries.
+- [Aiera Topics API](https://apis.io/apis/aiera/aiera-topics-api/) — The Topics API from Aiera — 6 operation(s) for topics.
+- [Aiera Transcrippets API](https://apis.io/apis/aiera/aiera-transcrippets-api/) — The Transcrippets API from Aiera — 1 operation(s) for transcrippets.
+- [Aiera Transcrippets v1 API](https://apis.io/apis/aiera/aiera-transcrippets-v1-api/) — Shareable transcript snippets
+- [Aiera User Admin v1 API](https://apis.io/apis/aiera/aiera-user-admin-v1-api/) — Organization user management
+- [Aiera Users v1 API](https://apis.io/apis/aiera/aiera-users-v1-api/) — User entitlements and permissions
 
-## Notable findings
+### Published properties
 
-- **The MCP surface and the REST contract are only partly overlapping projections of the same corpus.**
-  25 of Aiera's 39 MCP tools have no operation in either published spec — financials, ratios, KPIs and
-  segments, indexes, watchlists, conferences, all four embedding-based semantic search tools, and the
-  entire broker-research family. See `mcp/aiera-tool-crosswalk.yml`.
-- **The data model speaks capital-markets standards natively** — ISIN (ISO 6166), MIC (ISO 10383),
-  CUSIP, GICS, PermID and RIC are first-class lookup keys, and SEC filings are addressed by EDGAR form
-  number. See `conformance/aiera-conformance.yml`.
-- **The MCP server publishes a complete OAuth 2.1 discovery stack** (RFC 8414 + RFC 9728 + PKCE +
-  RFC 7591 dynamic client registration), which is what lets the Claude and ChatGPT connector
-  directories register against it.
-- **Gaps:** no idempotency mechanism on any of the four mutating operations, no published rate limits
-  or 429, no declared error body schema, no deprecation policy, no changelog, and no published pricing.
-- Aiera's REST documentation carries a banner announcing it is being deprecated in favour of
-  https://platform.aiera.com, with no date and no migration mapping. The replacement docs host is a
-  client-rendered SPA that serves the same HTML shell for every path.
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-- https://aiera.com/
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [Aiera MCP Server](https://apis.io/servers/aiera/aiera-mcp-server/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Aiera Rest Api Overlay](https://apis.io/overlays/aiera/aiera-rest-api-overlay/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Aiera Authentication](https://apis.io/security/aiera/aiera-authentication/)
+- [Aiera Domain Security](https://apis.io/security/aiera/aiera-domain-security/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Aiera Scopes](https://apis.io/scopes/aiera/aiera-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Aiera Plans Pricing](https://apis.io/plans/aiera/aiera-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Aiera Rate Limits](https://apis.io/rate-limits/aiera/aiera-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://aiera.com/)
+- [Documentation](https://rest.aiera.com/)
+- [Getting started](https://rest.aiera.com/#quick-start)
+- [API reference](https://rest.aiera.com/docs/authentication)
+- [Sign up](https://dashboard.aiera.com/auth)
+- [Support](https://support.aiera.com/hc/en-us)
+- [Blog](https://aiera.com/newsroom/)
+- [Terms of service](https://aiera.com/terms-of-service/)
+- [Privacy policy](https://aiera.com/privacy-policy/)
+- [GitHub](https://github.com/aiera-inc)
+- [Status](https://status.aiera.com/)
+
+## API Evangelist rating
+
+**Kin Score 40.9** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 80.0 |
+| Contract quality | 51.4 |
+| Contract governance | 4.5 |
+| Operational transparency | 10.5 |
+| Developer ergonomics | 60.1 |
+| Access clarity | 21.1 |
+
+**Agent readiness 41.5** — agent-ready (gated down from agent-native)
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | documented (partial credit) |
+| Auth Clarity | served (partial credit) |
+| Idempotency | — |
+| Error Semantics | derived (partial credit) |
+| OpenAPI Examples | partial |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | verified |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+| Pagination Ratio | — |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 38.0** — Securities & Market Data
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/aiera/](https://apis.io/providers/aiera/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Aiera: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/aiera/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
